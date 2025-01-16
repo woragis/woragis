@@ -29,5 +29,5 @@ Here are some ideas to get you started:
 <a href="https://www.leetcode.com/woragis" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/leet-code.svg" alt="woragis" height="30" width="40" /></a>
 </p>
 
-<p><img align="center" src="https://github-readme-streak-stats.herokuapp.com/?user=woragis&" alt="woragis" /></p>
-
+<!-- <p><img align="center" src="https://github-readme-streak-stats.herokuapp.com/?user=woragis&" alt="woragis" /></p> -->
+[![GitHub Streak](https://github-readme-streak-stats.herokuapp.com?user=woragis&hide_border=true)](https://git.io/streak-stats)
