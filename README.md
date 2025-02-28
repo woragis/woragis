@@ -20,11 +20,27 @@ Here are some ideas to get you started:
 
 - 🌱 I’m currently learning **Backend and Database Fundamentals**
 
-<h3 align="left">Connect with me:</h3>
-<p align="left">
-<a href="https://linkedin.com/in/jezreel-andrade" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="jezreel-andrade" height="30" width="40" /></a>
-<a href="https://instagram.com/y.jezreel.andrade" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/instagram.svg" alt="y.jezreel.andrade" height="30" width="40" /></a>
-<a href="https://www.leetcode.com/woragis" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/leet-code.svg" alt="woragis" height="30" width="40" /></a>
+<h3 align="left">Talk to me :)</h3>
+<p>
+  <a href="https://instagram.com/y.jezreel.andrade">
+    <img
+      src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"
+      alt="whatsapp link" />
+  </a>
+<!-- </p> -->
+<!-- <p> -->
+  <br />
+  <a href="https://instagram.com/y.jezreel.andrade">
+    <img
+      src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white"
+      alt="telegram link" />
+  </a>
+  <br />
+  <a href="https://instagram.com/y.jezreel.andrade">
+    <img
+      src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white"
+      alt="gmail link" />
+  </a>
 </p>
 
 <!-- Tools Section -->
