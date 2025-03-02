@@ -20,7 +20,7 @@ Here are some ideas to get you started:
 
 - 🌱 I’m currently learning **Backend and Database Fundamentals**
 
-<h3 align="left">Talk to me :)</h3>
+<h3 align="left">Talk to me 😁</h3>
 <p>
   <a href="https://instagram.com/y.jezreel.andrade">
     <img
