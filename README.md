@@ -20,6 +20,23 @@ Here are some ideas to get you started:
 
 - 🌱 I’m currently learning **Backend and Database Fundamentals**
 
+### Experiência de trabalho
+
+Na visão geral abaixo você encontrará minha experiência de trabalho mais recente:
+
+[<img align="left" height="94px" width="94px" alt="Warpnet" src="https://www.spacex.com/static/images/share.jpg"/>](https://www.spacex.com/)
+
+**Fullstack Developer (Jr)** \
+[**LizardTi**](https://www.google.com/) • Part-time \
+Linguagens & Tecnologias: `Python`, `Django`, `JavaScript`, `TypeScript`, `React`\
+Projetos em destaque: [Rocket](https://www.spacex.com/), [Marte](<https://pt.wikipedia.org/wiki/Marte_(planeta)>)
+<br/>
+
+<br/>
+
+Por favor, encontre-me no [LinkedIn](https://www.linkedin.com/in/iuricode/) para uma descrição mais detalhada da minha experiência de trabalho, educação e certificação.
+
+
 <h3 align="left">Talk to me 😁</h3>
 <p>
   <a href="https://instagram.com/y.jezreel.andrade">
