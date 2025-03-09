@@ -41,6 +41,18 @@ Here are some ideas to get you started:
       src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white"
       alt="gmail link" />
   </a>
+  <br />
+  <a href="https://instagram.com/y.jezreel.andrade">
+    <img
+      src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white"
+      alt="gmail link" />
+  </a>
+  <br />
+  <a href="https://instagram.com/y.jezreel.andrade">
+    <img
+      src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white"
+      alt="gmail link" />
+  </a>
 </p>
 
 <!-- Tools Section -->
