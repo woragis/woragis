@@ -36,40 +36,14 @@ Projetos em destaque: [...](https://www.google.com/), [...](<https://pt.wikipedi
 
 Por favor, encontre-me no [LinkedIn](https://www.linkedin.com/in/jezreel-andrade/) para uma descrição mais detalhada da minha experiência de trabalho, educação e certificação.
 
-
-<h3 align="left">Talk to me 😁</h3>
+<!-- Social Media Section -->
+<h3 align="left">My Social Media 😁</h3>
 <p>
-  <a href="https://instagram.com/y.jezreel.andrade">
-    <img
-      src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"
-      alt="whatsapp link" />
-  </a>
-<!-- </p> -->
-<!-- <p> -->
-  <br />
-  <a href="https://instagram.com/y.jezreel.andrade">
-    <img
-      src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white"
-      alt="telegram link" />
-  </a>
-  <br />
-  <a href="https://instagram.com/y.jezreel.andrade">
-    <img
-      src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white"
-      alt="gmail link" />
-  </a>
-  <br />
-  <a href="https://instagram.com/y.jezreel.andrade">
-    <img
-      src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white"
-      alt="gmail link" />
-  </a>
-  <br />
-  <a href="https://instagram.com/y.jezreel.andrade">
-    <img
-      src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white"
-      alt="gmail link" />
-  </a>
+  <code><a href="https://instagram.com/y.jezreel.andrade"><img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="whatsapp link" /></a></code>
+  <code><a href="https://instagram.com/y.jezreel.andrade"><img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="telegram link" /></a></code>
+  <code><a href="https://instagram.com/y.jezreel.andrade"><img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="gmail link" /></a></code>
+  <code><a href="https://instagram.com/y.jezreel.andrade"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="gmail link" /></a></code>
+  <code><a href="https://instagram.com/y.jezreel.andrade"><img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="gmail link" /></a></code>
 </p>
 
 <!-- Tools Section -->
