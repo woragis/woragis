@@ -20,7 +20,7 @@ Here are some ideas to get you started:
 
 - 🌱 I’m currently learning **Backend and Database Fundamentals**
 
-### Experiência de trabalho
+### Work Experience
 
 Na visão geral abaixo você encontrará minha experiência de trabalho mais recente:
 
@@ -29,7 +29,7 @@ Na visão geral abaixo você encontrará minha experiência de trabalho mais rec
 **Fullstack Developer (Jr)** \
 [**LizardTi**](https://www.google.com/) • Part-time \
 Linguagens & Tecnologias: `Python`, `Django`, `JavaScript`, `TypeScript`, `React`\
-Projetos em destaque: [...](https://www.google.com/), [...](<https://pt.wikipedia.org/wiki/Marte_(planeta)>)
+Projetos em destaque: [...(development phase)](https://www.google.com/)
 <br/>
 
 <br/>
