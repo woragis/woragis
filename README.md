@@ -57,33 +57,11 @@ Por favor, encontre-me no [LinkedIn](https://www.linkedin.com/in/jezreel-andrade
   <code><img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="Typescript backend language" /></code>
 </p>
 
-<!-- Tools Section -->
-<h3 align="left">General use Tools</h3>
-
+<!-- Devops -->
+<h3 align="left">Devops Tools</h3>
 <p align="left">
-  <!-- Bash Icon -->
-  <a href="https://www.gnu.org/software/bash/" target="_blank" rel="noreferrer">
-    <img src="https://www.vectorlogo.zone/logos/gnu_bash/gnu_bash-icon.svg" alt="bash" width="40" height="40"/>
-  </a>
-
-  <!-- Docker Icon -->
-  <a href="https://www.docker.com/" target="_blank" rel="noreferrer">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original-wordmark.svg" alt="docker" width="40" height="40"/>
-  </a>
-
-  <!-- Git Icon -->
-  <a href="https://git-scm.com/" target="_blank" rel="noreferrer">
-    <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40"/>
-  </a>
-
-  <!-- Linux Icon -->
-  <a href="https://www.linux.org/" target="_blank" rel="noreferrer">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/linux/linux-original.svg" alt="linux" width="40" height="40"/>
-  </a>
-
-  <!-- Nginx Icon -->
-  <a href="https://www.nginx.com" target="_blank" rel="noreferrer">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nginx/nginx-original.svg" alt="nginx" width="40" height="40"/>
+  <a href="#">
+    <img src="https://skillicons.dev/icons?i=aws,docker,kubernetes,linux,git,nginx" />
   </a>
 </p>
 
