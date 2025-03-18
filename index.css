@@ -1,0 +1,74 @@
+:root {
+  --bgcolor-default: #0d1117;
+  --bgColor-disabled: #212830;
+  --bgColor-done-emphasis: #8957e5;
+  --bgColor-done-muted: #ab7df826;
+  --bgColor-emphasis: #3d444d;
+  --bgColor-muted: #151b23;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style-type: none;
+}
+
+html {
+  background-color: #0d1117;
+  color: white;
+}
+
+header {
+  height: 5rem;
+  background: black;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+nav {
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+}
+
+ul.nav-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+
+  li {
+    margin: 10px;
+  }
+}
+
+main {
+  min-height: calc(100vh - calc(80px));
+  display: flex;
+  justify-content: start;
+  align-items: stretch;
+  flex-direction: column;
+  margin: 30px 50px 80px;
+}
+
+footer {
+  background-color: black;
+  height: 10rem;
+}
+
+ul.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  flex-direction: column;
+}
