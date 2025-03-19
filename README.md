@@ -16,9 +16,10 @@ Here are some ideas to get you started:
 <h1 align="center">Hi 👋, I'm Jezreel de Andrade</h1>
 <h3 align="center">A passionate Backend developer from Brazil</h3>
 
-- 🔭 I’m currently working on [Todo App](https://github.com/woragis/todo-app) [Notes App](https://github.com/woragis/notes-app) [Blog App](https://github.com/woragis/blog-app) [Cipher Master](https://github.com/woragis/cipher-master)
+- 🔭 I’m currently working on [My Page](https://woragis.github.io/woragis)
+<!-- - [Todo App](https://github.com/woragis/todo-app) [Notes App](https://github.com/woragis/notes-app) [Blog App](https://github.com/woragis/blog-app) [Cipher Master](https://github.com/woragis/cipher-master) -->
 
-- 🌱 I’m currently learning **Backend and Database Fundamentals**
+- 🌱 I’m currently learning **AWS and Nextjs**
 
 ### Work Experience
 
