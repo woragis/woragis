@@ -116,8 +116,45 @@
       <hr />
       <br />
 
-      <section id="projects">
-        <h1>Projects section</h1>
+      <!-- Projects Section -->
+      <section class="max-w-5xl mx-auto p-6">
+        <h2 class="text-2xl font-bold mb-4">Projects</h2>
+        <div class="grid gap-6">
+          <!-- Project Item -->
+          <div class="flex bg-gray-100 p-4 rounded-lg shadow-md">
+            <!-- Project Screenshot -->
+            <img
+              src="screenshot.jpg"
+              alt="Project Screenshot"
+              class="w-24 h-24 rounded-lg object-cover text-black"
+            />
+
+            <!-- Project Details -->
+            <div class="ml-4 flex flex-col justify-between">
+              <div>
+                <h3 class="text-lg font-semibold text-black">Project Title</h3>
+                <p class="text-sm text-gray-600">
+                  This is a short description of the project.
+                </p>
+
+                <!-- Tags -->
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <span
+                    class="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-600 rounded"
+                    >React</span
+                  >
+                  <span
+                    class="px-2 py-1 text-xs font-semibold bg-green-100 text-green-600 rounded"
+                    >Node.js</span
+                  >
+                </div>
+              </div>
+
+              <!-- Last Updated -->
+              <p class="text-xs text-gray-500 mt-2">Last updated: March 2025</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="certifications">
@@ -135,5 +172,10 @@
         <li>Instagram</li>
       </ul>
     </footer>
+    <div id="project-list"></div>
+    <script
+      type="module"
+      src="projects.js"
+    ></script>
   </body>
 </html>
