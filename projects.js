@@ -1,14 +1,14 @@
 const tagColors = {
-  react: 'bg-blue-100 text-blue-600',
-  nextjs: 'bg-gray-900 text-gray-100',
-  springboot: 'bg-green-300 text-green-600',
-  java: 'bg-red-300 text-red-600',
-  rust: 'bg-gray-400 text-gray-700',
-  golang: 'bg-blue-300 text-blue-600',
-  firebase: 'bg-yellow-300 text-yellow-600',
-  postgresql: 'bg-blue-300 text-blue-600',
-  mongodb: 'bg-green-300 text-green-600',
-  tailwindcss: 'bg-cyan-300 text-cyan-600',
+  react: 'react',
+  nextjs: 'nextjs',
+  springboot: 'springboot',
+  java: 'java',
+  rust: 'rust',
+  golang: 'golang',
+  firebase: 'firebase',
+  postgresql: 'postgresql',
+  mongodb: 'mongodb',
+  tailwindcss: 'tailwindcss',
 }
 
 const projects = [
@@ -40,36 +40,30 @@ const projects = [
 function renderProjects() {
   const projectList = document.querySelector('#project-list')
   if (!projectList) {
-    console.error('Element with class project-list not found')
+    console.error('Element with id project-list not found')
     return
   }
   projectList.innerHTML = ''
 
   projects.forEach((project) => {
     const projectItem = document.createElement('div')
-    projectItem.className = 'flex bg-gray-100 my-12 p-4 rounded-lg shadow-md'
+    projectItem.className = 'project-card'
 
     projectItem.innerHTML = `
-        <img src="${project.img}" alt="${
-      project.title
-    }" class="w-24 h-24 rounded-lg object-cover">
-        <div class="ml-4 flex flex-col justify-between">
+        <img src="${project.img}" alt="${project.title}" class="project-image">
+        <div class="project-content">
           <div>
-            <h3 class="text-lg font-semibold text-black">${project.title}</h3>
-            <p class="text-sm text-gray-600">${project.description}</p>
-          <div class="mt-2 flex flex-wrap gap-2">
+            <h3 class="project-title">${project.title}</h3>
+            <p class="project-description">${project.description}</p>
+          <div class="project-tags">
             ${project.tags
               .map((tag) => {
-                const colorClass =
-                  tagColors[tag.toLowerCase()] || 'bg-gray-300 text-black'
-                return `<div class="px-4 py-2 p-12 text-xs font-semibold rounded ${colorClass}">${tag}</div>`
+                return `<div class="project-tag ${tag.toLowerCase()}">${tag}</div>`
               })
               .join('')}
           </div>
           </div>
-          <p class="text-xs text-gray-500 mt-2">Last updated: ${
-            project.updated
-          }</p>
+          <p class="project-updated">Last updated: ${project.updated}</p>
         </div>
       `
 
