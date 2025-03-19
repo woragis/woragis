@@ -1,0 +1,26 @@
+{
+  "name": "woragis",
+  "version": "1.0.0",
+  "description": "<!-- ## Hi there 👋 **woragis/woragis** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx @tailwindcss/cli -i ./input.css -o ./index.css",
+    "dev": "npx @tailwindcss/cli -i ./input.css -o ./index.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/woragis/woragis.git"
+  },
+  "keywords": [],
+  "author": "woragis",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/woragis/woragis/issues"
+  },
+  "homepage": "https://github.com/woragis/woragis#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.14",
+    "tailwindcss": "^4.0.14"
+  }
+}
