@@ -2,8 +2,8 @@ import { Global } from '@emotion/react'
 import { styles } from './styles/global'
 
 import Navbar from '@/components/Navbar'
-import Project from '@/components/Project'
 import HeroSection from '@/components/HeroSection'
+import Footer from '@/components/Footer'
 
 function App() {
   return (
@@ -14,8 +14,7 @@ function App() {
       <main>
         <HeroSection />
       </main>
-      <h1>Woragis</h1>
-      <Project />
+      <Footer />
       <Global styles={styles} />
     </>
   )
