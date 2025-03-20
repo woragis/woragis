@@ -4,6 +4,7 @@ import { styles } from './styles/global'
 import Navbar from '@/components/Navbar'
 import HeroSection from '@/components/HeroSection'
 import Footer from '@/components/Footer'
+import ProjectsSection from './components/ProjectsSection'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       </header>
       <main>
         <HeroSection />
+        <ProjectsSection />
       </main>
       <Footer />
       <Global styles={styles} />
