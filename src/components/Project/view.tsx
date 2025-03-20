@@ -1,5 +1,13 @@
+import { FaExternalLinkAlt } from 'react-icons/fa'
 import { projectModel } from './model'
-import { Project, ProjectLink, ProjectScreenshot, ProjectTitle } from './styles'
+import {
+  Project,
+  HiddenData,
+  ProjectLink,
+  ProjectScreenshot,
+  ProjectTitle,
+  DisplayedData,
+} from './styles'
 
 export const ProjectView = ({ project }: ReturnType<typeof projectModel>) => {
   return (
@@ -8,8 +16,15 @@ export const ProjectView = ({ project }: ReturnType<typeof projectModel>) => {
         src={project.imgSrc}
         alt={project.name}
       />
-      <ProjectTitle>{project.name}</ProjectTitle>
-      <ProjectLink href={project.href}>Link</ProjectLink>
+      <DisplayedData id='normal-data'>
+        <ProjectTitle>{project.name}</ProjectTitle>
+      </DisplayedData>
+      <HiddenData id='hidden-data'>
+        <ProjectTitle>{project.name}</ProjectTitle>
+        <ProjectLink href={project.href}>
+          Link <FaExternalLinkAlt />
+        </ProjectLink>
+      </HiddenData>
     </Project>
   )
 }
