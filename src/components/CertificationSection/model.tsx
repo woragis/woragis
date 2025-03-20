@@ -1,7 +1,7 @@
-import { CertifationsInterface } from '@/types/components.types'
+import { CertificationsInterface } from '@/types/components.types'
 
 export const certificationSectionModel = () => {
-  const myCertifications: CertifationsInterface[] = [
+  const myCertifications: CertificationsInterface[] = [
     {
       key: 'docker',
       name: 'Docker and Kubernetes: The Complete Guide',

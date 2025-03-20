@@ -16,8 +16,8 @@ export const CertificationSectionView = ({
   })
 
   return (
-    <Certifications>
-      <h1>Certificates</h1>
+    <Certifications id='certifications'>
+      <h1>My Certifications</h1>
       <ul>{myCertificationsComponent}</ul>
       {/* <ul>
         <em>Extra curricular certificates</em>

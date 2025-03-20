@@ -11,7 +11,7 @@ export const ProjectsSectionView = ({
   })
 
   return (
-    <section>
+    <section id='projects'>
       <h1>Projects</h1>
       <hr />
       <Projects>{projectsComponent}</Projects>

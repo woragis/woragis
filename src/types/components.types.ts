@@ -1,6 +1,6 @@
 import { JSX } from '@emotion/react/jsx-runtime'
 
-export interface CertifationsInterface {
+export interface CertificationsInterface {
   key: string
   name: string
   imgSrc: string
@@ -8,7 +8,7 @@ export interface CertifationsInterface {
   completed: boolean
 }
 export interface CertificateProps {
-  certificate: CertifationsInterface
+  certificate: CertificationsInterface
 }
 
 export interface ProjectInterface {
