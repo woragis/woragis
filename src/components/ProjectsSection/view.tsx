@@ -1,19 +1,20 @@
-import Project from '../Project'
 import { projectsSectionModel } from './model'
 import { Projects } from './styles'
+
+import Project from '../Project'
 
 export const ProjectsSectionView = ({
   projects,
 }: ReturnType<typeof projectsSectionModel>) => {
-  const projectsComponent = projects.map(() => {
-    return <Project />
+  const projectsComponent = projects.map((project) => {
+    return <Project project={project} />
   })
 
   return (
-    <div>
+    <section>
       <h1>Projects</h1>
       <hr />
       <Projects>{projectsComponent}</Projects>
-    </div>
+    </section>
   )
 }
