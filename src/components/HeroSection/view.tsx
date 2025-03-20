@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Hero, Names, Side, TemporaryName, TypewriterP } from './styles'
+import { Greet, Hero, MyPicture, Name, Presentation, Side } from './styles'
 import { heroSectionModel } from './model'
 
 export const HeroSectionView = ({
@@ -15,28 +15,15 @@ export const HeroSectionView = ({
   return (
     <Hero>
       <Side>
-        <span>div</span>
-        <p>picture of me</p>
-        <p ref={namesDiv}></p>
+        <MyPicture src='https://avatars.githubusercontent.com/u/79119700?v=4' />
       </Side>
       <Side>
-        <Names>
-          <TypewriterP
-            length={18}
-            delay='0s'
-            duration='3s'
-          >
-            Jezreel de Andrade
-          </TypewriterP>
-          <TemporaryName
-            length={7}
-            duration='2s'
-            delay='3s'
-          >
-            woragis
-          </TemporaryName>
-        </Names>
-        <p>Little paragraph telling my motivation and why i like coding</p>
+        <Presentation>
+          <p>
+            <Greet>Hello!</Greet> My name is:
+          </p>
+          <Name ref={namesDiv}></Name>
+        </Presentation>
       </Side>
     </Hero>
   )

@@ -45,7 +45,7 @@ const blink = keyframes`
 }
 `
 
-export const TypewriterP = styled.p<TypewriterPProps>`
+const TypewriterP = styled.p<TypewriterPProps>`
   max-width: min-content;
   font-family: monospace;
   font-size: 1.5rem;
@@ -62,14 +62,7 @@ export const TypewriterP = styled.p<TypewriterPProps>`
     ${blink} 1s step-end infinite;
 `
 
-export const Names = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: start;
-  flex-direction: column;
-`
-
-export const temporaryTyping = keyframes`
+const temporaryTyping = keyframes`
 0% {
     width: 0%;
 }
@@ -81,7 +74,7 @@ export const temporaryTyping = keyframes`
 }
 `
 
-export const TemporaryName = styled.p<TypewriterPProps>`
+const TemporaryName = styled.p<TypewriterPProps>`
   width: 0%;
   max-width: min-content;
   font-family: monospace;
@@ -97,4 +90,33 @@ export const TemporaryName = styled.p<TypewriterPProps>`
   animation: ${temporaryTyping} ${(_) => _.duration} steps(${(_) => _.length})
       forwards ${(_) => _.delay},
     ${blink} 1s step-end infinite;
+`
+
+export const MyPicture = styled.img`
+  width: 430px;
+  position: relative;
+  border-radius: 50%;
+`
+
+export const Presentation = styled.div`
+  display: grid;
+  grid-template-rows: 1fr 12rem;
+  font-family: 'Roboto Mono', monospace;
+  text-align: left;
+  width: inherit;
+  font-size: 2.6rem;
+`
+
+export const Greet = styled.span`
+  font-size: 3.8rem;
+`
+
+export const Name = styled.span`
+  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 800;
+  font-size: 4rem;
+  height: calc(3rem * 2);
+  width: 34rem;
+  text-align: left;
 `
