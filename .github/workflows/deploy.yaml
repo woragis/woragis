@@ -22,11 +22,11 @@ jobs:
           node-version: 18 # Change if needed
           cache: 'npm'
 
-      - name: Restore cached dependencies
-        uses: actions/cache@v4
+      - name: Cache dependencies
+        uses: actions/cache@v3
         with:
-          path: ./node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('./package-lock.json') }}
+          path: ~/.npm
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
         run: npm ci
