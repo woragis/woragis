@@ -1,12 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Navbar from '@/components/Navbar'
+import Project from './components/Project'
+import { Global } from '@emotion/react'
+import { styles } from './styles/global'
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return <></>
+  return (
+    <>
+      <header>
+        <Navbar />
+      </header>
+      <h1>Woragis</h1>
+      <Project />
+      <Global styles={styles} />
+    </>
+  )
 }
 
 export default App
