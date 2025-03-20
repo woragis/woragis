@@ -1,35 +1,41 @@
 export const heroSectionModel = () => {
   const texts = [
-    // 'Hello, my name is Jezreel',
-    // 'but you can call me jazz',
     'Jezreel de Andrade',
-    'woragis',
+    'or... you can call me by my nickname',
+    'jazz 🎷👀',
   ]
 
-  function incrementString(word: string) {}
-  function decrementFromString(size: number) {}
+  async function textTypingEffect(element: HTMLElement, text: string) {
+    if (!element) return
 
-  async function textTypingEffect(
-    element: HTMLElement,
-    text: string,
-    i: number = 0
-  ) {
-    element.textContent += text[i]
+    element.textContent = '' // Reset content
 
-    if (i === text.length - 1) return
-
-    setTimeout(() => textTypingEffect(element, text, i + 1), 50)
+    for (const char of text) {
+      element.textContent += char
+      await new Promise((resolve) => setTimeout(resolve, 50)) // Typing delay
+    }
   }
+
   async function textDeletionEffect(element: HTMLElement) {
-    const currentText = element.textContent || ''
-    const currentLength = currentText.length || 0
-    if (currentLength === 0) return
+    if (!element) return
 
-    const newText = currentText.slice(0, currentLength - 1)
-    element.textContent = newText
+    while (element.textContent && element.textContent.length > 0) {
+      element.textContent = element.textContent.slice(0, -1)
+      await new Promise((resolve) => setTimeout(resolve, 30)) // Deletion delay
+    }
+  }
+  async function cycleTexts(element: HTMLElement, texts: string[]) {
+    let index = 0
 
-    setTimeout(() => textDeletionEffect(element), 50)
+    while (true) {
+      const text = texts[index]
+
+      await textTypingEffect(element, text) // Type text
+      await new Promise((resolve) => setTimeout(resolve, 1500)) // Longer delay after typing
+      await textDeletionEffect(element) // Delete text
+      index = (index + 1) % texts.length // Move to next text (loop infinitely)
+    }
   }
 
-  return { textTypingEffect, texts, textDeletionEffect }
+  return { cycleTexts, texts }
 }

@@ -3,27 +3,13 @@ import { Hero, Names, Side, TemporaryName, TypewriterP } from './styles'
 import { heroSectionModel } from './model'
 
 export const HeroSectionView = ({
-  textTypingEffect,
-  textDeletionEffect,
+  cycleTexts,
   texts,
 }: ReturnType<typeof heroSectionModel>) => {
   const namesDiv = useRef<HTMLParagraphElement>(null)
 
-  const namesEffect = async () => {
-    if (namesDiv.current) {
-      textTypingEffect(namesDiv.current, texts[0]).then(() => {
-        // if (namesDiv.current) textDeletionEffect(namesDiv.current)
-      })
-    }
-  }
   useEffect(() => {
-    // Type my name
-
-    // Type 'or'
-    // Type woragis
-    // Delete everything
-    // restart animation
-    namesEffect()
+    if (namesDiv.current) cycleTexts(namesDiv.current, texts)
   }, [])
 
   return (
