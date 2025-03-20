@@ -25,7 +25,7 @@ Here are some ideas to get you started:
 
 Na visão geral abaixo você encontrará minha experiência de trabalho mais recente:
 
-[<img align="left" height="94px" width="94px" alt="Warpnet" src="assets/lizardti.jpg"/>](https://www.google.com/)
+[<img align="left" height="94px" width="94px" alt="Warpnet" src="src/assets/lizardti.jpg"/>](https://www.google.com/)
 
 **Fullstack Developer (Jr)** \
 [**LizardTi**](https://www.google.com/) • Part-time \
