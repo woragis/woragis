@@ -27,7 +27,7 @@ export const certificationSectionModel = () => {
       key: 'tailwindcss',
       name: 'Tailwind CSS From Scratch | Learn By Building Projects',
       imgSrc: '',
-      tags: ['html', 'css', 'tailwindcss'],
+      tags: ['html', 'css', 'tailwind'],
       completed: true,
     },
     {
@@ -64,7 +64,7 @@ export const certificationSectionModel = () => {
       key: 'java',
       name: 'Java Masterclass 2025: 130+ Hours of Expert Lessons',
       imgSrc: '',
-      tags: ['java', 'object-oriented-programming'],
+      tags: ['java'],
       completed: false,
     },
     {

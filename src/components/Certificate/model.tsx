@@ -1,9 +1,10 @@
-import { CertificationsInterface } from '@/types/components.types'
+import { CertificationsInterface, Tags } from '@/types/components.types'
+import { Tag } from './styles'
 
 export const certificateModel = (certificate: CertificationsInterface) => {
-  const mapTags = (tags: string[]) => {
+  const mapTags = (tags: Tags[]) => {
     return tags.map((tag) => {
-      return <span> {tag} </span>
+      return <Tag className={tag}> {tag} </Tag>
     })
   }
 

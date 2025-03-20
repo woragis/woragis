@@ -6,7 +6,7 @@ export const projectsSectionModel = () => {
       name: 'E-commerce',
       href: 'https://woragis.github.io/e-commerce',
       imgSrc: '',
-      tags: ['springboot', 'java', 'react'],
+      tags: ['spring-boot', 'java', 'react'],
       lastUpdated: '',
     },
     {
