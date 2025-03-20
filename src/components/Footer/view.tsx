@@ -10,29 +10,8 @@ import {
   MyPicture,
   ButtonCTA,
 } from './styles'
-import { FaGithub, FaInstagram, FaLinkedin } from 'react-icons/fa6'
-import { BiLogoGmail } from 'react-icons/bi'
 
-export const FooterView = ({}: ReturnType<typeof footerModel>) => {
-  const socialLinks = [
-    {
-      name: 'jezreel.veloso',
-      path: 'mailto:jezreel.veloso@gmail.com',
-      icon: <BiLogoGmail />,
-    },
-    { name: 'github', path: 'https://github.com/woragis', icon: <FaGithub /> },
-    {
-      name: 'linkedin',
-      path: 'https://linkedin.com/in/jezreel-andrade',
-      icon: <FaLinkedin />,
-    },
-    {
-      name: 'instagram',
-      path: 'https://instagram.com/y.jezreel.andrade',
-      icon: <FaInstagram />,
-    },
-  ]
-
+export const FooterView = ({ socialLinks }: ReturnType<typeof footerModel>) => {
   const socialComponent = socialLinks.map((social) => {
     return (
       <Social>

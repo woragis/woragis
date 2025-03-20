@@ -1,19 +1,8 @@
+import { CertificateProps } from '@/types/components.types'
 import { certificateModel } from './model'
 import { CertificateView } from './view'
 
-export interface CertifationsInterface {
-  key: string
-  name: string
-  imgSrc: string
-  tags: string[]
-  completed: boolean
-}
-
-const Certificate = ({
-  certificate,
-}: {
-  certificate: CertifationsInterface
-}) => {
+const Certificate = ({ certificate }: CertificateProps) => {
   const model = certificateModel(certificate)
 
   return <CertificateView {...model} />

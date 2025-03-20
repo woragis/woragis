@@ -1,7 +1,8 @@
+import { ProjectProps } from '@/types/components.types'
 import { projectModel } from './model'
-import { ProjectInterface, ProjectView } from './view'
+import { ProjectView } from './view'
 
-const Project = ({ project }: { project: ProjectInterface }) => {
+const Project = ({ project }: ProjectProps) => {
   const model = projectModel(project)
 
   return <ProjectView {...model} />

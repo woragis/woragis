@@ -1,4 +1,4 @@
-import { ProjectInterface } from '../Project/view'
+import { ProjectInterface } from '@/types/components.types'
 
 export const projectsSectionModel = () => {
   const projects: ProjectInterface[] = [

@@ -1,4 +1,4 @@
-import { CertifationsInterface } from '.'
+import { CertifationsInterface } from '@/types/components.types'
 
 export const certificateModel = (certificate: CertifationsInterface) => {
   const mapTags = (tags: string[]) => {

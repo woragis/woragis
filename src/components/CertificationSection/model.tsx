@@ -1,4 +1,4 @@
-import { CertifationsInterface } from '../Certificate'
+import { CertifationsInterface } from '@/types/components.types'
 
 export const certificationSectionModel = () => {
   const myCertifications: CertifationsInterface[] = [
