@@ -19,23 +19,43 @@ export const Logo = styled.span`
 `
 
 export const Links = styled.ul`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  grid-template-columns: repeat(3, 1fr);
+  width: 300px;
   gap: 10px;
 `
 
 export const Link = styled.li`
   list-style-type: none;
-  width: 70px;
+  width: min-content;
+  text-align: center;
+  font-size: 19px;
+  position: relative;
 
   a {
     text-transform: capitalize;
     text-decoration: none;
+  }
 
-    &:hover {
-      text-decoration: underline;
+  &::before {
+    content: '';
+    background-color: var(--text-primary);
+    height: 2px;
+    width: 0;
+    transition: 300ms;
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  &:hover {
+    a {
+      color: var(--text-primary);
+    }
+    &::before {
+      width: 100%;
     }
   }
 `
