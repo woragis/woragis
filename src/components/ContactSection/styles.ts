@@ -43,7 +43,11 @@ export const Title = styled.h2`
 
   &::after {
     content: '';
-    background-color: var(--accent-secondary);
+    background: linear-gradient(
+      270deg,
+      var(--accent-primary),
+      var(--accent-secondary)
+    );
     width: 120px;
     height: 5px;
     border-radius: 10px;
@@ -113,12 +117,31 @@ export const Button = styled.button`
   gap: 10px;
   border: none;
   border-radius: 50px;
-  background: linear-gradient(230deg, var(--accent-primary), var(--bg-primary));
   cursor: pointer;
   min-width: 40%;
+  background: transparent;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 
-  img {
-    height: 15px;
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    height: 400%;
+    width: 100%;
+    border-radius: 50px;
+    background: linear-gradient(
+      230deg,
+      var(--accent-primary),
+      var(--bg-primary)
+    );
+    transition: 200ms;
+  }
+  &:hover {
+    &::before {
+      transform: rotate(260deg);
+    }
   }
 `
 
