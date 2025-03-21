@@ -11,7 +11,8 @@ export const Project = styled.li`
   height: 300px;
   min-width: 400px;
   border-radius: 20px;
-  background-color: var(--accent-tertiary);
+  background-image: radial-gradient(white, var(--bg-primary) 43%);
+  background-color: rgba(0, 0, 0, 0.9);
   color: var(--text-primary);
   gap: 15px;
   transition: 200ms;
@@ -70,7 +71,7 @@ export const ProjectScreenshot = styled.img`
   height: 220px;
   position: sticky;
   top: 0;
-  border-radius: 10px;
+  border-radius: 20px;
   transition: all 500ms;
   background-color: var(--text-muted);
 `
