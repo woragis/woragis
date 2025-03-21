@@ -7,6 +7,7 @@ import Footer from '@/components/Footer'
 import ProjectsSection from './components/ProjectsSection'
 import CertificationSection from './components/CertificationSection'
 import AboutSection from './components/AboutSection'
+import ContactSection from './components/ContactSection'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <AboutSection />
         <ProjectsSection />
         <CertificationSection />
+        <ContactSection />
       </main>
       <Footer />
       <Global styles={styles} />

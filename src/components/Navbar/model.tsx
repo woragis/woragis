@@ -5,6 +5,7 @@ export const navbarModel = () => {
     { name: 'about', path: '#about' },
     { name: 'projects', path: '#projects' },
     { name: 'certifications', path: '#certifications' },
+    { name: 'contact', path: '#contact' },
   ]
 
   return { links }

@@ -22,7 +22,7 @@ export const Links = styled.ul`
   display: grid;
   justify-items: center;
   align-content: center;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   width: 300px;
   gap: 10px;
 `
