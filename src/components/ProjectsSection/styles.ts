@@ -1,5 +1,22 @@
 import styled from '@emotion/styled'
 
+export const Section = styled.section`
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  padding-block: 40px 80px;
+`
+
+export const Title = styled.h2`
+  text-align: center;
+  font-size: 3rem;
+  margin: 0 auto 60px;
+  width: min-content;
+  position: relative;
+  width: 600px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid var(--text-primary);
+`
+
 export const Projects = styled.ul`
   padding-inline: 50px;
   display: grid;

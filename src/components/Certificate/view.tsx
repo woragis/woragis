@@ -1,6 +1,6 @@
 import { FaExternalLinkAlt } from 'react-icons/fa'
 import { certificateModel } from './model'
-import { Certificate, CertificateImg } from './styles'
+import { Certificate, CertificateImg, Subtitle, Title } from './styles'
 
 export const CertificateView = ({
   certificate,
@@ -20,9 +20,9 @@ export const CertificateView = ({
         </a>
       </CertificateImg>
       <div>
-        <h3>{certificate.name}</h3>
-        <p>Tags: {tags}</p>
-        <p>{certificate.completed ? 'Completed' : 'To do'}</p>
+        <Title>{certificate.name}</Title>
+        <Subtitle>Tags: {tags}</Subtitle>
+        <Subtitle>{certificate.completed ? 'Completed' : 'To do'}</Subtitle>
       </div>
     </Certificate>
   )

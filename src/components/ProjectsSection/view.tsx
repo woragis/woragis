@@ -1,5 +1,5 @@
 import { projectsSectionModel } from './model'
-import { Projects } from './styles'
+import { Projects, Section, Title } from './styles'
 
 import Project from '../Project'
 
@@ -11,10 +11,9 @@ export const ProjectsSectionView = ({
   })
 
   return (
-    <section id='projects'>
-      <h1>Projects</h1>
-      <hr />
+    <Section id='projects'>
+      <Title>Projects</Title>
       <Projects>{projectsComponent}</Projects>
-    </section>
+    </Section>
   )
 }

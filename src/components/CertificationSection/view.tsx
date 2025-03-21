@@ -1,4 +1,5 @@
 import Certificate from '../Certificate'
+import { Title } from '../ProjectsSection/styles'
 import { certificationSectionModel } from './model'
 import { Certificates, Certifications } from './styles'
 
@@ -17,7 +18,7 @@ export const CertificationSectionView = ({
 
   return (
     <Certifications id='certifications'>
-      <h1>My Certifications</h1>
+      <Title>My Certifications</Title>
       <Certificates>{myCertificationsComponent}</Certificates>
       {/* <ul>
         <em>Extra curricular certificates</em>

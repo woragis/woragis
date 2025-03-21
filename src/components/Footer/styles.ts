@@ -6,10 +6,11 @@ export const Footer = styled.footer`
   align-items: center;
   position: relative;
   min-height: 12rem;
-  background-color: lightgray;
   padding-inline: 2rem;
   padding-block: 3rem;
   padding-bottom: 8rem;
+  background-color: var(--bg-tertiary);
+  color: var(--text-muted);
 `
 
 export const FooterNav = styled.div`
@@ -32,6 +33,11 @@ export const Socials = styled.ul`
 
 export const Social = styled.li`
   list-style-type: none;
+  font-size: 15px;
+
+  a {
+    color: var(--text-muted);
+  }
 `
 
 export const MyPicture = styled.img`
@@ -47,23 +53,23 @@ export const Copy = styled.span`
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  background-color: darkgray;
   text-align: center;
+  background-color: var(--bg-primary);
 `
 
 export const ButtonCTA = styled.button`
   transition: 200ms;
-  background-color: black;
-  color: white;
   font-weight: bold;
   font-size: 16px;
-  border: 3px solid black;
+  border: 3px solid var(--accent-primary);
   height: 3rem;
   border-radius: 10px;
   width: 120px;
+  background-color: var(--accent-primary);
+  color: var(--text-primary);
 
   &:hover {
-    background-color: white;
-    color: black;
+    background-color: var(--text-primary);
+    color: var(--accent-primary);
   }
 `

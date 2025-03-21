@@ -7,6 +7,8 @@ export const Hero = styled.section`
   justify-content: center;
   align-items: center;
   flex-direction: row-reverse;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 `
 
 export const Side = styled.aside`
@@ -16,6 +18,7 @@ export const Side = styled.aside`
   flex-direction: column;
   height: 100%;
   width: 50%;
+  font-family: 'JetBrains Mono', monospace;
 
   @media (max-width: 768px) {
     min-width: 100%;
@@ -44,7 +47,7 @@ export const Greet = styled.span`
 
 export const Name = styled.span`
   font-family: 'JetBrains Mono', monospace;
-  font-family: 'Roboto Mono', monospace;
+  /* font-family: 'Roboto Mono', monospace; */
   font-weight: 800;
   font-size: 4rem;
   height: calc(3rem * 2);

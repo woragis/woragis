@@ -11,7 +11,8 @@ export const Project = styled.li`
   height: 300px;
   min-width: 400px;
   border-radius: 20px;
-  background-color: beige;
+  background-color: var(--accent-tertiary);
+  color: var(--text-primary);
   gap: 15px;
   transition: 200ms;
   transition: padding 500ms;
@@ -53,8 +54,15 @@ export const HiddenData = styled.div`
   padding-top: 30px;
   padding-bottom: 30px;
   z-index: 10;
-  background-color: rgba(0, 0, 0, 0.5);
   width: 100%;
+  background-color: var(--accent-secondary);
+  color: var(--text-tertiary);
+  opacity: 0.8;
+
+  a {
+    color: var(--text-tertiary);
+    opacity: 0.6;
+  }
 `
 
 export const ProjectScreenshot = styled.img`
@@ -63,8 +71,8 @@ export const ProjectScreenshot = styled.img`
   position: sticky;
   top: 0;
   border-radius: 10px;
-  background-color: white;
   transition: all 500ms;
+  background-color: var(--text-muted);
 `
 
 export const ProjectTitle = styled.h3`

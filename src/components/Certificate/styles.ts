@@ -10,6 +10,9 @@ export const Certificate = styled.li`
   align-items: center;
   padding: 10px 30px;
   gap: 20px;
+  border-radius: 20px;
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
 `
 
 export const CertificateImg = styled.figure`
@@ -52,10 +55,23 @@ export const CertificateImg = styled.figure`
   &:hover {
     a {
       color: white;
-      background-color: rgba(0, 0, 0, 0.5);
       bottom: 0;
+      background-color: var(--bg-primary);
+      opacity: 0.5;
     }
   }
+`
+
+export const Title = styled.h3`
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+`
+
+export const Subtitle = styled.p`
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
 `
 
 export const Tag = styled.span`

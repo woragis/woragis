@@ -6,6 +6,12 @@ export const Nav = styled.nav`
   align-items: center;
   height: 5rem;
   padding-inline: 50px;
+  background-color: var(--bg-secondary);
+
+  a,
+  span {
+    color: var(--text-secondary);
+  }
 `
 
 export const Logo = styled.span`
