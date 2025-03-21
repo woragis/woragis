@@ -6,6 +6,7 @@ import HeroSection from '@/components/HeroSection'
 import Footer from '@/components/Footer'
 import ProjectsSection from './components/ProjectsSection'
 import CertificationSection from './components/CertificationSection'
+import AboutSection from './components/AboutSection'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       </header>
       <main>
         <HeroSection />
+        <AboutSection />
         <ProjectsSection />
         <CertificationSection />
       </main>
