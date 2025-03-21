@@ -49,7 +49,7 @@ export const styles = css`
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
   }
-  body {
+  html {
     scroll-behavior: smooth;
   }
 `
