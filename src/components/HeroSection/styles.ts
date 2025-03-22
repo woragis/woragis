@@ -56,6 +56,7 @@ export const MyPicture = styled.img`
       position: absolute;
       right: 50px;
       top: 120px;
+      width: 240px;
     }
   }
 `
@@ -66,6 +67,7 @@ export const Presentation = styled.div`
   font-family: 'Roboto Mono', monospace;
   text-align: left;
   width: inherit;
+  font-size: 2.8rem;
   @media (max-width: 800px) {
     font-size: 1.8rem;
   }
