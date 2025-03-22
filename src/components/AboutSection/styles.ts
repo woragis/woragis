@@ -27,6 +27,8 @@ export const Side = styled.aside`
 
 export const AboutPargraph = styled.p`
   max-width: 600px;
+  display: inline-block;
+  margin-inline: auto;
   font-size: 1.2rem;
   line-height: 1.8rem;
 `
