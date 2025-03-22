@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import { FaCircleCheck } from 'react-icons/fa6'
 
 export const Certificate = styled.li`
   width: 500px;
@@ -13,6 +14,18 @@ export const Certificate = styled.li`
   border-radius: 20px;
   background-color: var(--bg-primary);
   color: var(--text-secondary);
+  position: relative;
+`
+
+interface CompletedProps {
+  completed: boolean
+}
+export const Completed = styled(FaCircleCheck)<CompletedProps>`
+  color: ${(_) => (_.completed ? 'green' : 'var(--text-muted)')};
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 1.4rem;
 `
 
 export const CertificateImg = styled.figure`

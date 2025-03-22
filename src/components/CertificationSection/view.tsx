@@ -7,7 +7,6 @@ export const CertificationSectionView = ({
   myCertifications,
 }: ReturnType<typeof certificationSectionModel>) => {
   const myCertificationsComponent = myCertifications.map((certificate) => {
-    if (!certificate.completed) return
     return (
       <Certificate
         key={certificate.key}

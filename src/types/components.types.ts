@@ -46,6 +46,7 @@ export interface ProjectInterface {
   lastUpdated: string
   imgSrc: string
   tags: ProjectTags[]
+  description: string
 }
 
 export interface ProjectProps {
