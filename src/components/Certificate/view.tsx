@@ -11,11 +11,18 @@ import {
 export const CertificateView = ({
   certificate,
   mapTags,
+  reverse,
+  index,
+  quantity,
 }: ReturnType<typeof certificateModel>) => {
   const tags = mapTags(certificate.tags)
 
   return (
-    <Certificate>
+    <Certificate
+      index={index}
+      reverse={reverse}
+      quantity={quantity}
+    >
       <CertificateImg>
         <img
           src={certificate.imgSrc}

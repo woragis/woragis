@@ -6,14 +6,19 @@ import { Certificates } from './styles'
 export const CertificationSectionView = ({
   myCertifications,
 }: ReturnType<typeof certificationSectionModel>) => {
-  const myCertificationsComponent = myCertifications.map((certificate) => {
-    return (
-      <Certificate
-        key={certificate.key}
-        certificate={certificate}
-      />
-    )
-  })
+  const myCertificationsComponent = myCertifications.map(
+    (certificate, index) => {
+      return (
+        <Certificate
+          key={certificate.key}
+          certificate={certificate}
+          index={index}
+          reverse={index % 2 === 0}
+          quantity={myCertifications.length / 2}
+        />
+      )
+    }
+  )
 
   return (
     <Section id='certifications'>

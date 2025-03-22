@@ -1,9 +1,25 @@
+import { keyframes } from '@emotion/react'
 import styled from '@emotion/styled'
 import { FaCircleCheck } from 'react-icons/fa6'
 
-export const Certificate = styled.li`
-  width: 500px;
-  height: 120px;
+interface CertificateProps {
+  index: number
+  reverse: boolean
+  quantity: number
+}
+
+const animation = keyframes`
+from {
+  left: 100%;
+}
+to {
+  left: calc(var(--certificate-width) * -1);
+}
+`
+
+export const Certificate = styled.li<CertificateProps>`
+  width: var(--certificate-width);
+  height: var(--certificate-height);
   border: 1px solid;
   display: grid;
   grid-template-columns: 100px 1fr;
@@ -14,7 +30,18 @@ export const Certificate = styled.li`
   border-radius: 20px;
   background-color: var(--bg-primary);
   color: var(--text-secondary);
-  position: relative;
+  position: absolute;
+  left: ${(_) => (_.reverse ? '0' : '100%')};
+  right: ${(_) => (_.reverse ? '100%' : '0')};
+  top: ${(_) => (_.reverse ? 'calc(var(--certificate-height) - 20px)' : '')};
+  --quantity: ${(_) => _.quantity};
+  --duration: calc(${(_) => _.quantity}s * 1.5);
+  --position: ${(_) => _.index};
+  animation: ${animation} var(--duration) linear infinite
+    ${(_) => (_.reverse ? 'reverse' : '')};
+  animation-delay: calc(
+    (var(--duration) / var(--quantity)) * (var(--position) - 1) * 3.2
+  );
 `
 
 interface CompletedProps {
