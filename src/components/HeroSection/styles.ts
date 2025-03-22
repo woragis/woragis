@@ -11,6 +11,7 @@ export const Hero = styled.section`
 
   @media (max-width: 800px) {
     & {
+      padding-top: 260px;
       flex-direction: column;
       height: max-content;
     }
@@ -52,6 +53,9 @@ export const MyPicture = styled.img`
   @media (max-width: 800px) {
     & {
       border-radius: 20px;
+      position: absolute;
+      right: 50px;
+      top: 120px;
     }
   }
 `
@@ -62,11 +66,16 @@ export const Presentation = styled.div`
   font-family: 'Roboto Mono', monospace;
   text-align: left;
   width: inherit;
-  font-size: 2.6rem;
+  @media (max-width: 800px) {
+    font-size: 1.8rem;
+  }
 `
 
 export const Greet = styled.span`
   font-size: 3.8rem;
+  @media (max-width: 800px) {
+    font-size: 2.8rem;
+  }
 `
 
 export const Name = styled.span`
@@ -81,6 +90,7 @@ export const Name = styled.span`
   @media (max-width: 800px) {
     & {
       width: 100%;
+      font-size: 1.9rem;
     }
   }
 `
