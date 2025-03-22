@@ -1,11 +1,11 @@
-import { FaGithub, FaInstagram, FaLinkedin } from 'react-icons/fa6'
+import { FaGithub, FaLinkedin } from 'react-icons/fa6'
 import { BiLogoGmail } from 'react-icons/bi'
 import { SocialLinksInterface } from '@/types/components.types'
 
 export const footerModel = () => {
   const socialLinks: SocialLinksInterface[] = [
     {
-      name: 'jezreel.veloso',
+      name: 'Email me',
       path: 'mailto:jezreel.veloso@gmail.com',
       icon: <BiLogoGmail />,
     },
@@ -15,11 +15,11 @@ export const footerModel = () => {
       path: 'https://linkedin.com/in/jezreel-andrade',
       icon: <FaLinkedin />,
     },
-    {
-      name: 'instagram',
-      path: 'https://instagram.com/y.jezreel.andrade',
-      icon: <FaInstagram />,
-    },
+    // {
+    //   name: 'instagram',
+    //   path: 'https://instagram.com/y.jezreel.andrade',
+    //   icon: <FaInstagram />,
+    // },
   ]
 
   return { socialLinks }
