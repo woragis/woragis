@@ -3,12 +3,18 @@ import styled from '@emotion/styled'
 export const Hero = styled.section`
   height: calc(100vh - 5rem);
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   flex-direction: row-reverse;
   background-color: var(--bg-primary);
   color: var(--text-primary);
+
+  @media (max-width: 800px) {
+    & {
+      flex-direction: column;
+      height: max-content;
+    }
+  }
 `
 
 export const Side = styled.aside`
@@ -20,9 +26,15 @@ export const Side = styled.aside`
   width: 50%;
   font-family: 'JetBrains Mono', monospace;
 
-  @media (max-width: 768px) {
+  /* @media (max-width: 768px) {
     min-width: 100%;
     height: 50%;
+  } */
+  @media (max-width: 800px) {
+    & {
+      width: 100%;
+      padding: 2rem 5rem;
+    }
   }
 `
 
@@ -30,6 +42,18 @@ export const MyPicture = styled.img`
   width: 430px;
   position: relative;
   border-radius: 50%;
+
+  @media (max-width: 1200px) {
+    & {
+      width: 50%;
+    }
+  }
+
+  @media (max-width: 800px) {
+    & {
+      border-radius: 20px;
+    }
+  }
 `
 
 export const Presentation = styled.div`
@@ -53,4 +77,10 @@ export const Name = styled.span`
   height: calc(3rem * 2);
   width: 34rem;
   text-align: left;
+
+  @media (max-width: 800px) {
+    & {
+      width: 100%;
+    }
+  }
 `
