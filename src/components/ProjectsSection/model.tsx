@@ -8,6 +8,7 @@ export const projectsSectionModel = () => {
       imgSrc: '',
       tags: ['spring-boot', 'java', 'react'],
       lastUpdated: '',
+      description: 'Project I built with NextJs, and used stripe',
     },
     {
       name: 'Reservatorio de Dopamina',
@@ -15,6 +16,7 @@ export const projectsSectionModel = () => {
       imgSrc: '',
       tags: ['clone', 'nextjs', 'stripe'],
       lastUpdated: '',
+      description: 'Project based on a platform of neuroscience studying',
     },
     {
       name: 'Landing Page',
@@ -22,6 +24,7 @@ export const projectsSectionModel = () => {
       imgSrc: '',
       tags: ['html', 'css', 'javascript'],
       lastUpdated: '',
+      description: 'Useful to use as a marketing page',
     },
   ]
 

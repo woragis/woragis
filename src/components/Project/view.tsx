@@ -7,6 +7,7 @@ import {
   ProjectScreenshot,
   ProjectTitle,
   DisplayedData,
+  ProjectDescription,
 } from './styles'
 
 export const ProjectView = ({ project }: ReturnType<typeof projectModel>) => {
@@ -18,6 +19,7 @@ export const ProjectView = ({ project }: ReturnType<typeof projectModel>) => {
       />
       <DisplayedData id='normal-data'>
         <ProjectTitle>{project.name}</ProjectTitle>
+        <ProjectDescription>{project.description}</ProjectDescription>
       </DisplayedData>
       <HiddenData id='hidden-data'>
         <ProjectTitle>{project.name}</ProjectTitle>

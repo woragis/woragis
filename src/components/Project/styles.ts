@@ -44,6 +44,7 @@ export const DisplayedData = styled.div`
   bottom: 20px;
   height: 50px;
   transition: 200ms;
+  text-align: left;
 `
 
 export const HiddenData = styled.div`
@@ -63,6 +64,11 @@ export const HiddenData = styled.div`
   a {
     color: var(--text-tertiary);
     opacity: 0.6;
+  }
+
+  @media (max-width: 1000px) {
+    text-align: center;
+    padding-inline: 0;
   }
 `
 
@@ -88,4 +94,8 @@ export const ProjectLink = styled.a`
   &:hover {
     text-decoration: underline;
   }
+`
+
+export const ProjectDescription = styled.p`
+  color: var(--text-muted);
 `
