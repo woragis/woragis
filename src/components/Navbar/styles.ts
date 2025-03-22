@@ -23,8 +23,12 @@ export const Links = styled.ul`
   justify-items: center;
   align-content: center;
   grid-template-columns: repeat(4, 1fr);
-  width: 300px;
-  gap: 10px;
+  width: max-content;
+  gap: 30px;
+
+  @media (max-width: 1000px) {
+    display: none;
+  }
 `
 
 export const Link = styled.li`
