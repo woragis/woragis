@@ -7,6 +7,7 @@ export const Nav = styled.nav`
   height: 5rem;
   padding-inline: 50px;
   background-color: var(--bg-secondary);
+  position: relative;
 
   a,
   span {
@@ -60,6 +61,46 @@ export const Link = styled.li`
     }
     &::before {
       width: 100%;
+    }
+  }
+`
+
+export const Burger = styled.div`
+  position: absolute;
+  right: 24px;
+  top: 20px;
+  width: 30px;
+  aspect-ratio: 1 / 1;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0px;
+  cursor: pointer;
+  height: min-content;
+  z-index: 1;
+
+  span {
+    display: inline-block;
+    background-color: white;
+    height: 4px;
+    width: 100%;
+    z-index: 10;
+    border-radius: 15px;
+    transition: 200ms;
+  }
+
+  &.active {
+    span:nth-child(1) {
+      transform: rotateZ(45deg) translate(8px, 8px);
+    }
+    span:nth-child(2) {
+      opacity: 0;
+    }
+    span:nth-child(3) {
+      transform: rotateZ(-45deg) translate(7px, -6px);
     }
   }
 `
