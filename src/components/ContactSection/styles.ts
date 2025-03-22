@@ -7,6 +7,11 @@ export const Section = styled.section`
   align-items: center;
   min-height: 500px;
   background-color: var(--bg-primary);
+  @media (max-width: 800px) {
+    & {
+      grid-template-columns: 1fr;
+    }
+  }
 `
 
 export const Form = styled.form`
@@ -18,6 +23,12 @@ export const Form = styled.form`
   width: max-content;
   margin: 40px auto;
   padding: 20px;
+  @media (max-width: 800px) {
+    & {
+      width: 100%;
+      margin-inline: auto;
+    }
+  }
 `
 
 export const Title = styled.h2`
@@ -79,7 +90,7 @@ export const Field = styled.input`
 
   @media (max-width: 800px) {
     & {
-      width: 800vw;
+      width: 100%;
     }
   }
 `
@@ -104,6 +115,12 @@ export const Message = styled.textarea`
   }
   &::placeholder {
     color: var(--text-muted);
+  }
+
+  @media (max-width: 800px) {
+    & {
+      width: 100%;
+    }
   }
 `
 
@@ -149,6 +166,7 @@ export const SectionImg = styled.img`
   width: 300px;
   border-radius: 30px;
   margin-inline: auto;
+
   @media (max-width: 800px) {
     & {
       display: none;
