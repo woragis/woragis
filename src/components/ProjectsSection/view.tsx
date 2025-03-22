@@ -1,6 +1,7 @@
 import { projectsSectionModel } from './model'
-import { Projects, Section, Title } from './styles'
+import { Projects } from './styles'
 
+import { Section, Title } from '../ui/Section'
 import Project from '../Project'
 
 export const ProjectsSectionView = ({
