@@ -1,7 +1,7 @@
 import Certificate from '../Certificate'
-import { Title } from '../ProjectsSection/styles'
+import { Section, Title } from '../ui/Section'
 import { certificationSectionModel } from './model'
-import { Certificates, Certifications } from './styles'
+import { Certificates } from './styles'
 
 export const CertificationSectionView = ({
   myCertifications,
@@ -17,7 +17,7 @@ export const CertificationSectionView = ({
   })
 
   return (
-    <Certifications id='certifications'>
+    <Section id='certifications'>
       <Title>My Certifications</Title>
       <Certificates>{myCertificationsComponent}</Certificates>
       {/* <ul>
@@ -36,6 +36,6 @@ export const CertificationSectionView = ({
         <li>Teoria da Musica do Intermediario ao Avancado</li>
         <li>Harmonia da Musica do Bascio ao Avancado</li>
       </ul> */}
-    </Certifications>
+    </Section>
   )
 }
