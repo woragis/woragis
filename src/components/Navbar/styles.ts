@@ -103,4 +103,8 @@ export const Burger = styled.div`
       transform: rotateZ(-45deg) translate(7px, -6px);
     }
   }
+
+  @media (min-width: 1001px) {
+    display: none;
+  }
 `
