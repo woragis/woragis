@@ -12,6 +12,9 @@ export const Section = styled.section`
       padding: 2rem;
     }
   }
+  @media (max-width: 800px) {
+    padding-inline: 0;
+  }
 `
 
 export const Title = styled.h2`
@@ -23,4 +26,8 @@ export const Title = styled.h2`
   width: 600px;
   padding-bottom: 30px;
   border-bottom: 2px solid var(--text-primary);
+
+  @media (max-width: 800px) {
+    width: 100%;
+  }
 `
