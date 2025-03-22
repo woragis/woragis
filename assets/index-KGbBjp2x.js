@@ -200,6 +200,10 @@ Error generating stack: `+n.message+`
       transform: rotateZ(-45deg) translate(7px, -6px);
     }
   }
+
+  @media (min-width: 1001px) {
+    display: none;
+  }
 `,Pc=G.createContext({});function Fc(i){const a=G.useRef(null);return a.current===null&&(a.current=i()),a.current}const Jc=typeof window<"u",Ty=Jc?G.useLayoutEffect:G.useEffect,jr=G.createContext(null),$c=G.createContext({transformPagePoint:i=>i,isStatic:!1,reducedMotion:"never"});class qS extends G.Component{getSnapshotBeforeUpdate(a){const s=this.props.childRef.current;if(s&&a.isPresent&&!this.props.isPresent){const o=s.offsetParent,c=o instanceof HTMLElement&&o.offsetWidth||0,f=this.props.sizeRef.current;f.height=s.offsetHeight||0,f.width=s.offsetWidth||0,f.top=s.offsetTop,f.left=s.offsetLeft,f.right=c-f.width-f.left}return null}componentDidUpdate(){}render(){return this.props.children}}function YS({children:i,isPresent:a,anchorX:s}){const o=G.useId(),c=G.useRef(null),f=G.useRef({width:0,height:0,top:0,left:0,right:0}),{nonce:d}=G.useContext($c);return G.useInsertionEffect(()=>{const{width:p,height:m,top:y,left:v,right:b}=f.current;if(a||!c.current||!p||!m)return;const x=s==="left"?`left: ${v}`:`right: ${b}`;c.current.dataset.motionPopId=o;const R=document.createElement("style");return d&&(R.nonce=d),document.head.appendChild(R),R.sheet&&R.sheet.insertRule(`
           [data-motion-pop-id="${o}"] {
             position: absolute !important;
@@ -286,6 +290,7 @@ Error generating stack: `+n.message+`
       position: absolute;
       right: 50px;
       top: 120px;
+      width: 240px;
     }
   }
 `,R3=st.div`
@@ -294,6 +299,7 @@ Error generating stack: `+n.message+`
   font-family: 'Roboto Mono', monospace;
   text-align: left;
   width: inherit;
+  font-size: 2.8rem;
   @media (max-width: 800px) {
     font-size: 1.8rem;
   }
