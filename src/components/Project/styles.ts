@@ -1,4 +1,48 @@
+import { keyframes } from '@emotion/react'
 import styled from '@emotion/styled'
+
+const showCardAnimation = keyframes`
+50% {
+  transform: translateY(-18rem);
+}
+
+100% {
+  transform: translateY(-8rem);
+  opacity: 1;
+}
+
+`
+
+const removeOverflowAnimation = keyframes`
+to {
+  overflow: initial;
+}
+`
+
+const showOverflowAnimation = keyframes`
+0% {
+  overflow: initial;
+  pointer-events: none;
+}
+50% {
+  overflow: hidden;
+}
+`
+const removeCardAnimation = keyframes`
+0% {
+  transform: translateY(-14rem);
+}
+
+50% {
+  transform: translateY(-18rem);
+}
+
+100% {
+  transform: translateY(0.5rem);
+  opacity: 0;
+}
+
+`
 
 export const Project = styled.li`
   overflow: hidden;
@@ -20,8 +64,15 @@ export const Project = styled.li`
   position: relative;
   cursor: pointer;
 
+  &:not(:hover) {
+    animation: ${showOverflowAnimation} 2s forwards;
+    #hidden-data {
+      animation: ${removeCardAnimation} 1s forwards;
+    }
+  }
   &:hover {
     padding: 0;
+    animation: ${removeOverflowAnimation} 2s forwards;
     img {
       top: -20px;
       height: 100%;
@@ -34,12 +85,14 @@ export const Project = styled.li`
       }
     }
     #hidden-data {
-      bottom: 0;
+      animation: ${showCardAnimation} 1s forwards;
+      opacity: 1;
+      transition: opacity 300ms;
     }
   }
 `
 
-export const DisplayedData = styled.div`
+export const DisplayedData = styled.article`
   position: absolute;
   bottom: 20px;
   height: 50px;
@@ -47,19 +100,21 @@ export const DisplayedData = styled.div`
   text-align: left;
 `
 
-export const HiddenData = styled.div`
+export const HiddenData = styled.article`
   transition: 400ms ease-in-out;
   position: absolute;
-  bottom: -100%;
+  bottom: -14rem;
+  height: 14rem;
+  opacity: 0;
+  margin-inline: auto;
   left: 0;
-  padding-left: 20px;
-  padding-top: 30px;
-  padding-bottom: 30px;
-  z-index: 10;
-  width: 100%;
+  right: 0;
+  z-index: 1;
+  width: 400px;
   background-color: var(--accent-secondary);
   color: var(--text-tertiary);
-  opacity: 0.8;
+  padding: 1.5rem 2rem;
+  border-radius: 1rem;
 
   a {
     color: var(--text-tertiary);
