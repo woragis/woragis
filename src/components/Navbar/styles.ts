@@ -15,8 +15,20 @@ export const Nav = styled.nav`
   }
 `
 
-export const Logo = styled.span`
-  text-transform: uppercase;
+export const Logo = styled.a`
+  height: 100%;
+  padding: 5px;
+  svg {
+    font-size: 23px;
+    transition: all 300ms;
+    height: 100%;
+    fill: var(--text-secondary);
+  }
+  &:hover {
+    svg {
+      fill: var(--text-primary);
+    }
+  }
 `
 
 export const Links = styled.ul`
