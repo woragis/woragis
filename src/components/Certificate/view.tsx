@@ -19,6 +19,7 @@ export const CertificateView = ({
 
   return (
     <Certificate
+      className='certificate'
       index={index}
       reverse={reverse}
       quantity={quantity}

@@ -1,6 +1,8 @@
 import styled from '@emotion/styled'
 
 export const Section = styled.section`
+  width: 100%;
+  overflow-x: hidden;
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   padding-block: 40px 80px;

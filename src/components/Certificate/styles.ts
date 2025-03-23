@@ -9,9 +9,6 @@ interface CertificateProps {
 }
 
 const animation = keyframes`
-from {
-  left: 100%;
-}
 to {
   left: calc(var(--certificate-width) * -1);
 }
@@ -31,17 +28,18 @@ export const Certificate = styled.li<CertificateProps>`
   background-color: var(--bg-primary);
   color: var(--text-secondary);
   position: absolute;
-  left: ${(_) => (_.reverse ? '0' : '100%')};
-  right: ${(_) => (_.reverse ? '100%' : '0')};
-  top: ${(_) => (_.reverse ? 'calc(var(--certificate-height) - 20px)' : '')};
-  --quantity: ${(_) => _.quantity};
-  --duration: calc(${(_) => _.quantity}s * 1.5);
-  --position: ${(_) => _.index};
-  animation: ${animation} var(--duration) linear infinite
-    ${(_) => (_.reverse ? 'reverse' : '')};
+  left: max(calc(200px * 8), 100%);
+  top: 0;
+
+  --quantity: 16;
+  --duration: 5s;
+  --index: ${(_) => _.index + 1};
+  animation: ${animation} var(--duration) linear infinite !important;
   animation-delay: calc(
-    (var(--duration) / var(--quantity)) * (var(--position) - 1) * 3.2
-  );
+    var(--duration) / var(--quantity) * (var(--quantity) - var(--index)) * -1
+  ) !important;
+  width: var(--certificate-width);
+  overflow-x: hidden;
 `
 
 interface CompletedProps {

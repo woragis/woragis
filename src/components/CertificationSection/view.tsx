@@ -23,7 +23,13 @@ export const CertificationSectionView = ({
   return (
     <Section id='certifications'>
       <Title>My Certifications</Title>
-      <Certificates>{myCertificationsComponent}</Certificates>
+      <Certificates
+        reverse={true}
+        rows={1}
+        quantity={myCertifications.length}
+      >
+        {myCertificationsComponent}
+      </Certificates>
       {/* <ul>
         <em>Extra curricular certificates</em>
         <li>Curso de Piano e Teclado: Academia da Musica Online</li>
