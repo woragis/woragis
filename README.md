@@ -140,20 +140,11 @@ Por favor, encontre-me no [LinkedIn](https://www.linkedin.com/in/jezreel-andrade
 </p>
 
 <!-- Mobile Languages and tools section -->
-<h3>Mobile languages</h3>
-<p>
-  <!-- Dart mobile language -->
-  <a href="https://dart.dev" target="_blank" rel="noreferrer">
-    <img src="https://www.vectorlogo.zone/logos/dartlang/dartlang-icon.svg" alt="dart" width="40" height="40"/>
-  </a>
+### Mobile languages
 
-  <!-- Flutter framework icon -->
-  <a href="https://flutter.dev" target="_blank" rel="noreferrer">
-    <img src="https://www.vectorlogo.zone/logos/flutterio/flutterio-icon.svg" alt="flutter" width="40" height="40"/>
-  </a>
-</p>
+[![My Skills](https://skillicons.dev/icons?i=dart,flutter)](https://woragis.github.io/woragis)
 
 <!-- <p><img align="center" src="https://github-readme-streak-stats.herokuapp.com/?user=woragis&" alt="woragis" /></p> 
-[![GitHub Streak](https://github-readme-streak-stats.herokuapp.com?user=woragis&hide_border=true)](https://git.io/streak-stats)
 -->
-<a href="https://git.io/streak-stats"><img src="https://github-readme-streak-stats.herokuapp.com?user=woragis&hide_border=true" alt="GitHub Streak" /></a>
+
+[![GitHub Streak](https://github-readme-streak-stats.herokuapp.com?user=woragis&hide_border=true)](https://woragis.github.io/woragis)
