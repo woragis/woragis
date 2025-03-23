@@ -1,3 +1,5 @@
+import { SiMinutemailer } from 'react-icons/si'
+import { Button } from '../ui/Button'
 import { Section, Title } from '../ui/Section'
 import { aboutSectionModel } from './model'
 import {
@@ -37,6 +39,9 @@ export const AboutSectionView = ({}: ReturnType<typeof aboutSectionModel>) => {
             actively seeking opportunities where I can apply my skills and grow
             as a developer.
           </AboutPargraph>
+          <Button>
+            Talk to Me <SiMinutemailer />{' '}
+          </Button>
         </Side>
         <PictureContainer>
           <AboutPicture

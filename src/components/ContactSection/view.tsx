@@ -1,16 +1,9 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
 import { contactSectionModel } from './model'
-import {
-  Button,
-  Field,
-  Form,
-  Message,
-  Section,
-  SectionImg,
-  Title,
-} from './styles'
+import { Field, Form, Message, Section, SectionImg, Title } from './styles'
 import ishowspeed from '@/assets/ishowspeed.jpg'
 import { MdOutlineArrowForwardIos } from 'react-icons/md'
+import { Button } from '../ui/Button'
 
 export const ContactSectionView = ({}: ReturnType<
   typeof contactSectionModel

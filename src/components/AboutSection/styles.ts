@@ -22,6 +22,7 @@ export const Side = styled.aside`
   flex-direction: column;
   justify-content: center;
   align-items: start;
+  gap: 50px;
 `
 
 export const AboutPargraph = styled.p`
