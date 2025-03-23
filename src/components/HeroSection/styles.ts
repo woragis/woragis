@@ -1,13 +1,13 @@
 import styled from '@emotion/styled'
 
 export const Hero = styled.section`
-  height: calc(100vh - 5rem);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: row-reverse;
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  height: max(500px, calc(100vh - 5rem));
 
   @media (max-width: 800px) {
     & {
