@@ -5,7 +5,6 @@ export const AboutMe = styled.article`
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
   align-items: center;
-  height: 600px;
   padding: 3rem 6rem;
   @media (max-width: 1024px) {
     & {
