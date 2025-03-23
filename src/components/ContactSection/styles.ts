@@ -1,3 +1,4 @@
+import { keyframes } from '@emotion/react'
 import styled from '@emotion/styled'
 
 export const Section = styled.section`
@@ -124,6 +125,11 @@ export const Message = styled.textarea`
   }
 `
 
+const buttonAnimation = keyframes`
+  to {
+    transform: rotate(360deg);
+  }
+`
 export const Button = styled.button`
   display: flex;
   justify-content: center;
@@ -145,19 +151,18 @@ export const Button = styled.button`
     content: '';
     position: absolute;
     z-index: -1;
-    height: 400%;
-    width: 100%;
+    height: 500%;
+    width: 110%;
     border-radius: 50px;
     background: linear-gradient(
       230deg,
       var(--accent-primary),
       var(--bg-primary)
     );
-    transition: 200ms;
   }
   &:hover {
     &::before {
-      transform: rotate(260deg);
+      animation: ${buttonAnimation} 500ms infinite linear;
     }
   }
 `
