@@ -13,6 +13,7 @@ const MobileNav = (props: MobileNavProps) => {
     return (
       <Link
         initial={{ opacity: 0, y: -50 + index * -10 }}
+        exit={{ opacity: 0, y: -50 + index * -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeInOut' }}
       >
@@ -26,6 +27,7 @@ const MobileNav = (props: MobileNavProps) => {
         <Nav
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={props.handleClose}
         >
