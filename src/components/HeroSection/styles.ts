@@ -7,7 +7,8 @@ export const Hero = styled.section`
   flex-direction: row-reverse;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  height: max(500px, calc(100vh - 5rem));
+  height: max(500px, calc(100vh - var(--nav-height)));
+  margin-top: var(--nav-height);
 
   @media (max-width: 800px) {
     & {

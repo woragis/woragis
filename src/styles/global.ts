@@ -2,6 +2,7 @@ import { css } from '@emotion/react'
 
 export const styles = css`
   :root {
+    --nav-height: 5rem;
     /* Background Colors */
     --bg-primary: #f8f9fa;
     --bg-secondary: #e9ecef;
@@ -51,5 +52,6 @@ export const styles = css`
   }
   html {
     scroll-behavior: smooth;
+    background-color: var(--bg-primary);
   }
 `

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { navbarModel } from './model'
 import { Burger, Link, Links, Logo, Nav } from './styles'
 import MobileNav from '../MobileNav'
+import { useMotionValueEvent, useScroll } from 'framer-motion'
 
 export const NavbarView = ({ links }: ReturnType<typeof navbarModel>) => {
   const linksComponent = links.map((link, index) => {
@@ -16,15 +17,34 @@ export const NavbarView = ({ links }: ReturnType<typeof navbarModel>) => {
   const [mobileNavOpened, setMobileNavOpened] = useState<boolean>(false)
   const handleBurgerClick = () => {
     if (burgerRef.current) {
-      burgerRef.current.classList.toggle('active')
+      mobileNavOpened
+        ? burgerRef.current.classList.remove('active')
+        : burgerRef.current.classList.add('active')
       setMobileNavOpened((p) => !p)
     }
   }
   const handleMobileNavClose = () => {
     handleBurgerClick()
   }
+  const [navHidden, setNavHidden] = useState<boolean>(false)
+  const { scrollY } = useScroll()
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    const previous = scrollY.getPrevious() || 0
+    if (previous < latest && latest > 150) {
+      setNavHidden(true)
+    } else {
+      setNavHidden(false)
+    }
+  })
   return (
-    <Nav>
+    <Nav
+      variants={{
+        visible: { y: 0 },
+        hidden: { y: '-100%' },
+      }}
+      animate={navHidden ? 'hidden' : 'visible'}
+      transition={{ duration: 0.35, ease: 'linear' }}
+    >
       <Burger
         ref={burgerRef}
         onClick={handleBurgerClick}

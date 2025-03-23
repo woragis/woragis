@@ -1,13 +1,18 @@
 import styled from '@emotion/styled'
+import { motion } from 'framer-motion'
 
-export const Nav = styled.nav`
+export const Nav = styled(motion.nav)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 5rem;
+  height: var(--nav-height);
   padding-inline: 50px;
   background-color: var(--bg-secondary);
-  position: relative;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
 
   a,
   span {
