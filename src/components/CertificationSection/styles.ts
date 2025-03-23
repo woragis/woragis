@@ -1,5 +1,14 @@
 import styled from '@emotion/styled'
 
+export const CertificationsWrapper = styled.section`
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 1) 15% 85%,
+    rgba(0, 0, 0, 0)
+  );
+`
+
 interface CertificatesProps {
   reverse: boolean
   rows: number
@@ -23,13 +32,6 @@ export const Certificates = styled.ul<CertificatesProps>`
   width: 100%;
   min-width: calc(var(--certificate-width) * var(--certificates-quantity));
 
-  mask-image: linear-gradient(
-    to right,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 1) 20%,
-    rgba(0, 0, 0, 1) 90%,
-    rgba(0, 0, 0, 0)
-  );
   & .certificate {
     transition: filter 500ms;
   }

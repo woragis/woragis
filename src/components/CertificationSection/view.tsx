@@ -1,7 +1,7 @@
 import Certificate from '../Certificate'
 import { Section, Title } from '../ui/Section'
 import { certificationSectionModel } from './model'
-import { Certificates } from './styles'
+import { Certificates, CertificationsWrapper } from './styles'
 
 export const CertificationSectionView = ({
   myCertifications,
@@ -21,16 +21,17 @@ export const CertificationSectionView = ({
   )
 
   return (
-    <Section id='certifications'>
-      <Title>My Certifications</Title>
-      <Certificates
-        reverse={true}
-        rows={1}
-        quantity={myCertifications.length}
-      >
-        {myCertificationsComponent}
-      </Certificates>
-      {/* <ul>
+    <Section>
+      <CertificationsWrapper id='certifications'>
+        <Title>My Certifications</Title>
+        <Certificates
+          reverse={true}
+          rows={1}
+          quantity={myCertifications.length}
+        >
+          {myCertificationsComponent}
+        </Certificates>
+        {/* <ul>
         <em>Extra curricular certificates</em>
         <li>Curso de Piano e Teclado: Academia da Musica Online</li>
         <li>Curso de Piano completo para Iniciantes</li>
@@ -46,6 +47,7 @@ export const CertificationSectionView = ({
         <li>Teoria da Musica do Intermediario ao Avancado</li>
         <li>Harmonia da Musica do Bascio ao Avancado</li>
       </ul> */}
+      </CertificationsWrapper>
     </Section>
   )
 }
