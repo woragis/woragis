@@ -609,6 +609,7 @@ to {
     var(--duration) / var(--certificates-quantity) *
       (var(--certificates-quantity) - var(--index)) * -1
   ) !important;
+  animation-direction: ${n=>n.reverse?"reverse":"normal"} !important;
   overflow-x: hidden;
 `,c4=it(B5)`
   color: ${n=>n.completed?"green":"var(--text-muted)"};
