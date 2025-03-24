@@ -578,7 +578,7 @@ to {
   }
 `,n4=it.p`
   color: var(--text-muted);
-`,i4=({project:n})=>j.jsxs(J5,{children:[j.jsx(t4,{src:n.imgSrc,alt:n.name}),j.jsxs(W5,{id:"normal-data",children:[j.jsx(Tg,{children:n.name}),j.jsx(n4,{children:n.description})]}),j.jsxs(I5,{id:"hidden-data",children:[j.jsx(Tg,{children:n.name}),j.jsxs(e4,{href:n.href,children:["Link ",j.jsx(Av,{})]})]})]}),a4=({project:n})=>{const a=P5(n);return j.jsx(i4,{...a})},l4=({projects:n})=>{const a=n.map(s=>j.jsx(a4,{project:s}));return j.jsxs(Yf,{id:"projects",children:[j.jsx(Gf,{children:"Projects"}),j.jsx(Z5,{children:a})]})},s4=()=>{const n=X5();return j.jsx(l4,{...n})},r4=()=>({myCertifications:[{key:"docker",name:"Docker and Kubernetes: The Complete Guide",imgSrc:"",tags:["docker","devops","kubernetes"],completed:!0},{key:"git",name:"The Git & Github Bootcamp",imgSrc:"",tags:["git","github"],completed:!0},{key:"github-actions",name:"Github Actions - The Complete Guide",imgSrc:"",tags:["github","github-actions","ci/cd"],completed:!0},{key:"tailwindcss",name:"Tailwind CSS From Scratch | Learn By Building Projects",imgSrc:"",tags:["html","css","tailwind"],completed:!0},{key:"nextjs",name:"Next.js 15 & React - The Complete Guide",imgSrc:"",tags:["react","nextjs","backend"],completed:!1},{key:"aws",name:"AWS, na pratica!",imgSrc:"",tags:["aws"],completed:!1},{key:"kubernetes",name:"",imgSrc:"",tags:[],completed:!1},{key:"backend-fundamentals",name:"Fundamentals of Backend Engineering",imgSrc:"",tags:["backend"],completed:!1},{key:"database-fundamentals",name:"Fundamentals of Database Engineering",imgSrc:"",tags:["database"],completed:!1},{key:"devops",name:"",imgSrc:"",tags:[],completed:!1},{key:"java",name:"Java Masterclass 2025: 130+ Hours of Expert Lessons",imgSrc:"",tags:["java"],completed:!1},{key:"spring-boot",name:"Spring Boot 3, Spring Framework 6: Beginner to Guru",imgSrc:"",tags:["java","spring-boot","backend"],completed:!1},{key:"rust",name:"",imgSrc:"",tags:[],completed:!1},{key:"go",name:"Go - The Complete Guide",imgSrc:"",tags:["go","backend"],completed:!1},{key:"sql",name:"SQL and PostgreSQL: The Complete Developer's Guide",imgSrc:"",tags:["postgres","sql","database"],completed:!1},{key:"redis",name:"Redis: The Complete Developer's Guide",imgSrc:"",tags:["redis","cache"],completed:!1}]}),o4=wa`
+`,i4=({project:n})=>j.jsxs(J5,{children:[j.jsx(t4,{src:n.imgSrc,alt:n.name}),j.jsxs(W5,{id:"normal-data",children:[j.jsx(Tg,{children:n.name}),j.jsx(n4,{children:n.description})]}),j.jsxs(I5,{id:"hidden-data",children:[j.jsx(Tg,{children:n.name}),j.jsxs(e4,{href:n.href,children:["Link ",j.jsx(Av,{})]})]})]}),a4=({project:n})=>{const a=P5(n);return j.jsx(i4,{...a})},l4=({projects:n})=>{const a=n.map(s=>j.jsx(a4,{project:s}));return j.jsxs(Yf,{id:"projects",children:[j.jsx(Gf,{children:"Projects"}),j.jsx(Z5,{children:a})]})},s4=()=>{const n=X5();return j.jsx(l4,{...n})},r4=()=>{const n=[{key:"docker",name:"Docker and Kubernetes: The Complete Guide",imgSrc:"",tags:["docker","devops","kubernetes"],completed:!0},{key:"git",name:"The Git & Github Bootcamp",imgSrc:"",tags:["git","github"],completed:!0},{key:"github-actions",name:"Github Actions - The Complete Guide",imgSrc:"",tags:["github","github-actions","ci/cd"],completed:!0},{key:"tailwindcss",name:"Tailwind CSS From Scratch | Learn By Building Projects",imgSrc:"",tags:["html","css","tailwind"],completed:!0},{key:"nextjs",name:"Next.js 15 & React - The Complete Guide",imgSrc:"",tags:["react","nextjs","backend"],completed:!1},{key:"aws",name:"AWS, na pratica!",imgSrc:"",tags:["aws"],completed:!1},{key:"kubernetes",name:"",imgSrc:"",tags:[],completed:!1},{key:"backend-fundamentals",name:"Fundamentals of Backend Engineering",imgSrc:"",tags:["backend"],completed:!1},{key:"database-fundamentals",name:"Fundamentals of Database Engineering",imgSrc:"",tags:["database"],completed:!1},{key:"devops",name:"",imgSrc:"",tags:[],completed:!1},{key:"java",name:"Java Masterclass 2025: 130+ Hours of Expert Lessons",imgSrc:"",tags:["java"],completed:!1},{key:"spring-boot",name:"Spring Boot 3, Spring Framework 6: Beginner to Guru",imgSrc:"",tags:["java","spring-boot","backend"],completed:!1},{key:"rust",name:"",imgSrc:"",tags:[],completed:!1},{key:"go",name:"Go - The Complete Guide",imgSrc:"",tags:["go","backend"],completed:!1},{key:"sql",name:"SQL and PostgreSQL: The Complete Developer's Guide",imgSrc:"",tags:["postgres","sql","database"],completed:!1},{key:"redis",name:"Redis: The Complete Developer's Guide",imgSrc:"",tags:["redis","cache"],completed:!1}],a=n.length,s=3,r=Math.floor(a/s);return{myCertifications:n,certificatesLength:a,certificatePerRow:s,rowsCount:r}},o4=wa`
 to {
   left: calc(var(--certificate-width) * -1);
 }
@@ -597,7 +597,9 @@ to {
   color: var(--text-secondary);
   position: absolute;
   left: max(calc(200px * 8), 100%);
-  --top: calc(${n=>n.top} * var(--certificate-height));
+  --top: calc(
+    (${n=>n.top} * var(--certificate-height)) + (${n=>n.top} * 20px)
+  );
   top: var(--top);
 
   --duration: 5s;
@@ -737,7 +739,9 @@ to {
   --certificate-height: 120px;
   --certificate-width: 400px;
   --rows: ${n=>n.rows};
-  --certificates-height: calc(var(--certificate-height) * var(--rows));
+  --certificates-height: calc(
+    (var(--certificate-height) * var(--rows)) + (var(--rows) * 20px)
+  );
   --certificates-quantity: ${n=>n.quantity};
 
   height: var(--certificates-height);
@@ -758,7 +762,7 @@ to {
   & .certificate:hover {
     filter: grayscale(0);
   }
-`,S4=({myCertifications:n})=>{const a=n.length,s=3,r=Math.floor(a/s),u=n.map((f,d)=>{const p=Math.floor(d%a/s);return j.jsx(y4,{certificate:f,index:d,reverse:p%2===0,top:p},f.key)});return j.jsx(Yf,{children:j.jsxs(v4,{id:"certifications",children:[j.jsx(Gf,{children:"My Certifications"}),j.jsx(b4,{reverse:!0,rows:r+1,quantity:a,children:u})]})})},x4=()=>{const n=r4();return j.jsx(S4,{...n})},T4=()=>({});function A4(n){return Vi({attr:{role:"img",viewBox:"0 0 24 24"},child:[{tag:"path",attr:{d:"M17.187 19.181L24 4.755 0 12.386l9.196 1.963.043 4.896 2.759-2.617-2.147-2.076 7.336 4.63z"},child:[]}]})(n)}const E4=wa`
+`,S4=({myCertifications:n,certificatesLength:a,certificatePerRow:s,rowsCount:r})=>{const u=n.map((f,d)=>{const p=Math.floor(d%a/s);return j.jsx(y4,{certificate:f,index:d,reverse:p%2===0,top:p},f.key)});return j.jsx(Yf,{children:j.jsxs(v4,{id:"certifications",children:[j.jsx(Gf,{children:"My Certifications"}),j.jsx(b4,{reverse:!0,rows:r+1,quantity:a,children:u})]})})},x4=()=>{const n=r4();return j.jsx(S4,{...n})},T4=()=>({});function A4(n){return Vi({attr:{role:"img",viewBox:"0 0 24 24"},child:[{tag:"path",attr:{d:"M17.187 19.181L24 4.755 0 12.386l9.196 1.963.043 4.896 2.759-2.617-2.147-2.076 7.336 4.63z"},child:[]}]})(n)}const E4=wa`
   to {
     transform: rotate(360deg);
   }
