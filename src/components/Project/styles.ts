@@ -65,14 +65,14 @@ export const Project = styled.li`
   cursor: pointer;
 
   &:not(:hover) {
-    animation: ${showOverflowAnimation} 2s forwards;
+    animation: ${showOverflowAnimation} 1s forwards;
     #hidden-data {
-      animation: ${removeCardAnimation} 1s forwards;
+      animation: ${removeCardAnimation} 500ms forwards;
     }
   }
   &:hover {
     padding: 0;
-    animation: ${removeOverflowAnimation} 2s forwards;
+    animation: ${removeOverflowAnimation} 1s forwards;
     img {
       top: -20px;
       height: 100%;
@@ -85,7 +85,7 @@ export const Project = styled.li`
       }
     }
     #hidden-data {
-      animation: ${showCardAnimation} 1s forwards;
+      animation: ${showCardAnimation} 500ms forwards;
       opacity: 1;
       transition: opacity 300ms;
     }
@@ -110,7 +110,7 @@ export const HiddenData = styled.article`
   left: 0;
   right: 0;
   z-index: 1;
-  width: 400px;
+  width: 92%;
   background-color: var(--accent-secondary);
   color: var(--text-tertiary);
   padding: 1.5rem 2rem;
