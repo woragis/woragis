@@ -6,14 +6,20 @@ import { Certificates, CertificationsWrapper } from './styles'
 export const CertificationSectionView = ({
   myCertifications,
 }: ReturnType<typeof certificationSectionModel>) => {
+  const certificatesLength = myCertifications.length
+  const certificatePerRow = 3
+  const rowsCount = Math.floor(certificatesLength / certificatePerRow)
   const myCertificationsComponent = myCertifications.map(
     (certificate, index) => {
+      const row = Math.floor((index % certificatesLength) / certificatePerRow)
+
       return (
         <Certificate
           key={certificate.key}
           certificate={certificate}
           index={index}
-          reverse={index % 2 === 0}
+          reverse={row % 2 === 0}
+          top={row}
         />
       )
     }
@@ -25,8 +31,8 @@ export const CertificationSectionView = ({
         <Title>My Certifications</Title>
         <Certificates
           reverse={true}
-          rows={1}
-          quantity={myCertifications.length}
+          rows={rowsCount + 1}
+          quantity={certificatesLength}
         >
           {myCertificationsComponent}
         </Certificates>

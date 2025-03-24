@@ -40,6 +40,7 @@ export interface CertificateProps {
   certificate: CertificationsInterface
   reverse: boolean
   index: number
+  top: number
 }
 
 export interface ProjectInterface {

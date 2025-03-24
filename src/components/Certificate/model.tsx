@@ -4,7 +4,8 @@ import { Tag } from './styles'
 export const certificateModel = (
   certificate: CertificationsInterface,
   reverse: boolean,
-  index: number
+  index: number,
+  top: number
 ) => {
   const mapTags = (tags: Tags[]) => {
     return tags.map((tag) => {
@@ -12,5 +13,5 @@ export const certificateModel = (
     })
   }
 
-  return { certificate, mapTags, index, reverse }
+  return { certificate, mapTags, index, reverse, top }
 }
