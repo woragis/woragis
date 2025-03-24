@@ -23,14 +23,20 @@ export const Side = styled.aside`
   justify-content: center;
   align-items: start;
   gap: 50px;
+  padding-inline: 100px;
+
+  button {
+    width: 200px;
+  }
 `
 
 export const AboutPargraph = styled.p`
   max-width: 600px;
   display: inline-block;
-  margin-inline: auto;
+  margin-inline-end: auto;
   font-size: 1.2rem;
   line-height: 1.8rem;
+  text-align: left;
 `
 
 export const Highlight = styled.span`

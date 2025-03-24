@@ -27,7 +27,7 @@ export const Button = styled.button`
     content: '';
     position: absolute;
     z-index: -1;
-    height: 500%;
+    height: 500px;
     width: 110%;
     border-radius: 50px;
     background: linear-gradient(
