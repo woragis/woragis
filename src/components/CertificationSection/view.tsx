@@ -5,10 +5,10 @@ import { Certificates, CertificationsWrapper } from './styles'
 
 export const CertificationSectionView = ({
   myCertifications,
+  certificatesLength,
+  certificatePerRow,
+  rowsCount,
 }: ReturnType<typeof certificationSectionModel>) => {
-  const certificatesLength = myCertifications.length
-  const certificatePerRow = 3
-  const rowsCount = Math.floor(certificatesLength / certificatePerRow)
   const myCertificationsComponent = myCertifications.map(
     (certificate, index) => {
       const row = Math.floor((index % certificatesLength) / certificatePerRow)

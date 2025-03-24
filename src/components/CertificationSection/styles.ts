@@ -25,7 +25,9 @@ export const Certificates = styled.ul<CertificatesProps>`
   --certificate-height: 120px;
   --certificate-width: 400px;
   --rows: ${(_) => _.rows};
-  --certificates-height: calc(var(--certificate-height) * var(--rows));
+  --certificates-height: calc(
+    (var(--certificate-height) * var(--rows)) + (var(--rows) * 20px)
+  );
   --certificates-quantity: ${(_) => _.quantity};
 
   height: var(--certificates-height);

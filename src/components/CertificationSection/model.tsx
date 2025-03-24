@@ -98,5 +98,9 @@ export const certificationSectionModel = () => {
     },
   ]
 
-  return { myCertifications }
+  const certificatesLength = myCertifications.length
+  const certificatePerRow = 3
+  const rowsCount = Math.floor(certificatesLength / certificatePerRow)
+
+  return { myCertifications, certificatesLength, certificatePerRow, rowsCount }
 }

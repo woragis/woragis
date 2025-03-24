@@ -29,7 +29,9 @@ export const Certificate = styled.li<CertificateProps>`
   color: var(--text-secondary);
   position: absolute;
   left: max(calc(200px * 8), 100%);
-  --top: calc(${(_) => _.top} * var(--certificate-height));
+  --top: calc(
+    (${(_) => _.top} * var(--certificate-height)) + (${(_) => _.top} * 20px)
+  );
   top: var(--top);
 
   --duration: 5s;
