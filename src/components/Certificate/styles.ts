@@ -41,6 +41,7 @@ export const Certificate = styled.li<CertificateProps>`
     var(--duration) / var(--certificates-quantity) *
       (var(--certificates-quantity) - var(--index)) * -1
   ) !important;
+  animation-direction: ${(_) => (_.reverse ? 'reverse' : 'normal')} !important;
   overflow-x: hidden;
 `
 
