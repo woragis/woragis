@@ -23,7 +23,7 @@ export const Certificates = styled.ul<CertificatesProps>`
   position: relative;
   overflow-x: hidden;
   --certificate-height: 120px;
-  --certificate-width: 240px;
+  --certificate-width: 400px;
   --rows: ${(_) => _.rows};
   --certificates-height: calc(var(--certificate-height) * var(--rows));
   --certificates-quantity: ${(_) => _.quantity};

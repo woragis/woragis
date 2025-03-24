@@ -14,7 +14,6 @@ export const CertificationSectionView = ({
           certificate={certificate}
           index={index}
           reverse={index % 2 === 0}
-          quantity={myCertifications.length / 2}
         />
       )
     }

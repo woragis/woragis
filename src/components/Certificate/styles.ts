@@ -5,7 +5,6 @@ import { FaCircleCheck } from 'react-icons/fa6'
 interface CertificateProps {
   index: number
   reverse: boolean
-  quantity: number
 }
 
 const animation = keyframes`
@@ -31,14 +30,15 @@ export const Certificate = styled.li<CertificateProps>`
   left: max(calc(200px * 8), 100%);
   top: 0;
 
-  --quantity: 16;
   --duration: 5s;
+  --max-per-row: 5;
+  --row-quantity: calc(var(--certificates-quantity) / var(--max-per-row));
   --index: ${(_) => _.index + 1};
   animation: ${animation} var(--duration) linear infinite !important;
   animation-delay: calc(
-    var(--duration) / var(--quantity) * (var(--quantity) - var(--index)) * -1
+    var(--duration) / var(--certificates-quantity) *
+      (var(--certificates-quantity) - var(--index)) * -1
   ) !important;
-  width: var(--certificate-width);
   overflow-x: hidden;
 `
 
