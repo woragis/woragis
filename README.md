@@ -64,24 +64,9 @@ Por favor, encontre-me no [LinkedIn](https://www.linkedin.com/in/jezreel-andrade
 </p>
 
 <!-- Database Section -->
-<h3 align="left">Database Languages</h3>
+### Database Languages
 
-<p>
-  <!-- PostgreSQL Database Icon -->
-  <a href="https://www.postgresql.org" target="_blank" rel="noreferrer">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original-wordmark.svg" alt="postgresql" width="40" height="40"/>
-  </a>
-
-  <!-- Redis Database Icon -->
-  <a href="https://redis.io" target="_blank" rel="noreferrer">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/redis/redis-original-wordmark.svg" alt="redis" width="40" height="40"/>
-  </a>
-
-  <!-- MongoDB Database Icon -->
-  <a href="https://www.mongodb.com/" target="_blank" rel="noreferrer">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mongodb/mongodb-original-wordmark.svg" alt="mongodb" width="40" height="40"/>
-  </a>
-</p>
+[![My Skills](https://skillicons.dev/icons?i=postgres,redis,mongodb)](https://woragis.github.io/woragis)
 
 <!-- Frontend Languages -->
 <h3 align="left">Frontend Languages and Tools</h3>
