@@ -47,32 +47,24 @@ Por favor, encontre-me no [LinkedIn](https://www.linkedin.com/in/jezreel-andrade
   <code><a href="https://instagram.com/y.jezreel.andrade"><img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="gmail link" /></a></code>
 </p>
 
-<!-- Devops -->
-<h3 align="left">Devops Tools</h3>
-<p align="left">
-  <a href="#">
-    <img src="https://skillicons.dev/icons?i=aws,docker,kubernetes,linux,git,nginx" />
-  </a>
-</p>
+<!-- Devops Section -->
+### Devops Tools
+[![My Skills](https://skillicons.dev/icons?i=linux,aws,docker,kubernetes,git,nginx)](https://woragis.github.io/woragis)
 
-<!-- Backend Languages -->
+<!-- Backend Section -->
 ### Backend Languages
-
 [![My Skills](https://skillicons.dev/icons?i=rust,golang,nodejs,express,javascript,typescript,python,django)](https://woragis.github.io/woragis)
 
 <!-- Database Section -->
 ### Database Languages
-
 [![My Skills](https://skillicons.dev/icons?i=postgres,redis,mongodb)](https://woragis.github.io/woragis)
 
-<!-- Frontend Languages -->
+<!-- Frontend Section -->
 ### Frontend Languages and Tools
-
 [![My Skills](https://skillicons.dev/icons?i=html,css,javascript,typescript,react,redux,sass,tailwindcss&perline=2)](https://woragis.github.io/woragis)
 
-<!-- Mobile Languages and tools section -->
+<!-- Mobile Section -->
 ### Mobile languages
-
 [![My Skills](https://skillicons.dev/icons?i=dart,flutter)](https://woragis.github.io/woragis)
 
 <!-- <p><img align="center" src="https://github-readme-streak-stats.herokuapp.com/?user=woragis&" alt="woragis" /></p> 
