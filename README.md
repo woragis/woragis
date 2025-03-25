@@ -56,12 +56,9 @@ Por favor, encontre-me no [LinkedIn](https://www.linkedin.com/in/jezreel-andrade
 </p>
 
 <!-- Backend Languages -->
-<h3 align="left">Backend Languages</h3>
-<p align="left">
-  <a href="#">
-    <img src="https://skillicons.dev/icons?i=rust,golang,nodejs,express,python,django" />
-  </a>
-</p>
+### Backend Languages
+
+[![My Skills](https://skillicons.dev/icons?i=rust,golang,nodejs,express,javascript,typescript,python,django)](https://woragis.github.io/woragis)
 
 <!-- Database Section -->
 ### Database Languages
