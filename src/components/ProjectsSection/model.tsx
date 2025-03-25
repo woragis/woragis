@@ -26,6 +26,14 @@ export const projectsSectionModel = () => {
       lastUpdated: '',
       description: 'Useful to use as a marketing page',
     },
+    {
+      name: 'Pokedex',
+      href: 'https://pokedex-webapp-submodule.vercel.app/',
+      imgSrc: '',
+      tags: ['nextjs', 'scss', 'firebase'],
+      lastUpdated: '',
+      description: 'Pokedex project',
+    },
   ]
 
   return { projects }

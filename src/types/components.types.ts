@@ -22,6 +22,7 @@ export type Frameworks =
   | 'redis'
   | 'cache'
   | 'javascript'
+  | 'scss'
 
 export type Careers = 'backend' | 'frontend' | 'devops' | 'database'
 export type ProjectType = 'clone'
