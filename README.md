@@ -71,7 +71,7 @@ Por favor, encontre-me no [![LinkedIn](src/assets/linkedin.svg)](https://www.lin
 
 <!-- Frontend Section -->
 ### Frontend Languages and Tools
-[![My Skills](https://skillicons.dev/icons?i=html,css,javascript,typescript,react,redux,sass,tailwindcss&perline=2)](https://woragis.github.io/woragis)
+[![My Skills](https://skillicons.dev/icons?i=html,css,javascript,typescript,react,redux,sass,tailwindcss)](https://woragis.github.io/woragis)
 
 <!-- Mobile Section -->
 ### Mobile languages
