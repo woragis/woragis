@@ -25,7 +25,7 @@ Here are some ideas to get you started:
 |Project Title|Website Link|Github Link|
 |---|---|---|
 |My Page|[My Page](https://woragis.github.io/woragis)|[woragis/](https://github.com/woragis/woragis)|
-|Pokedex|[Woragis's Pokedex](https://pokedex-woragis.vercel.app)|[Pokedex](https://github.com/woragis/pokedex-webapp-submodule)|
+|Pokedex|[Woragis's Pokedex](https://pokedex-woragis.vercel.app)|[pokedex/](https://github.com/woragis/pokedex-webapp-submodule)|
 |RD Clone|[Reservatorio Clone](https://github.com/woragis/rd-clone)|[rd-clone/](https://github.com/woragis/rd-clone)|
 |Mario Clone|[Mario Landing Page](https://github.com/woragis/mario)|[mario/](https://github.com/woragis/mario)|
 |Todo App|[Todo App](https://github.com/woragis/todo-app)|[todo/](https://github.com/woragis/todo-app)|
