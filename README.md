@@ -21,6 +21,19 @@ Here are some ideas to get you started:
 
 - 🌱 I’m currently learning **AWS and Nextjs**
 
+### Projects
+
+- [My Personal Page](https://github.com/woragis/woragis)
+- [Pokedex](https://github.com/woragis/pokedex-webapp-submodule)
+- [Reservatorio Clone](https://github.com/woragis/rd-clone)
+- [Mario Game Clone](https://github.com/woragis/mario)
+- [Todo App](https://github.com/woragis/todo-app)
+- [Notes App](https://github.com/woragis/notes-app)
+- [Bmi Calculator](https://github.com/woragis/bmi-calculator)
+- [Afk Minecraft Bot](https://github.com/woragis/minecraft-afk-bot)
+- [Weather App](https://github.com/woragis/weather-app)
+- [Blog App](https://github.com/woragis/blog-app)
+
 ### Work Experience
 
 Na visão geral abaixo você encontrará minha experiência de trabalho mais recente:
