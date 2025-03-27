@@ -1,4 +1,5 @@
 import { ProjectInterface } from '@/types/components.types'
+import pokedexScreenShot from '@/assets/projects/pokedex-screenshot.png'
 
 export const projectsSectionModel = () => {
   const projects: ProjectInterface[] = [
@@ -28,8 +29,8 @@ export const projectsSectionModel = () => {
     },
     {
       name: 'Pokedex',
-      href: 'https://pokedex-webapp-submodule.vercel.app/',
-      imgSrc: '',
+      href: 'https://pokedex-woragis.vercel.app/',
+      imgSrc: pokedexScreenShot,
       tags: ['nextjs', 'scss', 'firebase'],
       lastUpdated: '',
       description: 'Pokedex project',
