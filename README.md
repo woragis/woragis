@@ -22,17 +22,18 @@ Here are some ideas to get you started:
 - 🌱 I’m currently learning **AWS and Nextjs**
 
 ### Projects
-
-- [My Personal Page](https://github.com/woragis/woragis)
-- [Pokedex](https://github.com/woragis/pokedex-webapp-submodule)
-- [Reservatorio Clone](https://github.com/woragis/rd-clone)
-- [Mario Game Clone](https://github.com/woragis/mario)
-- [Todo App](https://github.com/woragis/todo-app)
-- [Notes App](https://github.com/woragis/notes-app)
-- [Bmi Calculator](https://github.com/woragis/bmi-calculator)
-- [Afk Minecraft Bot](https://github.com/woragis/minecraft-afk-bot)
-- [Weather App](https://github.com/woragis/weather-app)
-- [Blog App](https://github.com/woragis/blog-app)
+|Project Title|Website Link|Github Link|
+|---|---|---|
+|My Page|[My Page](https://woragis.github.io/woragis)|[woragis/](https://github.com/woragis/woragis)|
+|Pokedex|[Woragis's Pokedex](https://pokedex-woragis.vercel.app)|[Pokedex](https://github.com/woragis/pokedex-webapp-submodule)|
+|RD Clone|[Reservatorio Clone](https://github.com/woragis/rd-clone)|[rd-clone/](https://github.com/woragis/rd-clone)|
+|Mario Clone|[Mario Landing Page](https://github.com/woragis/mario)|[mario/](https://github.com/woragis/mario)|
+|Todo App|[Todo App](https://github.com/woragis/todo-app)|[todo/](https://github.com/woragis/todo-app)|
+|Notes App|[Notes App](https://github.com/woragis/notes-app)|[notes/](https://github.com/woragis/notes-app)|
+|Bmi Calculator|[Bmi Calculator](https://github.com/woragis/bmi-calculator)|[bmi-calculator/](https://github.com/woragis/bmi-calculator)|
+|Minecraft Afk Mouse|[Afk Minecraft Bot](https://github.com/woragis/minecraft-afk-bot)|[minecraft-afk/](https://github.com/woragis/minecraft-afk-bot)|
+|Weather App|[Weather App](https://github.com/woragis/weather-app)|[weather/](https://github.com/woragis/weather-app)|
+|Blog App|[Blog App](https://github.com/woragis/blog-app)|[blog/](https://github.com/woragis/blog-app)|
 
 ### Work Experience
 
