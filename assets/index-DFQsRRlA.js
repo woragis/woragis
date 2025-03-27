@@ -393,7 +393,7 @@ Error generating stack: `+i.message+`
   width: 100%;
   text-align: center;
   background-color: var(--bg-primary);
-`,G5=({socialLinks:n})=>{const a=n.map(s=>{const[r,u]=G.useState(!1);return j.jsx(q5,{onMouseEnter:()=>u(!0),onMouseLeave:()=>u(!1),children:j.jsxs("a",{href:s.path,target:"_black",children:[s.icon,j.jsx(qg,{children:r&&j.jsx(Il.span,{initial:{opacity:0,position:"absolute",x:"-24%",textTransform:"capitalize",fontSize:18,fontWeight:700},animate:{opacity:1,y:30,x:"-24%"},exit:{opacity:0,y:0},transition:{duration:.2},children:s.name})})]})})});return j.jsxs(L5,{children:[j.jsx(H5,{children:a}),j.jsx(Y5,{children:"© 2025 Jezreel de Andrade. All Rights Reserved."})]})},k5=()=>{const n=N5();return j.jsx(G5,{...n})},X5=()=>({projects:[{name:"E-commerce",href:"https://woragis.github.io/e-commerce",imgSrc:"",tags:["spring-boot","java","react"],lastUpdated:"",description:"Project I built with NextJs, and used stripe"},{name:"Reservatorio de Dopamina",href:"https://woragis.github.io/rd-clone",imgSrc:"",tags:["clone","nextjs","stripe"],lastUpdated:"",description:"Project based on a platform of neuroscience studying"},{name:"Landing Page",href:"https://woragis.github.io/landing-page",imgSrc:"",tags:["html","css","javascript"],lastUpdated:"",description:"Useful to use as a marketing page"},{name:"Pokedex",href:"https://pokedex-webapp-submodule.vercel.app/",imgSrc:"",tags:["nextjs","scss","firebase"],lastUpdated:"",description:"Pokedex project"}]}),Z5=it.ul`
+`,G5=({socialLinks:n})=>{const a=n.map(s=>{const[r,u]=G.useState(!1);return j.jsx(q5,{onMouseEnter:()=>u(!0),onMouseLeave:()=>u(!1),children:j.jsxs("a",{href:s.path,target:"_black",children:[s.icon,j.jsx(qg,{children:r&&j.jsx(Il.span,{initial:{opacity:0,position:"absolute",x:"-24%",textTransform:"capitalize",fontSize:18,fontWeight:700},animate:{opacity:1,y:30,x:"-24%"},exit:{opacity:0,y:0},transition:{duration:.2},children:s.name})})]})})});return j.jsxs(L5,{children:[j.jsx(H5,{children:a}),j.jsx(Y5,{children:"© 2025 Jezreel de Andrade. All Rights Reserved."})]})},k5=()=>{const n=N5();return j.jsx(G5,{...n})},X5="/woragis/assets/pokedex-screenshot-ByJFTYp4.png",Z5=()=>({projects:[{name:"E-commerce",href:"https://woragis.github.io/e-commerce",imgSrc:"",tags:["spring-boot","java","react"],lastUpdated:"",description:"Project I built with NextJs, and used stripe"},{name:"Reservatorio de Dopamina",href:"https://woragis.github.io/rd-clone",imgSrc:"",tags:["clone","nextjs","stripe"],lastUpdated:"",description:"Project based on a platform of neuroscience studying"},{name:"Landing Page",href:"https://woragis.github.io/landing-page",imgSrc:"",tags:["html","css","javascript"],lastUpdated:"",description:"Useful to use as a marketing page"},{name:"Pokedex",href:"https://pokedex-woragis.vercel.app/",imgSrc:X5,tags:["nextjs","scss","firebase"],lastUpdated:"",description:"Pokedex project"}]}),P5=it.ul`
   padding-inline: 50px;
   display: grid;
   justify-items: center;
@@ -445,7 +445,7 @@ Error generating stack: `+i.message+`
   @media (max-width: 800px) {
     width: 100%;
   }
-`,P5=n=>({project:n});function Av(n){return Vi({attr:{viewBox:"0 0 512 512"},child:[{tag:"path",attr:{d:"M432,320H400a16,16,0,0,0-16,16V448H64V128H208a16,16,0,0,0,16-16V80a16,16,0,0,0-16-16H48A48,48,0,0,0,0,112V464a48,48,0,0,0,48,48H400a48,48,0,0,0,48-48V336A16,16,0,0,0,432,320ZM488,0h-128c-21.37,0-32.05,25.91-17,41l35.73,35.73L135,320.37a24,24,0,0,0,0,34L157.67,377a24,24,0,0,0,34,0L435.28,133.32,471,169c15,15,41,4.5,41-17V24A24,24,0,0,0,488,0Z"},child:[]}]})(n)}const K5=wa`
+`,K5=n=>({project:n});function Av(n){return Vi({attr:{viewBox:"0 0 512 512"},child:[{tag:"path",attr:{d:"M432,320H400a16,16,0,0,0-16,16V448H64V128H208a16,16,0,0,0,16-16V80a16,16,0,0,0-16-16H48A48,48,0,0,0,0,112V464a48,48,0,0,0,48,48H400a48,48,0,0,0,48-48V336A16,16,0,0,0,432,320ZM488,0h-128c-21.37,0-32.05,25.91-17,41l35.73,35.73L135,320.37a24,24,0,0,0,0,34L157.67,377a24,24,0,0,0,34,0L435.28,133.32,471,169c15,15,41,4.5,41-17V24A24,24,0,0,0,488,0Z"},child:[]}]})(n)}const Q5=wa`
 50% {
   transform: translateY(-18rem);
 }
@@ -455,11 +455,11 @@ Error generating stack: `+i.message+`
   opacity: 1;
 }
 
-`,Q5=wa`
+`,F5=wa`
 to {
   overflow: initial;
 }
-`,F5=wa`
+`,$5=wa`
 0% {
   overflow: initial;
   pointer-events: none;
@@ -467,7 +467,7 @@ to {
 50% {
   overflow: hidden;
 }
-`,$5=wa`
+`,J5=wa`
 0% {
   transform: translateY(-14rem);
 }
@@ -481,7 +481,7 @@ to {
   opacity: 0;
 }
 
-`,J5=it.li`
+`,W5=it.li`
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -502,14 +502,14 @@ to {
   cursor: pointer;
 
   &:not(:hover) {
-    animation: ${F5} 1s forwards;
+    animation: ${$5} 1s forwards;
     #hidden-data {
-      animation: ${$5} 500ms forwards;
+      animation: ${J5} 500ms forwards;
     }
   }
   &:hover {
     padding: 0;
-    animation: ${Q5} 1s forwards;
+    animation: ${F5} 1s forwards;
     img {
       top: -20px;
       height: 100%;
@@ -522,18 +522,18 @@ to {
       }
     }
     #hidden-data {
-      animation: ${K5} 500ms forwards;
+      animation: ${Q5} 500ms forwards;
       opacity: 1;
       transition: opacity 300ms;
     }
   }
-`,W5=it.article`
+`,I5=it.article`
   position: absolute;
   bottom: 20px;
   height: 50px;
   transition: 200ms;
   text-align: left;
-`,I5=it.article`
+`,t4=it.article`
   transition: 400ms ease-in-out;
   position: absolute;
   bottom: -14rem;
@@ -558,7 +558,7 @@ to {
     text-align: center;
     padding-inline: 0;
   }
-`,t4=it.img`
+`,e4=it.img`
   width: 100%;
   height: 220px;
   position: sticky;
@@ -569,20 +569,20 @@ to {
 `,Tg=it.h3`
   font-size: 2rem;
   transition: 200ms;
-`,e4=it.a`
+`,n4=it.a`
   text-decoration: none;
   transition: 200ms;
 
   &:hover {
     text-decoration: underline;
   }
-`,n4=it.p`
+`,i4=it.p`
   color: var(--text-muted);
-`,i4=({project:n})=>j.jsxs(J5,{children:[j.jsx(t4,{src:n.imgSrc,alt:n.name}),j.jsxs(W5,{id:"normal-data",children:[j.jsx(Tg,{children:n.name}),j.jsx(n4,{children:n.description})]}),j.jsxs(I5,{id:"hidden-data",children:[j.jsx(Tg,{children:n.name}),j.jsxs(e4,{href:n.href,children:["Link ",j.jsx(Av,{})]})]})]}),a4=({project:n})=>{const a=P5(n);return j.jsx(i4,{...a})},l4=({projects:n})=>{const a=n.map(s=>j.jsx(a4,{project:s}));return j.jsxs(Yf,{id:"projects",children:[j.jsx(Gf,{children:"Projects"}),j.jsx(Z5,{children:a})]})},s4=()=>{const n=X5();return j.jsx(l4,{...n})},r4=()=>{const n=[{key:"docker",name:"Docker and Kubernetes: The Complete Guide",imgSrc:"",tags:["docker","devops","kubernetes"],completed:!0},{key:"git",name:"The Git & Github Bootcamp",imgSrc:"",tags:["git","github"],completed:!0},{key:"github-actions",name:"Github Actions - The Complete Guide",imgSrc:"",tags:["github","github-actions","ci/cd"],completed:!0},{key:"tailwindcss",name:"Tailwind CSS From Scratch | Learn By Building Projects",imgSrc:"",tags:["html","css","tailwind"],completed:!0},{key:"nextjs",name:"Next.js 15 & React - The Complete Guide",imgSrc:"",tags:["react","nextjs","backend"],completed:!1},{key:"aws",name:"AWS, na pratica!",imgSrc:"",tags:["aws"],completed:!1},{key:"kubernetes",name:"",imgSrc:"",tags:[],completed:!1},{key:"backend-fundamentals",name:"Fundamentals of Backend Engineering",imgSrc:"",tags:["backend"],completed:!1},{key:"database-fundamentals",name:"Fundamentals of Database Engineering",imgSrc:"",tags:["database"],completed:!1},{key:"devops",name:"",imgSrc:"",tags:[],completed:!1},{key:"java",name:"Java Masterclass 2025: 130+ Hours of Expert Lessons",imgSrc:"",tags:["java"],completed:!1},{key:"spring-boot",name:"Spring Boot 3, Spring Framework 6: Beginner to Guru",imgSrc:"",tags:["java","spring-boot","backend"],completed:!1},{key:"rust",name:"",imgSrc:"",tags:[],completed:!1},{key:"go",name:"Go - The Complete Guide",imgSrc:"",tags:["go","backend"],completed:!1},{key:"sql",name:"SQL and PostgreSQL: The Complete Developer's Guide",imgSrc:"",tags:["postgres","sql","database"],completed:!1},{key:"redis",name:"Redis: The Complete Developer's Guide",imgSrc:"",tags:["redis","cache"],completed:!1}],a=n.length,s=3,r=Math.floor(a/s);return{myCertifications:n,certificatesLength:a,certificatePerRow:s,rowsCount:r}},o4=wa`
+`,a4=({project:n})=>j.jsxs(W5,{children:[j.jsx(e4,{src:n.imgSrc,alt:n.name}),j.jsxs(I5,{id:"normal-data",children:[j.jsx(Tg,{children:n.name}),j.jsx(i4,{children:n.description})]}),j.jsxs(t4,{id:"hidden-data",children:[j.jsx(Tg,{children:n.name}),j.jsxs(n4,{href:n.href,children:["Link ",j.jsx(Av,{})]})]})]}),l4=({project:n})=>{const a=K5(n);return j.jsx(a4,{...a})},s4=({projects:n})=>{const a=n.map(s=>j.jsx(l4,{project:s}));return j.jsxs(Yf,{id:"projects",children:[j.jsx(Gf,{children:"Projects"}),j.jsx(P5,{children:a})]})},r4=()=>{const n=Z5();return j.jsx(s4,{...n})},o4=()=>{const n=[{key:"docker",name:"Docker and Kubernetes: The Complete Guide",imgSrc:"",tags:["docker","devops","kubernetes"],completed:!0},{key:"git",name:"The Git & Github Bootcamp",imgSrc:"",tags:["git","github"],completed:!0},{key:"github-actions",name:"Github Actions - The Complete Guide",imgSrc:"",tags:["github","github-actions","ci/cd"],completed:!0},{key:"tailwindcss",name:"Tailwind CSS From Scratch | Learn By Building Projects",imgSrc:"",tags:["html","css","tailwind"],completed:!0},{key:"nextjs",name:"Next.js 15 & React - The Complete Guide",imgSrc:"",tags:["react","nextjs","backend"],completed:!1},{key:"aws",name:"AWS, na pratica!",imgSrc:"",tags:["aws"],completed:!1},{key:"kubernetes",name:"",imgSrc:"",tags:[],completed:!1},{key:"backend-fundamentals",name:"Fundamentals of Backend Engineering",imgSrc:"",tags:["backend"],completed:!1},{key:"database-fundamentals",name:"Fundamentals of Database Engineering",imgSrc:"",tags:["database"],completed:!1},{key:"devops",name:"",imgSrc:"",tags:[],completed:!1},{key:"java",name:"Java Masterclass 2025: 130+ Hours of Expert Lessons",imgSrc:"",tags:["java"],completed:!1},{key:"spring-boot",name:"Spring Boot 3, Spring Framework 6: Beginner to Guru",imgSrc:"",tags:["java","spring-boot","backend"],completed:!1},{key:"rust",name:"",imgSrc:"",tags:[],completed:!1},{key:"go",name:"Go - The Complete Guide",imgSrc:"",tags:["go","backend"],completed:!1},{key:"sql",name:"SQL and PostgreSQL: The Complete Developer's Guide",imgSrc:"",tags:["postgres","sql","database"],completed:!1},{key:"redis",name:"Redis: The Complete Developer's Guide",imgSrc:"",tags:["redis","cache"],completed:!1}],a=n.length,s=3,r=Math.floor(a/s);return{myCertifications:n,certificatesLength:a,certificatePerRow:s,rowsCount:r}},u4=wa`
 to {
   left: calc(var(--certificate-width) * -1);
 }
-`,u4=it.li`
+`,c4=it.li`
   width: var(--certificate-width);
   height: var(--certificate-height);
   border: 1px solid;
@@ -606,20 +606,20 @@ to {
   --max-per-row: 5;
   --row-quantity: calc(var(--certificates-quantity) / var(--max-per-row));
   --index: ${n=>n.index+1};
-  animation: ${o4} var(--duration) linear infinite !important;
+  animation: ${u4} var(--duration) linear infinite !important;
   animation-delay: calc(
     var(--duration) / var(--certificates-quantity) *
       (var(--certificates-quantity) - var(--index)) * -1
   ) !important;
   animation-direction: ${n=>n.reverse?"reverse":"normal"} !important;
   overflow-x: hidden;
-`,c4=it(B5)`
+`,f4=it(B5)`
   color: ${n=>n.completed?"green":"var(--text-muted)"};
   position: absolute;
   right: 10px;
   top: 10px;
   font-size: 1.4rem;
-`,f4=it.figure`
+`,d4=it.figure`
   position: relative;
   overflow: hidden;
   height: 100%;
@@ -664,15 +664,15 @@ to {
       opacity: 0.5;
     }
   }
-`,d4=it.h3`
+`,h4=it.h3`
   color: var(--text-primary);
   font-size: 1.2rem;
   letter-spacing: 2px;
-`,h4=it.p`
+`,m4=it.p`
   color: var(--text-muted);
   font-size: 0.9rem;
   letter-spacing: 1px;
-`,m4=it.span`
+`,p4=it.span`
   &.react {
     background-color: #dbeafe;
     color: #2563eb;
@@ -722,14 +722,14 @@ to {
     background-color: #67e8f9;
     color: #0891b2;
   }
-`,p4=(n,a,s,r)=>({certificate:n,mapTags:f=>f.map(d=>j.jsxs(m4,{className:d,children:[" ",d," "]})),index:s,reverse:a,top:r}),g4=({certificate:n,mapTags:a,reverse:s,index:r,top:u})=>{const f=a(n.tags);return console.log("certificate: ",n.name,"top: ",u),j.jsxs(u4,{className:"certificate",index:r,reverse:s,top:u,children:[j.jsxs(f4,{children:[j.jsx("img",{src:n.imgSrc,alt:n.key}),j.jsxs("a",{href:n.key,children:["Open ",j.jsx(Av,{})]})]}),j.jsxs("div",{children:[j.jsx(d4,{children:n.name}),j.jsxs(h4,{children:["Tags: ",f]}),j.jsx(c4,{completed:n.completed})]})]})},y4=({certificate:n,reverse:a,index:s,top:r})=>{const u=p4(n,a,s,r);return j.jsx(g4,{...u})},v4=it.section`
+`,g4=(n,a,s,r)=>({certificate:n,mapTags:f=>f.map(d=>j.jsxs(p4,{className:d,children:[" ",d," "]})),index:s,reverse:a,top:r}),y4=({certificate:n,mapTags:a,reverse:s,index:r,top:u})=>{const f=a(n.tags);return console.log("certificate: ",n.name,"top: ",u),j.jsxs(c4,{className:"certificate",index:r,reverse:s,top:u,children:[j.jsxs(d4,{children:[j.jsx("img",{src:n.imgSrc,alt:n.key}),j.jsxs("a",{href:n.key,children:["Open ",j.jsx(Av,{})]})]}),j.jsxs("div",{children:[j.jsx(h4,{children:n.name}),j.jsxs(m4,{children:["Tags: ",f]}),j.jsx(f4,{completed:n.completed})]})]})},v4=({certificate:n,reverse:a,index:s,top:r})=>{const u=g4(n,a,s,r);return j.jsx(y4,{...u})},b4=it.section`
   mask-image: linear-gradient(
     to right,
     rgba(0, 0, 0, 0),
     rgba(0, 0, 0, 1) 15% 85%,
     rgba(0, 0, 0, 0)
   );
-`,b4=it.ul`
+`,S4=it.ul`
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -762,7 +762,7 @@ to {
   & .certificate:hover {
     filter: grayscale(0);
   }
-`,S4=({myCertifications:n,certificatesLength:a,certificatePerRow:s,rowsCount:r})=>{const u=n.map((f,d)=>{const p=Math.floor(d%a/s);return j.jsx(y4,{certificate:f,index:d,reverse:p%2===0,top:p},f.key)});return j.jsx(Yf,{children:j.jsxs(v4,{id:"certifications",children:[j.jsx(Gf,{children:"My Certifications"}),j.jsx(b4,{reverse:!0,rows:r+1,quantity:a,children:u})]})})},x4=()=>{const n=r4();return j.jsx(S4,{...n})},T4=()=>({});function A4(n){return Vi({attr:{role:"img",viewBox:"0 0 24 24"},child:[{tag:"path",attr:{d:"M17.187 19.181L24 4.755 0 12.386l9.196 1.963.043 4.896 2.759-2.617-2.147-2.076 7.336 4.63z"},child:[]}]})(n)}const E4=wa`
+`,x4=({myCertifications:n,certificatesLength:a,certificatePerRow:s,rowsCount:r})=>{const u=n.map((f,d)=>{const p=Math.floor(d%a/s);return j.jsx(v4,{certificate:f,index:d,reverse:p%2===0,top:p},f.key)});return j.jsx(Yf,{children:j.jsxs(b4,{id:"certifications",children:[j.jsx(Gf,{children:"My Certifications"}),j.jsx(S4,{reverse:!0,rows:r+1,quantity:a,children:u})]})})},T4=()=>{const n=o4();return j.jsx(x4,{...n})},A4=()=>({});function E4(n){return Vi({attr:{role:"img",viewBox:"0 0 24 24"},child:[{tag:"path",attr:{d:"M17.187 19.181L24 4.755 0 12.386l9.196 1.963.043 4.896 2.759-2.617-2.147-2.076 7.336 4.63z"},child:[]}]})(n)}const M4=wa`
   to {
     transform: rotate(360deg);
   }
@@ -798,10 +798,10 @@ to {
   }
   &:hover {
     &::before {
-      animation: ${E4} 500ms infinite linear;
+      animation: ${M4} 500ms infinite linear;
     }
   }
-`,M4=it.article`
+`,D4=it.article`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
@@ -814,7 +814,7 @@ to {
       padding: 2rem;
     }
   }
-`,D4=it.aside`
+`,w4=it.aside`
   height: 100%;
   width: 100%;
   display: flex;
@@ -827,7 +827,7 @@ to {
   button {
     width: 200px;
   }
-`,w4=it.p`
+`,R4=it.p`
   max-width: 600px;
   display: inline-block;
   margin-inline-end: auto;
@@ -842,7 +842,7 @@ to {
   &:hover {
     color: var(--accent-primary);
   }
-`,R4=it.figure`
+`,O4=it.figure`
   display: flex;
   justify-content: center;
   @media (max-width: 1024px) {
@@ -850,12 +850,12 @@ to {
       margin-top: 2rem;
     }
   }
-`,O4=it.img`
+`,C4=it.img`
   width: 75%;
   max-width: 350px;
   border-radius: 16px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-`,C4=({})=>j.jsxs(Yf,{id:"about",children:[j.jsx(Gf,{children:"About"}),j.jsxs(M4,{children:[j.jsxs(D4,{children:[j.jsxs(w4,{children:["I'm a versatile developer with expertise in",j.jsx(en,{children:" frontend (React, Next.js)"}),",",j.jsx(en,{children:" backend (Next.js)"}),", and",j.jsx(en,{children:" DevOps (AWS, Docker, Kubernetes)"}),". I enjoy building"," ",j.jsx(en,{children:"scalable, high-performance applications"}),", focusing on both user experience and backend efficiency. My experience spans from ",j.jsx(en,{children:"modern web development"})," ","to ",j.jsx(en,{children:" cloud infrastructure"}),", ensuring robust and optimized solutions. Beyond coding, I'm committed to"," ",j.jsx(en,{children:"continuous learning"}),", currently studying"," ",j.jsx(en,{children:"Japanese and German"}),", with plans to learn"," ",j.jsx(en,{children:"Russian"})," as well. I also have a strong interest in ",j.jsx(en,{children:"fitness, music, and reading"}),". I'm actively seeking opportunities where I can apply my skills and grow as a developer."]}),j.jsxs(Ev,{children:["Talk to Me ",j.jsx(A4,{})," "]})]}),j.jsx(R4,{children:j.jsx(O4,{src:"",alt:"about image"})})]})]}),z4=()=>{const n=T4();return j.jsx(C4,{...n})},j4=()=>({}),_4=it.section`
+`,z4=({})=>j.jsxs(Yf,{id:"about",children:[j.jsx(Gf,{children:"About"}),j.jsxs(D4,{children:[j.jsxs(w4,{children:[j.jsxs(R4,{children:["I'm a versatile developer with expertise in",j.jsx(en,{children:" frontend (React, Next.js)"}),",",j.jsx(en,{children:" backend (Next.js)"}),", and",j.jsx(en,{children:" DevOps (AWS, Docker, Kubernetes)"}),". I enjoy building"," ",j.jsx(en,{children:"scalable, high-performance applications"}),", focusing on both user experience and backend efficiency. My experience spans from ",j.jsx(en,{children:"modern web development"})," ","to ",j.jsx(en,{children:" cloud infrastructure"}),", ensuring robust and optimized solutions. Beyond coding, I'm committed to"," ",j.jsx(en,{children:"continuous learning"}),", currently studying"," ",j.jsx(en,{children:"Japanese and German"}),", with plans to learn"," ",j.jsx(en,{children:"Russian"})," as well. I also have a strong interest in ",j.jsx(en,{children:"fitness, music, and reading"}),". I'm actively seeking opportunities where I can apply my skills and grow as a developer."]}),j.jsxs(Ev,{children:["Talk to Me ",j.jsx(E4,{})," "]})]}),j.jsx(O4,{children:j.jsx(C4,{src:"",alt:"about image"})})]})]}),j4=()=>{const n=A4();return j.jsx(z4,{...n})},_4=()=>({}),V4=it.section`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   justify-content: space-evenly;
@@ -867,7 +867,7 @@ to {
       grid-template-columns: 1fr;
     }
   }
-`,V4=it.form`
+`,B4=it.form`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -882,7 +882,7 @@ to {
       margin-inline: auto;
     }
   }
-`,B4=it.h2`
+`,U4=it.h2`
   text-align: left;
   display: inline-block;
   position: relative;
@@ -942,7 +942,7 @@ to {
       width: 100%;
     }
   }
-`,U4=it.textarea`
+`,N4=it.textarea`
   height: 140px;
   padding-top: 15px;
   border-radius: 20px;
@@ -969,7 +969,7 @@ to {
       width: 100%;
     }
   }
-`,N4=it.img`
+`,L4=it.img`
   width: 300px;
   border-radius: 30px;
   margin-inline: auto;
@@ -979,4 +979,4 @@ to {
       display: none;
     }
   }
-`,L4="/woragis/assets/ishowspeed-8NyvMymg.jpg";function H4(n){return Vi({attr:{viewBox:"0 0 24 24"},child:[{tag:"path",attr:{fill:"none",d:"M0 0h24v24H0V0z"},child:[]},{tag:"path",attr:{d:"M6.23 20.23 8 22l10-10L8 2 6.23 3.77 14.46 12z"},child:[]}]})(n)}const q4=({})=>{const[n,a]=G.useState(""),s={name:"",email:"",message:""},[r,u]=G.useState(s),f=m=>{u({...r,[m.target.name]:m.target.value}),a("")},d=m=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m),p=m=>{if(m.preventDefault(),!r.name||!r.email||!r.message){a("All fields are required");return}if(!d(r.email)){a("Invalidate email address");return}console.log("Form submited: ",r),alert("Message sent!"),u(s)};return j.jsxs(_4,{id:"contact",children:[j.jsxs(V4,{onSubmit:p,children:[j.jsx(B4,{children:"Get in touch"}),j.jsx(Ag,{type:"text",name:"name",value:r.name,onChange:f,required:!0,placeholder:"Your name"}),j.jsx(Ag,{type:"email",name:"email",value:r.email,onChange:f,required:!0,placeholder:"Your email"}),j.jsx(U4,{name:"message",value:r.message,onChange:f,placeholder:"Your Message"}),n&&j.jsx("p",{className:"error",children:n}),j.jsxs(Ev,{type:"submit",children:["Send ",j.jsx(H4,{})]})]}),j.jsx(N4,{src:L4,alt:"ishowspeed"})]})},Y4=()=>{const n=j4();return j.jsx(q4,{...n})};function G4(){return j.jsxs(j.Fragment,{children:[j.jsx("header",{children:j.jsx(y5,{})}),j.jsxs("main",{children:[j.jsx(M5,{}),j.jsx(z4,{}),j.jsx(s4,{}),j.jsx(x4,{}),j.jsx(Y4,{})]}),j.jsx(k5,{}),j.jsx(KS,{styles:QS})]})}iS.createRoot(document.getElementById("root")).render(j.jsx(G4,{}));
+`,H4="/woragis/assets/ishowspeed-8NyvMymg.jpg";function q4(n){return Vi({attr:{viewBox:"0 0 24 24"},child:[{tag:"path",attr:{fill:"none",d:"M0 0h24v24H0V0z"},child:[]},{tag:"path",attr:{d:"M6.23 20.23 8 22l10-10L8 2 6.23 3.77 14.46 12z"},child:[]}]})(n)}const Y4=({})=>{const[n,a]=G.useState(""),s={name:"",email:"",message:""},[r,u]=G.useState(s),f=m=>{u({...r,[m.target.name]:m.target.value}),a("")},d=m=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m),p=m=>{if(m.preventDefault(),!r.name||!r.email||!r.message){a("All fields are required");return}if(!d(r.email)){a("Invalidate email address");return}console.log("Form submited: ",r),alert("Message sent!"),u(s)};return j.jsxs(V4,{id:"contact",children:[j.jsxs(B4,{onSubmit:p,children:[j.jsx(U4,{children:"Get in touch"}),j.jsx(Ag,{type:"text",name:"name",value:r.name,onChange:f,required:!0,placeholder:"Your name"}),j.jsx(Ag,{type:"email",name:"email",value:r.email,onChange:f,required:!0,placeholder:"Your email"}),j.jsx(N4,{name:"message",value:r.message,onChange:f,placeholder:"Your Message"}),n&&j.jsx("p",{className:"error",children:n}),j.jsxs(Ev,{type:"submit",children:["Send ",j.jsx(q4,{})]})]}),j.jsx(L4,{src:H4,alt:"ishowspeed"})]})},G4=()=>{const n=_4();return j.jsx(Y4,{...n})};function k4(){return j.jsxs(j.Fragment,{children:[j.jsx("header",{children:j.jsx(y5,{})}),j.jsxs("main",{children:[j.jsx(M5,{}),j.jsx(j4,{}),j.jsx(r4,{}),j.jsx(T4,{}),j.jsx(G4,{})]}),j.jsx(k5,{}),j.jsx(KS,{styles:QS})]})}iS.createRoot(document.getElementById("root")).render(j.jsx(k4,{}));
