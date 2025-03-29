@@ -76,6 +76,7 @@ export const Project = styled.li`
     img {
       top: -20px;
       height: 100%;
+      object-fit: cover;
     }
     #normal-data {
       bottom: -100%;
@@ -130,6 +131,7 @@ export const HiddenData = styled.article`
 export const ProjectScreenshot = styled.img`
   width: 100%;
   height: 220px;
+  object-fit: cover;
   position: sticky;
   top: 0;
   border-radius: 20px;
