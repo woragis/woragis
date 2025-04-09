@@ -11,10 +11,10 @@ jobs:
       - name: Deploy React App to AWS
         uses: woragis/terraform-react@v1
         with:
+          project-name: ${{ secrets.PROJECT_NAME }} # e.g., "MyReactApp"
+          root-domain: ${{ secrets.ROOT_DOMAIN }} # e.g., "example.com"
           terraform-dir: ./terraform
-          s3-bucket-name: ${{ secrets.S3_BUCKET_NAME }}
-          cf-distribution-id: ${{ secrets.CF_DISTRIBUTION_ID }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          # Optional: aws-region: "us-west-2"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
