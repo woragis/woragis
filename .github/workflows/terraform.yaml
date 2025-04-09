@@ -1,0 +1,20 @@
+name: Deploy React App with Terraform
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy React App to AWS
+        uses: woragis/terraform-react@v1
+        with:
+          terraform-dir: ./terraform
+          s3-bucket-name: ${{ secrets.S3_BUCKET_NAME }}
+          cf-distribution-id: ${{ secrets.CF_DISTRIBUTION_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
