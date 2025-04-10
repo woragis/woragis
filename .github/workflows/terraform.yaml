@@ -9,41 +9,42 @@ on:
 
 jobs:
   terraform-react:
-    name: Deploy React App Infrastructure
-    uses: woragis/terraform-react/action.yaml@v1
-    with:
-      project-name: my-app
-      terraform-dir: ./infra/react
-      aws-region: us-east-1
-      s3-bucket-name: woragis-bucket-name
-      logging-bucket-name: woragis-logging-bucket
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy React App Infrastructure
+        uses: woragis/terraform-react@v1
+        with:
+          project-name: my-app
+          terraform-dir: ./infra/react
+          aws-region: us-east-1
+          s3-bucket-name: woragis-bucket-name
+          logging-bucket-name: woragis-logging-bucket
 
   terraform-route53:
-    name: Set up Route 53 DNS
+    runs-on: ubuntu-latest
     needs: terraform-react
-    uses: woragis/terraform-route53/action.yaml@v1
-    # uses: woragis/terraform-route53@v1
-    with:
-      project-name: myapp
-      root-domain: example.com
-      subdomain: app
-      target-domain: ${{ needs.terraform-react.outputs.website_endpoint }}
-      target-record-type: CNAME
-      terraform-dir: ./infra/route53
-      aws-region: us-east-1
-    secrets: inherit
+    steps:
+      - name: Set up Route 53 DNS
+        uses: woragis/terraform-route53@v1
+        with:
+          project-name: myapp
+          root-domain: example.com
+          subdomain: app
+          target-domain: ${{ needs.terraform-react.outputs.website_endpoint }}
+          target-record-type: CNAME
+          terraform-dir: ./infra/route53
+          aws-region: us-east-1
 
   terraform-cdn:
-    name: Update CDN (CloudFront)
+    runs-on: ubuntu-latest
     needs: terraform-react
-    uses: woragis/terraform-cdn/action.yaml@v1
-    # uses: woragis/terraform-cdn@v1
-    with:
-      project-name: myapp
-      terraform-dir: ./infra/cdn
-      root-domain: example.com
-      origin-domain-name: ${{ needs.terraform-react.outputs.website_endpoint }}
-      logging-bucket-domain-name: ${{ needs.terraform-react.outputs.logging_bucket_name }}
-      environment: prod
-    secrets: inherit
+    steps:
+      - name: Update CDN (CloudFront)
+        uses: woragis/terraform-cdn@v1
+        with:
+          project-name: myapp
+          terraform-dir: ./infra/cdn
+          root-domain: example.com
+          origin-domain-name: ${{ needs.terraform-react.outputs.website_endpoint }}
+          logging-bucket-domain-name: ${{ needs.terraform-react.outputs.logging_bucket_name }}
+          environment: prod
