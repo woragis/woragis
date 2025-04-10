@@ -2,8 +2,8 @@ provider "aws" {
   region = var.aws_region
 }
 
-module "react" {
-  source             = "git::https://github.com/woragis/terraform-react.git//?ref=v1"
+module "s3" {
+  source             = "git::https://github.com/woragis/terraform-s3.git//?ref=v1"
   aws_region         = var.aws_region
   project_name       = var.project_name
   environment        = var.environment
