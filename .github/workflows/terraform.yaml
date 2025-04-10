@@ -8,17 +8,40 @@ on:
       - staging
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  terraform-react:
+    name: Deploy React App Infrastructure
+    uses: woragis/terraform-react@v1
+    with:
+      project-name: my-app
+      terraform-dir: ./infra/react
+      aws-region: us-east-1
+      s3-bucket-name: woragis-bucket-name
+      logging-bucket-name: woragis-logging-bucket
+    secrets: inherit
 
-    steps:
-      - name: Use Terraform React Action
-        uses: woragis/terraform-react@vtest
-        with:
-          project-name: 'Woragis'
-          root-domain: 'woragis.com'
-          terraform-dir: './terraform'
-          subdomain: 'www'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  terraform-route53:
+    name: Set up Route 53 DNS
+    needs: terraform-react
+    uses: woragis/terraform-route53@v1
+    with:
+      project-name: myapp
+      root-domain: example.com
+      subdomain: app
+      target-domain: ${{ needs.terraform-react.outputs.website_endpoint }}
+      target-record-type: CNAME
+      terraform-dir: ./infra/route53
+      aws-region: us-east-1
+    secrets: inherit
+
+  terraform-cdn:
+    name: Update CDN (CloudFront)
+    needs: terraform-react
+    uses: woragis/terraform-cdn@v1
+    with:
+      project-name: myapp
+      terraform-dir: ./infra/cdn
+      root-domain: example.com
+      origin-domain-name: ${{ needs.terraform-react.outputs.website_endpoint }}
+      logging-bucket-domain-name: ${{ needs.terraform-react.outputs.logging_bucket_name }}
+      environment: prod
+    secrets: inherit
