@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Use Terraform React Action
-        uses: woragis/terraform-react@v1
+        uses: woragis/terraform-react@vtest
         with:
           project-name: 'Woragis'
           root-domain: 'woragis.com'
