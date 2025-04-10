@@ -3,5 +3,5 @@ provider "aws" {
 }
 
 module "route53" {
-  source             = "git::https://github.com/woragis/terraform_route53.git//?ref=v1"
+  source             = "git::https://github.com/woragis/terraform-route53.git//?ref=v1"
 }
