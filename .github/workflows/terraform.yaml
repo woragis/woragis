@@ -1,20 +1,24 @@
-name: Deploy React App with Terraform
+name: Deploy React App
 
 on:
   push:
-    branches: [main]
+    branches:
+      - dev
+      - main
+      - staging
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Deploy React App to AWS
+      - name: Use Terraform React Action
         uses: woragis/terraform-react@v1
         with:
-          project-name: ${{ secrets.PROJECT_NAME }} # e.g., "MyReactApp"
-          root-domain: ${{ secrets.ROOT_DOMAIN }} # e.g., "example.com"
-          terraform-dir: ./terraform
-          # Optional: aws-region: "us-west-2"
+          project-name: 'Woragis'
+          root-domain: 'woragis.com'
+          terraform-dir: './terraform'
+          subdomain: 'www'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
