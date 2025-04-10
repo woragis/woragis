@@ -3,6 +3,16 @@ variable "project_name" {
   type        = string
 }
 
+variable "root_domain" {
+  description = "The root domain for the application"
+  type        = string
+}
+
+variable "subdomain" {
+  description = "The subdomain for the application"
+  type        = string
+}
+
 variable "environment" {
   description = "Deployment environment"
   type        = string
