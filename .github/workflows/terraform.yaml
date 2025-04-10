@@ -19,6 +19,9 @@ jobs:
           aws-region: us-east-1
           s3-bucket-name: woragis-bucket-name
           logging-bucket-name: woragis-logging-bucket
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   terraform-route53:
     runs-on: ubuntu-latest
@@ -34,6 +37,9 @@ jobs:
           target-record-type: CNAME
           terraform-dir: ./infra/route53
           aws-region: us-east-1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   terraform-cdn:
     runs-on: ubuntu-latest
@@ -48,3 +54,6 @@ jobs:
           origin-domain-name: ${{ needs.terraform-react.outputs.website_endpoint }}
           logging-bucket-domain-name: ${{ needs.terraform-react.outputs.logging_bucket_name }}
           environment: prod
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
