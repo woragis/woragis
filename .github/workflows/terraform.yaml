@@ -10,7 +10,7 @@ on:
 jobs:
   terraform-react:
     name: Deploy React App Infrastructure
-    uses: woragis/terraform-react@v1
+    uses: woragis/terraform-react/action.yaml@v1
     with:
       project-name: my-app
       terraform-dir: ./infra/react
@@ -22,7 +22,8 @@ jobs:
   terraform-route53:
     name: Set up Route 53 DNS
     needs: terraform-react
-    uses: woragis/terraform-route53@v1
+    uses: woragis/terraform-route53/action.yaml@v1
+    # uses: woragis/terraform-route53@v1
     with:
       project-name: myapp
       root-domain: example.com
@@ -36,7 +37,8 @@ jobs:
   terraform-cdn:
     name: Update CDN (CloudFront)
     needs: terraform-react
-    uses: woragis/terraform-cdn@v1
+    uses: woragis/terraform-cdn/action.yaml@v1
+    # uses: woragis/terraform-cdn@v1
     with:
       project-name: myapp
       terraform-dir: ./infra/cdn
