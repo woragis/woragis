@@ -7,8 +7,8 @@ module "react_app" {
   aws_region   = var.aws_region
 
   # Optional variables with fallback logic
-  s3_bucket_name              = ""
-  logging_bucket_name         = ""
-  cloudfront_distribution_name = ""
-  route53_zone_id             = "" # optional but keep it clean
+  s3_bucket_name               = "null"
+  logging_bucket_name          = "null"
+  cloudfront_distribution_name = "null"
+  route53_zone_id              = "null" # optional but keep it clean
 }
