@@ -1,4 +1,4 @@
-name: Deploy React App
+name: AWS Deploy
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   terraform-s3:
-    name: Creates S3 Buckets
+    name: Create S3 Buckets
     runs-on: ubuntu-latest
     steps:
       - name: Deploy React App Infrastructure
@@ -35,7 +35,7 @@ jobs:
       website_endpoint: ${{ steps.get_outputs.outputs.website_endpoint }}
 
   terraform-cdn:
-    name: Connects CloudFront to S3 Buckets and Routes
+    name: Connect CloudFront to S3 Buckets and Routes
     runs-on: ubuntu-latest
     needs: terraform-s3
     steps:
@@ -68,7 +68,7 @@ jobs:
       zone_id: ${{ steps.get_outputs.outputs.zone_id }}
 
   terraform-route53:
-    name: Creates Routes and Certificates
+    name: Create Routes and Certificates
     runs-on: ubuntu-latest
     needs: terraform-cdn
     steps:
@@ -87,7 +87,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   s3-deploy:
-    name: Deploy React app to S3 Bucket
+    name: Deploy React App to S3 Bucket
     runs-on: ubuntu-latest
     needs: terraform-s3
     steps:
