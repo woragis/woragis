@@ -8,7 +8,6 @@ module "cdn" {
   project_name                 = var.project_name
   root_domain                  = var.root_domain
   subdomain                    = var.subdomain
-  cloudfront_distribution_name = var.cloudfront_distribution_name
   origin_domain_name           = var.origin_domain_name
   tags                         = var.tags
   environment                  = var.environment
