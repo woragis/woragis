@@ -30,11 +30,6 @@ variable "origin_domain_name" {
   type        = string
 }
 
-variable "logging_bucket_domain_name" {
-  description = "Logging bucket domain name"
-  type        = string
-}
-
 variable "cloudfront_distribution_name" {
   description = "Optional custom name for the distribution"
   type        = string

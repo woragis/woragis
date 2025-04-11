@@ -20,9 +20,3 @@ variable "s3_bucket_name" {
   type        = string
   default     = "null"
 }
-
-variable "logging_bucket_name" {
-  description = "Custom name for the logging bucket (optional)"
-  type        = string
-  default     = "null"
-}
