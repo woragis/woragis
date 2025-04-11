@@ -23,6 +23,9 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    outputs:
+      s3_bucket_name: ${{ steps.get_outputs.outputs.s3_bucket_name }}
+      website_endpoint: ${{ steps.get_outputs.outputs.website_endpoint }}
 
   terraform-cdn:
     name: Connects CloudFront to S3 Buckets and Routes
