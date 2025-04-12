@@ -60,8 +60,6 @@ jobs:
   terraform-s3:
     name: Create S3 Buckets
     runs-on: ubuntu-latest
-    needs:
-      - terraform-route53-domain
     steps:
       - name: Deploy React App Infrastructure
         uses: woragis/terraform-s3@v1
@@ -89,8 +87,7 @@ jobs:
   terraform-cdn:
     name: Connect CloudFront to S3 Buckets and Routes
     runs-on: ubuntu-latest
-    needs:
-      - terraform-s3
+    needs: terraform-s3
     steps:
       - name: Update CDN (CloudFront)
         uses: woragis/terraform-cdn@v1
@@ -143,10 +140,7 @@ jobs:
   s3-deploy:
     name: Deploy React App to S3 Bucket
     runs-on: ubuntu-latest
-    needs:
-      - terraform-s3
-      - terraform-cdn
-      - terraform-route53-subdomain
+    needs: terraform-s3
     steps:
       - name: Debug output
         run: |
