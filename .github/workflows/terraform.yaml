@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    uses: ./.github/actions/aws-deploy.yaml
+    uses: ./.github/workflows/aws-deploy.yaml
     with:
       aws-region: us-east-1
       project-name: woragis
