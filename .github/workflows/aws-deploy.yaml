@@ -87,7 +87,9 @@ jobs:
   terraform-cdn:
     name: Connect CloudFront to S3 Buckets and Routes
     runs-on: ubuntu-latest
-    needs: terraform-s3
+    needs:
+      - terraform-route53-domain
+      - terraform-s3
     steps:
       - name: Update CDN (CloudFront)
         uses: woragis/terraform-cdn@v1
