@@ -10,7 +10,7 @@ jobs:
     with:
       aws-region: us-east-1
       project-name: woragis
-      root-domain: example.com
+      root-domain: woragis.com
       subdomain: www
       environment: prod
       s3-bucket-name: woragis-prod-bucket
