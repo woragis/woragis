@@ -31,9 +31,37 @@ on:
         required: true
 
 jobs:
+  terraform-route53-domain:
+    name: Create Routes and Certificates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Route 53 DNS
+        uses: woragis/terraform-route53-domain@v1
+        with:
+          project-name: ${{ inputs.project-name }}
+          root-domain: ${{ inputs.root-domain }}
+          aws-region: ${{ inputs.aws-region }}
+          environment: ${{ inputs.environment }}
+          terraform-dir: ./terraform/route53-domain
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Extract Terraform outputs
+        working-directory: ./terraform/route53-domain
+        id: get_outputs
+        shell: bash
+        run: |
+          echo "zone_id=$(terraform output -raw zone_id)" >> $GITHUB_OUTPUT
+
+    outputs:
+      zone_id: ${{ steps.get_outputs.outputs.zone_id }}
+
   terraform-s3:
     name: Create S3 Buckets
     runs-on: ubuntu-latest
+    needs:
+      - terraform-route53-domain
     steps:
       - name: Deploy React App Infrastructure
         uses: woragis/terraform-s3@v1
@@ -61,7 +89,8 @@ jobs:
   terraform-cdn:
     name: Connect CloudFront to S3 Buckets and Routes
     runs-on: ubuntu-latest
-    needs: terraform-s3
+    needs:
+      - terraform-s3
     steps:
       - name: Update CDN (CloudFront)
         uses: woragis/terraform-cdn@v1
@@ -84,7 +113,6 @@ jobs:
           echo "cloudfront_domain_name=$(terraform output -raw cloudfront_domain_name)" >> $GITHUB_OUTPUT
           echo "cloudfront_distribution_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
           echo "full_domain=$(terraform output -raw full_domain)" >> $GITHUB_OUTPUT
-          echo "zone_id=$(terraform output -raw zone_id)" >> $GITHUB_OUTPUT
 
     outputs:
       cloudfront_domain_name: ${{ steps.get_outputs.outputs.cloudfront_domain_name }}
@@ -92,20 +120,20 @@ jobs:
       full_domain: ${{ steps.get_outputs.outputs.full_domain }}
       zone_id: ${{ steps.get_outputs.outputs.zone_id }}
 
-  terraform-route53:
+  terraform-route53-subdomain:
     name: Create Routes and Certificates
     runs-on: ubuntu-latest
     needs: terraform-cdn
     steps:
       - name: Set up Route 53 DNS
-        uses: woragis/terraform-route53@v1
+        uses: woragis/terraform-route53-subdomain@v1
         with:
           project-name: ${{ inputs.project-name }}
           root-domain: ${{ inputs.root-domain }}
           subdomain: ${{ inputs.subdomain }}
           target-domain: ${{ needs.terraform-cdn.outputs.cloudfront_domain_name }}
           target-record-type: CNAME
-          terraform-dir: ./terraform/route53
+          terraform-dir: ./terraform/route53-subdomain
           aws-region: ${{ inputs.aws-region }}
           environment: ${{ inputs.environment }}
         env:
@@ -118,7 +146,7 @@ jobs:
     needs:
       - terraform-s3
       - terraform-cdn
-      - terraform-route53
+      - terraform-route53-subdomain
     steps:
       - name: Debug output
         run: |

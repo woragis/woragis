@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "route53" {
-  source             = "git::https://github.com/woragis/terraform-route53.git//?ref=v1"
+  source             = "git::https://github.com/woragis/terraform-route53-subdomain.git//?ref=v1"
   aws_region         = var.aws_region
   root_domain        = var.root_domain
   subdomain          = var.subdomain
