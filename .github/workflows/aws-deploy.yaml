@@ -35,6 +35,45 @@ jobs:
     name: Create Routes and Certificates
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.5.0'
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.aws-region }}
+
+      - name: Terraform Init
+        run: terraform init
+        shell: bash
+        working-directory: ./terraform/route53-domain
+
+      - name: Get Hosted Zone ID
+        id: get_zone
+        run: |
+          HZ_ID=$(aws route53 list-hosted-zones-by-name \
+            --dns-name "${{ inputs.root-domain }}" \
+            --query "HostedZones[0].Id" \
+            --output text)
+
+          HZ_ID_CLEAN=${HZ_ID##*/}
+          echo "zone_id=$HZ_ID_CLEAN" >> $GITHUB_OUTPUT
+        shell: bash
+        working-directory: ./terraform/route53-domain
+
+      - name: Terraform Import Hosted Zone
+        if: steps.get_zone.outputs.zone_id != ''
+        run: terraform import aws_route53_zone.primary ${{ steps.get_zone.outputs.zone_id }}
+        shell: bash
+        working-directory: ./terraform/route53-domain
+
       - name: Set up Route 53 DNS
         uses: woragis/terraform-route53-domain@v1
         with:
