@@ -82,6 +82,7 @@ jobs:
           target-record-type: CNAME
           terraform-dir: ./terraform/route53
           aws-region: us-east-1
+          environment: prod
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
