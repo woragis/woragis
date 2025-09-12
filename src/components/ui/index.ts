@@ -4,3 +4,4 @@ export { Section } from "./Section";
 export { Container } from "./Container";
 export { ThemeToggle } from "./ThemeToggle";
 export { LanguageSwitcher } from "./LanguageSwitcher";
+export { ClientOnly } from "../ClientOnly";
