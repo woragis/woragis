@@ -2,37 +2,82 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Section, Container, Card } from "../ui";
+import { Section, Container, Card, EmptyState } from "../ui";
+import { usePublicFeaturedTestimonials } from "@/hooks/usePublicTestimonials";
+import { Star, Quote } from "lucide-react";
 
 export const Testimonials: React.FC = () => {
   const { t } = useLanguage();
+  const {
+    data: testimonials = [],
+    isLoading,
+    error,
+  } = usePublicFeaturedTestimonials(3);
 
-  const testimonials = [
-    {
-      name: t("testimonials.items.client1.name"),
-      role: t("testimonials.items.client1.role"),
-      company: t("testimonials.items.client1.company"),
-      content: t("testimonials.items.client1.content"),
-      avatar: "👨‍💼",
-      rating: 5,
-    },
-    {
-      name: t("testimonials.items.client2.name"),
-      role: t("testimonials.items.client2.role"),
-      company: t("testimonials.items.client2.company"),
-      content: t("testimonials.items.client2.content"),
-      avatar: "👩‍💻",
-      rating: 5,
-    },
-    {
-      name: t("testimonials.items.client3.name"),
-      role: t("testimonials.items.client3.role"),
-      company: t("testimonials.items.client3.company"),
-      content: t("testimonials.items.client3.content"),
-      avatar: "👨‍🎨",
-      rating: 5,
-    },
-  ];
+  if (isLoading) {
+    return (
+      <Section
+        id="testimonials"
+        title={t("testimonials.title")}
+        subtitle={t("testimonials.subtitle")}
+      >
+        <Container>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, index) => (
+              <Card key={index} className="animate-pulse">
+                <div className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full mr-4"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Container>
+      </Section>
+    );
+  }
+
+  if (error) {
+    return (
+      <Section
+        id="testimonials"
+        title={t("testimonials.title")}
+        subtitle={t("testimonials.subtitle")}
+      >
+        <Container>
+          <EmptyState
+            title="Unable to Load Testimonials"
+            description="There was an error loading the testimonials. Please try again later."
+          />
+        </Container>
+      </Section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return (
+      <Section
+        id="testimonials"
+        title={t("testimonials.title")}
+        subtitle={t("testimonials.subtitle")}
+      >
+        <Container>
+          <EmptyState
+            title="No Testimonials Yet"
+            description="Testimonials will appear here once they are added to the portfolio."
+          />
+        </Container>
+      </Section>
+    );
+  }
 
   return (
     <Section
@@ -42,36 +87,56 @@ export const Testimonials: React.FC = () => {
     >
       <Container>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <Card key={index} hover className="flex flex-col">
-              <div className="flex items-center mb-4">
-                <div className="text-4xl mr-4">{testimonial.avatar}</div>
-                <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-white">
-                    {testimonial.name}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {testimonial.role} at {testimonial.company}
-                  </p>
+          {testimonials.map((testimonial) => (
+            <Card key={testimonial.id} hover className="flex flex-col h-full">
+              <div className="p-6 flex flex-col h-full">
+                {/* Quote icon */}
+                <div className="mb-4">
+                  <Quote className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+                </div>
+
+                {/* Testimonial content */}
+                <blockquote className="text-gray-600 dark:text-gray-300 mb-6 flex-grow">
+                  "{testimonial.content}"
+                </blockquote>
+
+                {/* Rating */}
+                <div className="flex items-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${
+                        i < testimonial.rating
+                          ? "text-yellow-400 fill-current"
+                          : "text-gray-300 dark:text-gray-600"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Author info */}
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                    {testimonial.avatar ? (
+                      <img
+                        src={testimonial.avatar}
+                        alt={testimonial.name}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      testimonial.name.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">
+                      {testimonial.name}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {testimonial.position} at {testimonial.company}
+                    </p>
+                  </div>
                 </div>
               </div>
-
-              <div className="flex mb-4">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <svg
-                    key={i}
-                    className="w-5 h-5 text-yellow-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-
-              <blockquote className="text-gray-600 dark:text-gray-300 italic flex-grow">
-                "{testimonial.content}"
-              </blockquote>
             </Card>
           ))}
         </div>
