@@ -2,20 +2,25 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope } from "react-icons/fa";
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
   const { t } = useLanguage();
 
   const socialLinks = [
-    { name: "GitHub", href: "https://github.com/yourusername", icon: "🐙" },
+    { name: "GitHub", href: "https://github.com/yourusername", icon: FaGithub },
     {
       name: "LinkedIn",
       href: "https://linkedin.com/in/yourprofile",
-      icon: "💼",
+      icon: FaLinkedin,
     },
-    { name: "Twitter", href: "https://twitter.com/yourusername", icon: "🐦" },
-    { name: "Email", href: "mailto:hello@example.com", icon: "📧" },
+    {
+      name: "Twitter",
+      href: "https://twitter.com/yourusername",
+      icon: FaTwitter,
+    },
+    { name: "Email", href: "mailto:hello@example.com", icon: FaEnvelope },
   ];
 
   return (
@@ -31,18 +36,21 @@ export const Footer: React.FC = () => {
               {t("footer.description")}
             </p>
             <div className="flex space-x-4">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                  aria-label={link.name}
-                >
-                  <span className="text-xl">{link.icon}</span>
-                </a>
-              ))}
+              {socialLinks.map((link) => {
+                const IconComponent = link.icon;
+                return (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    aria-label={link.name}
+                  >
+                    <IconComponent className="text-xl" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 

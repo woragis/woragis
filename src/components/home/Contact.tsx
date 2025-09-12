@@ -3,34 +3,35 @@
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Section, Container, Card, Button } from "../ui";
+import { FaEnvelope, FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
 
 export const Contact: React.FC = () => {
   const { t } = useLanguage();
 
   const contactMethods = [
     {
-      icon: "📧",
+      icon: FaEnvelope,
       title: t("contact.methods.email.title"),
       description: t("contact.methods.email.description"),
       value: t("contact.methods.email.value"),
       action: "mailto:hello@example.com",
     },
     {
-      icon: "💼",
+      icon: FaLinkedin,
       title: t("contact.methods.linkedin.title"),
       description: t("contact.methods.linkedin.description"),
       value: t("contact.methods.linkedin.value"),
       action: "https://linkedin.com/in/yourprofile",
     },
     {
-      icon: "🐙",
+      icon: FaGithub,
       title: t("contact.methods.github.title"),
       description: t("contact.methods.github.description"),
       value: t("contact.methods.github.value"),
       action: "https://github.com/yourusername",
     },
     {
-      icon: "🐦",
+      icon: FaTwitter,
       title: t("contact.methods.twitter.title"),
       description: t("contact.methods.twitter.description"),
       value: t("contact.methods.twitter.value"),
@@ -55,25 +56,30 @@ export const Contact: React.FC = () => {
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4">
-              {contactMethods.map((method, index) => (
-                <Card key={index} hover className="text-center">
-                  <div className="text-3xl mb-3">{method.icon}</div>
-                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    {method.title}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                    {method.description}
-                  </p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => window.open(method.action, "_blank")}
-                  >
-                    {method.value}
-                  </Button>
-                </Card>
-              ))}
+              {contactMethods.map((method, index) => {
+                const IconComponent = method.icon;
+                return (
+                  <Card key={index} hover className="text-center">
+                    <div className="text-3xl mb-3 text-blue-600 dark:text-blue-400">
+                      <IconComponent />
+                    </div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                      {method.title}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                      {method.description}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => window.open(method.action, "_blank")}
+                    >
+                      {method.value}
+                    </Button>
+                  </Card>
+                );
+              })}
             </div>
           </div>
 
