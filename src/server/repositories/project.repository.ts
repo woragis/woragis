@@ -95,18 +95,18 @@ export class ProjectRepository {
   }
 
   async search(filters: ProjectFilters): Promise<Project[]> {
-    let query = db.select().from(projects);
+    const conditions = [];
 
     if (filters.featured !== undefined) {
-      query = query.where(eq(projects.featured, filters.featured));
+      conditions.push(eq(projects.featured, filters.featured));
     }
 
     if (filters.visible !== undefined) {
-      query = query.where(eq(projects.visible, filters.visible));
+      conditions.push(eq(projects.visible, filters.visible));
     }
 
     if (filters.search) {
-      query = query.where(
+      conditions.push(
         and(
           like(projects.title, `%${filters.search}%`),
           like(projects.description, `%${filters.search}%`)
@@ -118,7 +118,13 @@ export class ProjectRepository {
       // This would need a more complex query for JSON array search
       // For now, we'll implement a simple text search
       const techFilter = filters.technologies.join("|");
-      query = query.where(like(projects.technologies, `%${techFilter}%`));
+      conditions.push(like(projects.technologies, `%${techFilter}%`));
+    }
+
+    let query = db.select().from(projects);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
 
     if (filters.limit) {

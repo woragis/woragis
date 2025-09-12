@@ -25,8 +25,8 @@ export abstract class BaseService {
     };
   }
 
-  protected validateId(id: string): boolean {
-    return id && id.trim().length > 0;
+  protected validateId(id: string | boolean): boolean {
+    return typeof id === "string" && id.trim().length > 0;
   }
 
   protected validateRequired<T>(data: T, fields: (keyof T)[]): string[] {

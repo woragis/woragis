@@ -1,10 +1,20 @@
+// Import all repositories
+import { ProjectRepository } from "./project.repository";
+import { TagRepository } from "./tag.repository";
+import { CategoryRepository } from "./category.repository";
+import { LanguageRepository } from "./language.repository";
+import { FrameworkRepository } from "./framework.repository";
+import { SettingsRepository } from "./settings.repository";
+
 // Export all repositories
-export { ProjectRepository } from "./project.repository";
-export { TagRepository } from "./tag.repository";
-export { CategoryRepository } from "./category.repository";
-export { LanguageRepository } from "./language.repository";
-export { FrameworkRepository } from "./framework.repository";
-export { SettingsRepository } from "./settings.repository";
+export {
+  ProjectRepository,
+  TagRepository,
+  CategoryRepository,
+  LanguageRepository,
+  FrameworkRepository,
+  SettingsRepository,
+};
 
 // Create singleton instances
 export const projectRepository = new ProjectRepository();

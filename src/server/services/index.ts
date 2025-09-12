@@ -1,10 +1,20 @@
+// Import all services
+import { ProjectService } from "./project.service";
+import { CategoryService } from "./category.service";
+import { TagService } from "./tag.service";
+import { LanguageService } from "./language.service";
+import { FrameworkService } from "./framework.service";
+import { SettingsService } from "./settings.service";
+
 // Export all services
-export { ProjectService } from "./project.service";
-export { CategoryService } from "./category.service";
-export { TagService } from "./tag.service";
-export { LanguageService } from "./language.service";
-export { FrameworkService } from "./framework.service";
-export { SettingsService } from "./settings.service";
+export {
+  ProjectService,
+  CategoryService,
+  TagService,
+  LanguageService,
+  FrameworkService,
+  SettingsService,
+};
 
 // Create singleton instances
 export const projectService = new ProjectService();
