@@ -1,9 +1,13 @@
 import { pgTable, text, uuid, timestamp, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { projects } from "./projects";
+import { users } from "./auth";
 
 export const tags = pgTable("tags", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull().unique(),
   slug: text("slug").notNull().unique(),
   description: text("description"),
@@ -26,7 +30,11 @@ export const projectTags = pgTable("project_tags", {
 });
 
 // Relations
-export const tagsRelations = relations(tags, ({ many }) => ({
+export const tagsRelations = relations(tags, ({ one, many }) => ({
+  user: one(users, {
+    fields: [tags.userId],
+    references: [users.id],
+  }),
   projectTags: many(projectTags),
 }));
 

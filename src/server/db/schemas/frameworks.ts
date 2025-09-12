@@ -8,9 +8,13 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { projects } from "./projects";
+import { users } from "./auth";
 
 export const frameworks = pgTable("frameworks", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull().unique(),
   slug: text("slug").notNull().unique(),
   description: text("description"),
@@ -39,7 +43,11 @@ export const projectFrameworks = pgTable("project_frameworks", {
 });
 
 // Relations
-export const frameworksRelations = relations(frameworks, ({ many }) => ({
+export const frameworksRelations = relations(frameworks, ({ one, many }) => ({
+  user: one(users, {
+    fields: [frameworks.userId],
+    references: [users.id],
+  }),
   projectFrameworks: many(projectFrameworks),
 }));
 

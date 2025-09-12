@@ -8,9 +8,13 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { projects } from "./projects";
+import { users } from "./auth";
 
 export const categories = pgTable("categories", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull().unique(),
   slug: text("slug").notNull().unique(),
   description: text("description"),
@@ -18,6 +22,7 @@ export const categories = pgTable("categories", {
   color: text("color"), // Hex color code for UI
   order: integer("order").default(0),
   visible: boolean("visible").default(true),
+  public: boolean("public").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -35,7 +40,11 @@ export const projectCategories = pgTable("project_categories", {
 });
 
 // Relations
-export const categoriesRelations = relations(categories, ({ many }) => ({
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  user: one(users, {
+    fields: [categories.userId],
+    references: [users.id],
+  }),
   projectCategories: many(projectCategories),
 }));
 
