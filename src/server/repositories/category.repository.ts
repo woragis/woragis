@@ -5,34 +5,69 @@ import type { Category, NewCategory, CategoryFilters } from "@/types";
 
 export class CategoryRepository {
   // Basic CRUD operations
-  async findAll(): Promise<Category[]> {
+  async findAll(userId?: string): Promise<Category[]> {
+    const query = db.select().from(categories);
+    if (userId) {
+      query.where(eq(categories.userId, userId));
+    }
+    return await query.orderBy(asc(categories.order), asc(categories.name));
+  }
+
+  async findVisible(userId?: string): Promise<Category[]> {
+    const conditions = [eq(categories.visible, true)];
+    if (userId) {
+      conditions.push(eq(categories.userId, userId));
+    }
     return await db
       .select()
       .from(categories)
+      .where(and(...conditions))
       .orderBy(asc(categories.order), asc(categories.name));
   }
 
-  async findVisible(): Promise<Category[]> {
+  async findPublic(): Promise<Category[]> {
     return await db
       .select()
       .from(categories)
-      .where(eq(categories.visible, true))
+      .where(and(eq(categories.visible, true), eq(categories.public, true)))
       .orderBy(asc(categories.order), asc(categories.name));
   }
 
-  async findById(id: string): Promise<Category | null> {
+  async findById(id: string, userId?: string): Promise<Category | null> {
+    const conditions = [eq(categories.id, id)];
+    if (userId) {
+      conditions.push(eq(categories.userId, userId));
+    }
     const result = await db
       .select()
       .from(categories)
-      .where(eq(categories.id, id));
+      .where(and(...conditions));
     return result[0] || null;
   }
 
-  async findBySlug(slug: string): Promise<Category | null> {
+  async findBySlug(slug: string, userId?: string): Promise<Category | null> {
+    const conditions = [eq(categories.slug, slug)];
+    if (userId) {
+      conditions.push(eq(categories.userId, userId));
+    }
     const result = await db
       .select()
       .from(categories)
-      .where(eq(categories.slug, slug));
+      .where(and(...conditions));
+    return result[0] || null;
+  }
+
+  async findPublicBySlug(slug: string): Promise<Category | null> {
+    const result = await db
+      .select()
+      .from(categories)
+      .where(
+        and(
+          eq(categories.slug, slug),
+          eq(categories.visible, true),
+          eq(categories.public, true)
+        )
+      );
     return result[0] || null;
   }
 
@@ -43,30 +78,49 @@ export class CategoryRepository {
 
   async update(
     id: string,
-    category: Partial<NewCategory>
+    category: Partial<NewCategory>,
+    userId?: string
   ): Promise<Category | null> {
+    const conditions = [eq(categories.id, id)];
+    if (userId) {
+      conditions.push(eq(categories.userId, userId));
+    }
     const result = await db
       .update(categories)
       .set({ ...category, updatedAt: new Date() })
-      .where(eq(categories.id, id))
+      .where(and(...conditions))
       .returning();
     return result[0] || null;
   }
 
-  async delete(id: string): Promise<void> {
-    await db.delete(categories).where(eq(categories.id, id));
+  async delete(id: string, userId?: string): Promise<void> {
+    const conditions = [eq(categories.id, id)];
+    if (userId) {
+      conditions.push(eq(categories.userId, userId));
+    }
+    await db.delete(categories).where(and(...conditions));
   }
 
   // Search and filtering
-  async search(filters: CategoryFilters): Promise<Category[]> {
-    let query = db.select().from(categories);
+  async search(filters: CategoryFilters, userId?: string): Promise<Category[]> {
+    const conditions = [];
+
+    if (userId) {
+      conditions.push(eq(categories.userId, userId));
+    }
 
     if (filters.visible !== undefined) {
-      query = query.where(eq(categories.visible, filters.visible));
+      conditions.push(eq(categories.visible, filters.visible));
     }
 
     if (filters.search) {
-      query = query.where(like(categories.name, `%${filters.search}%`));
+      conditions.push(like(categories.name, `%${filters.search}%`));
+    }
+
+    let query = db.select().from(categories);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
 
     if (filters.limit) {

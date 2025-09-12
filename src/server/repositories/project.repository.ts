@@ -22,29 +22,85 @@ import type {
 
 export class ProjectRepository {
   // Basic CRUD operations
-  async findAll(): Promise<Project[]> {
-    return await db.select().from(projects).orderBy(asc(projects.order));
+  async findAll(userId?: string): Promise<Project[]> {
+    const query = db.select().from(projects);
+    if (userId) {
+      query.where(eq(projects.userId, userId));
+    }
+    return await query.orderBy(asc(projects.order));
   }
 
-  async findVisible(): Promise<Project[]> {
+  async findVisible(userId?: string): Promise<Project[]> {
+    const conditions = [eq(projects.visible, true)];
+    if (userId) {
+      conditions.push(eq(projects.userId, userId));
+    }
     return await db
       .select()
       .from(projects)
-      .where(eq(projects.visible, true))
+      .where(and(...conditions))
       .orderBy(asc(projects.order));
   }
 
-  async findFeatured(limit: number = 3): Promise<Project[]> {
+  async findPublic(): Promise<Project[]> {
     return await db
       .select()
       .from(projects)
-      .where(eq(projects.featured, true))
+      .where(and(eq(projects.visible, true), eq(projects.public, true)))
+      .orderBy(asc(projects.order));
+  }
+
+  async findFeatured(limit: number = 3, userId?: string): Promise<Project[]> {
+    const conditions = [eq(projects.featured, true)];
+    if (userId) {
+      conditions.push(eq(projects.userId, userId));
+    }
+    return await db
+      .select()
+      .from(projects)
+      .where(and(...conditions))
       .orderBy(asc(projects.order))
       .limit(limit);
   }
 
-  async findById(id: string): Promise<Project | null> {
-    const result = await db.select().from(projects).where(eq(projects.id, id));
+  async findPublicFeatured(limit: number = 3): Promise<Project[]> {
+    return await db
+      .select()
+      .from(projects)
+      .where(
+        and(
+          eq(projects.featured, true),
+          eq(projects.visible, true),
+          eq(projects.public, true)
+        )
+      )
+      .orderBy(asc(projects.order))
+      .limit(limit);
+  }
+
+  async findById(id: string, userId?: string): Promise<Project | null> {
+    const conditions = [eq(projects.id, id)];
+    if (userId) {
+      conditions.push(eq(projects.userId, userId));
+    }
+    const result = await db
+      .select()
+      .from(projects)
+      .where(and(...conditions));
+    return result[0] || null;
+  }
+
+  async findPublicById(id: string): Promise<Project | null> {
+    const result = await db
+      .select()
+      .from(projects)
+      .where(
+        and(
+          eq(projects.id, id),
+          eq(projects.visible, true),
+          eq(projects.public, true)
+        )
+      );
     return result[0] || null;
   }
 
@@ -55,47 +111,67 @@ export class ProjectRepository {
 
   async update(
     id: string,
-    project: Partial<NewProject>
+    project: Partial<NewProject>,
+    userId?: string
   ): Promise<Project | null> {
+    const conditions = [eq(projects.id, id)];
+    if (userId) {
+      conditions.push(eq(projects.userId, userId));
+    }
     const result = await db
       .update(projects)
       .set({ ...project, updatedAt: new Date() })
-      .where(eq(projects.id, id))
+      .where(and(...conditions))
       .returning();
     return result[0] || null;
   }
 
-  async delete(id: string): Promise<void> {
-    await db.delete(projects).where(eq(projects.id, id));
+  async delete(id: string, userId?: string): Promise<void> {
+    const conditions = [eq(projects.id, id)];
+    if (userId) {
+      conditions.push(eq(projects.userId, userId));
+    }
+    await db.delete(projects).where(and(...conditions));
   }
 
   // Advanced operations
-  async updateOrder(projectOrders: ProjectOrderUpdate[]): Promise<void> {
-    const promises = projectOrders.map(({ id, order }) =>
-      db
+  async updateOrder(
+    projectOrders: ProjectOrderUpdate[],
+    userId?: string
+  ): Promise<void> {
+    const promises = projectOrders.map(({ id, order }) => {
+      const conditions = [eq(projects.id, id)];
+      if (userId) {
+        conditions.push(eq(projects.userId, userId));
+      }
+      return db
         .update(projects)
         .set({ order, updatedAt: new Date() })
-        .where(eq(projects.id, id))
-    );
+        .where(and(...conditions));
+    });
     await Promise.all(promises);
   }
 
-  async toggleVisibility(id: string): Promise<Project | null> {
-    const project = await this.findById(id);
+  async toggleVisibility(id: string, userId?: string): Promise<Project | null> {
+    const project = await this.findById(id, userId);
     if (!project) return null;
 
-    return await this.update(id, { visible: !project.visible });
+    return await this.update(id, { visible: !project.visible }, userId);
   }
 
-  async toggleFeatured(id: string): Promise<Project | null> {
-    const project = await this.findById(id);
+  async toggleFeatured(id: string, userId?: string): Promise<Project | null> {
+    const project = await this.findById(id, userId);
     if (!project) return null;
 
-    return await this.update(id, { featured: !project.featured });
+    return await this.update(id, { featured: !project.featured }, userId);
   }
 
-  async search(filters: ProjectFilters): Promise<Project[]> {
+  async search(filters: ProjectFilters, userId?: string): Promise<Project[]> {
     const conditions = [];
+
+    if (userId) {
+      conditions.push(eq(projects.userId, userId));
+    }
 
     if (filters.featured !== undefined) {
       conditions.push(eq(projects.featured, filters.featured));
@@ -139,8 +215,38 @@ export class ProjectRepository {
   }
 
   // Relations operations
-  async findWithRelations(id: string): Promise<ProjectWithRelations | null> {
-    const project = await this.findById(id);
+  async findWithRelations(
+    id: string,
+    userId?: string
+  ): Promise<ProjectWithRelations | null> {
+    const project = await this.findById(id, userId);
+    if (!project) return null;
+
+    const [
+      projectTags,
+      projectCategories,
+      projectLanguages,
+      projectFrameworks,
+    ] = await Promise.all([
+      this.getProjectTags(id),
+      this.getProjectCategories(id),
+      this.getProjectLanguages(id),
+      this.getProjectFrameworks(id),
+    ]);
+
+    return {
+      ...project,
+      tags: projectTags,
+      categories: projectCategories,
+      languages: projectLanguages,
+      frameworks: projectFrameworks,
+    };
+  }
+
+  async findPublicWithRelations(
+    id: string
+  ): Promise<ProjectWithRelations | null> {
+    const project = await this.findPublicById(id);
     if (!project) return null;
 
     const [
@@ -168,6 +274,7 @@ export class ProjectRepository {
     const result = await db
       .select({
         id: tags.id,
+        userId: tags.userId,
         name: tags.name,
         slug: tags.slug,
         description: tags.description,
@@ -187,6 +294,7 @@ export class ProjectRepository {
     const result = await db
       .select({
         id: categories.id,
+        userId: categories.userId,
         name: categories.name,
         slug: categories.slug,
         description: categories.description,
@@ -194,6 +302,7 @@ export class ProjectRepository {
         color: categories.color,
         order: categories.order,
         visible: categories.visible,
+        public: categories.public,
         createdAt: categories.createdAt,
         updatedAt: categories.updatedAt,
       })
@@ -208,6 +317,7 @@ export class ProjectRepository {
     const result = await db
       .select({
         id: languages.id,
+        userId: languages.userId,
         name: languages.name,
         slug: languages.slug,
         description: languages.description,
@@ -230,6 +340,7 @@ export class ProjectRepository {
     const result = await db
       .select({
         id: frameworks.id,
+        userId: frameworks.userId,
         name: frameworks.name,
         slug: frameworks.slug,
         description: frameworks.description,

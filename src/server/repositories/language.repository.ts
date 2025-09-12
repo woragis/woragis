@@ -10,34 +10,47 @@ import type {
 
 export class LanguageRepository {
   // Basic CRUD operations
-  async findAll(): Promise<Language[]> {
+  async findAll(userId?: string): Promise<Language[]> {
+    const query = db.select().from(languages);
+    if (userId) {
+      query.where(eq(languages.userId, userId));
+    }
+    return await query.orderBy(asc(languages.order), asc(languages.name));
+  }
+
+  async findVisible(userId?: string): Promise<Language[]> {
+    const conditions = [eq(languages.visible, true)];
+    if (userId) {
+      conditions.push(eq(languages.userId, userId));
+    }
     return await db
       .select()
       .from(languages)
+      .where(and(...conditions))
       .orderBy(asc(languages.order), asc(languages.name));
   }
 
-  async findVisible(): Promise<Language[]> {
-    return await db
-      .select()
-      .from(languages)
-      .where(eq(languages.visible, true))
-      .orderBy(asc(languages.order), asc(languages.name));
-  }
-
-  async findById(id: string): Promise<Language | null> {
+  async findById(id: string, userId?: string): Promise<Language | null> {
+    const conditions = [eq(languages.id, id)];
+    if (userId) {
+      conditions.push(eq(languages.userId, userId));
+    }
     const result = await db
       .select()
       .from(languages)
-      .where(eq(languages.id, id));
+      .where(and(...conditions));
     return result[0] || null;
   }
 
-  async findBySlug(slug: string): Promise<Language | null> {
+  async findBySlug(slug: string, userId?: string): Promise<Language | null> {
+    const conditions = [eq(languages.slug, slug)];
+    if (userId) {
+      conditions.push(eq(languages.userId, userId));
+    }
     const result = await db
       .select()
       .from(languages)
-      .where(eq(languages.slug, slug));
+      .where(and(...conditions));
     return result[0] || null;
   }
 
@@ -48,30 +61,49 @@ export class LanguageRepository {
 
   async update(
     id: string,
-    language: Partial<NewLanguage>
+    language: Partial<NewLanguage>,
+    userId?: string
   ): Promise<Language | null> {
+    const conditions = [eq(languages.id, id)];
+    if (userId) {
+      conditions.push(eq(languages.userId, userId));
+    }
     const result = await db
       .update(languages)
       .set({ ...language, updatedAt: new Date() })
-      .where(eq(languages.id, id))
+      .where(and(...conditions))
       .returning();
     return result[0] || null;
   }
 
-  async delete(id: string): Promise<void> {
-    await db.delete(languages).where(eq(languages.id, id));
+  async delete(id: string, userId?: string): Promise<void> {
+    const conditions = [eq(languages.id, id)];
+    if (userId) {
+      conditions.push(eq(languages.userId, userId));
+    }
+    await db.delete(languages).where(and(...conditions));
   }
 
   // Search and filtering
-  async search(filters: LanguageFilters): Promise<Language[]> {
-    let query = db.select().from(languages);
+  async search(filters: LanguageFilters, userId?: string): Promise<Language[]> {
+    const conditions = [];
+
+    if (userId) {
+      conditions.push(eq(languages.userId, userId));
+    }
 
     if (filters.visible !== undefined) {
-      query = query.where(eq(languages.visible, filters.visible));
+      conditions.push(eq(languages.visible, filters.visible));
     }
 
     if (filters.search) {
-      query = query.where(like(languages.name, `%${filters.search}%`));
+      conditions.push(like(languages.name, `%${filters.search}%`));
+    }
+
+    let query = db.select().from(languages);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
 
     if (filters.limit) {

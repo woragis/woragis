@@ -10,34 +10,47 @@ import type {
 
 export class FrameworkRepository {
   // Basic CRUD operations
-  async findAll(): Promise<Framework[]> {
+  async findAll(userId?: string): Promise<Framework[]> {
+    const query = db.select().from(frameworks);
+    if (userId) {
+      query.where(eq(frameworks.userId, userId));
+    }
+    return await query.orderBy(asc(frameworks.order), asc(frameworks.name));
+  }
+
+  async findVisible(userId?: string): Promise<Framework[]> {
+    const conditions = [eq(frameworks.visible, true)];
+    if (userId) {
+      conditions.push(eq(frameworks.userId, userId));
+    }
     return await db
       .select()
       .from(frameworks)
+      .where(and(...conditions))
       .orderBy(asc(frameworks.order), asc(frameworks.name));
   }
 
-  async findVisible(): Promise<Framework[]> {
-    return await db
-      .select()
-      .from(frameworks)
-      .where(eq(frameworks.visible, true))
-      .orderBy(asc(frameworks.order), asc(frameworks.name));
-  }
-
-  async findById(id: string): Promise<Framework | null> {
+  async findById(id: string, userId?: string): Promise<Framework | null> {
+    const conditions = [eq(frameworks.id, id)];
+    if (userId) {
+      conditions.push(eq(frameworks.userId, userId));
+    }
     const result = await db
       .select()
       .from(frameworks)
-      .where(eq(frameworks.id, id));
+      .where(and(...conditions));
     return result[0] || null;
   }
 
-  async findBySlug(slug: string): Promise<Framework | null> {
+  async findBySlug(slug: string, userId?: string): Promise<Framework | null> {
+    const conditions = [eq(frameworks.slug, slug)];
+    if (userId) {
+      conditions.push(eq(frameworks.userId, userId));
+    }
     const result = await db
       .select()
       .from(frameworks)
-      .where(eq(frameworks.slug, slug));
+      .where(and(...conditions));
     return result[0] || null;
   }
 
@@ -48,30 +61,52 @@ export class FrameworkRepository {
 
   async update(
     id: string,
-    framework: Partial<NewFramework>
+    framework: Partial<NewFramework>,
+    userId?: string
   ): Promise<Framework | null> {
+    const conditions = [eq(frameworks.id, id)];
+    if (userId) {
+      conditions.push(eq(frameworks.userId, userId));
+    }
     const result = await db
       .update(frameworks)
       .set({ ...framework, updatedAt: new Date() })
-      .where(eq(frameworks.id, id))
+      .where(and(...conditions))
       .returning();
     return result[0] || null;
   }
 
-  async delete(id: string): Promise<void> {
-    await db.delete(frameworks).where(eq(frameworks.id, id));
+  async delete(id: string, userId?: string): Promise<void> {
+    const conditions = [eq(frameworks.id, id)];
+    if (userId) {
+      conditions.push(eq(frameworks.userId, userId));
+    }
+    await db.delete(frameworks).where(and(...conditions));
   }
 
   // Search and filtering
-  async search(filters: FrameworkFilters): Promise<Framework[]> {
-    let query = db.select().from(frameworks);
+  async search(
+    filters: FrameworkFilters,
+    userId?: string
+  ): Promise<Framework[]> {
+    const conditions = [];
+
+    if (userId) {
+      conditions.push(eq(frameworks.userId, userId));
+    }
 
     if (filters.visible !== undefined) {
-      query = query.where(eq(frameworks.visible, filters.visible));
+      conditions.push(eq(frameworks.visible, filters.visible));
     }
 
     if (filters.search) {
-      query = query.where(like(frameworks.name, `%${filters.search}%`));
+      conditions.push(like(frameworks.name, `%${filters.search}%`));
+    }
+
+    let query = db.select().from(frameworks);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
 
     if (filters.limit) {

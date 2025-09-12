@@ -5,25 +5,47 @@ import type { Tag, NewTag, TagFilters } from "@/types";
 
 export class TagRepository {
   // Basic CRUD operations
-  async findAll(): Promise<Tag[]> {
-    return await db.select().from(tags).orderBy(asc(tags.name));
+  async findAll(userId?: string): Promise<Tag[]> {
+    const query = db.select().from(tags);
+    if (userId) {
+      query.where(eq(tags.userId, userId));
+    }
+    return await query.orderBy(asc(tags.name));
   }
 
-  async findVisible(): Promise<Tag[]> {
+  async findVisible(userId?: string): Promise<Tag[]> {
+    const conditions = [eq(tags.visible, true)];
+    if (userId) {
+      conditions.push(eq(tags.userId, userId));
+    }
     return await db
       .select()
       .from(tags)
-      .where(eq(tags.visible, true))
+      .where(and(...conditions))
       .orderBy(asc(tags.name));
   }
 
-  async findById(id: string): Promise<Tag | null> {
-    const result = await db.select().from(tags).where(eq(tags.id, id));
+  async findById(id: string, userId?: string): Promise<Tag | null> {
+    const conditions = [eq(tags.id, id)];
+    if (userId) {
+      conditions.push(eq(tags.userId, userId));
+    }
+    const result = await db
+      .select()
+      .from(tags)
+      .where(and(...conditions));
     return result[0] || null;
   }
 
-  async findBySlug(slug: string): Promise<Tag | null> {
-    const result = await db.select().from(tags).where(eq(tags.slug, slug));
+  async findBySlug(slug: string, userId?: string): Promise<Tag | null> {
+    const conditions = [eq(tags.slug, slug)];
+    if (userId) {
+      conditions.push(eq(tags.userId, userId));
+    }
+    const result = await db
+      .select()
+      .from(tags)
+      .where(and(...conditions));
     return result[0] || null;
   }
 
@@ -32,29 +54,51 @@ export class TagRepository {
     return result[0];
   }
 
-  async update(id: string, tag: Partial<NewTag>): Promise<Tag | null> {
+  async update(
+    id: string,
+    tag: Partial<NewTag>,
+    userId?: string
+  ): Promise<Tag | null> {
+    const conditions = [eq(tags.id, id)];
+    if (userId) {
+      conditions.push(eq(tags.userId, userId));
+    }
     const result = await db
       .update(tags)
       .set({ ...tag, updatedAt: new Date() })
-      .where(eq(tags.id, id))
+      .where(and(...conditions))
       .returning();
     return result[0] || null;
   }
 
-  async delete(id: string): Promise<void> {
-    await db.delete(tags).where(eq(tags.id, id));
+  async delete(id: string, userId?: string): Promise<void> {
+    const conditions = [eq(tags.id, id)];
+    if (userId) {
+      conditions.push(eq(tags.userId, userId));
+    }
+    await db.delete(tags).where(and(...conditions));
   }
 
   // Search and filtering
-  async search(filters: TagFilters): Promise<Tag[]> {
-    let query = db.select().from(tags);
+  async search(filters: TagFilters, userId?: string): Promise<Tag[]> {
+    const conditions = [];
+
+    if (userId) {
+      conditions.push(eq(tags.userId, userId));
+    }
 
     if (filters.visible !== undefined) {
-      query = query.where(eq(tags.visible, filters.visible));
+      conditions.push(eq(tags.visible, filters.visible));
     }
 
     if (filters.search) {
-      query = query.where(like(tags.name, `%${filters.search}%`));
+      conditions.push(like(tags.name, `%${filters.search}%`));
+    }
+
+    let query = db.select().from(tags);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
 
     if (filters.limit) {
