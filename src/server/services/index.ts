@@ -7,6 +7,7 @@ import { LanguageService } from "./language.service";
 import { FrameworkService } from "./framework.service";
 import { SettingsService } from "./settings.service";
 import { TestimonialService } from "./testimonial.service";
+import { BlogService } from "./blog.service";
 
 // Export all services
 export {
@@ -18,6 +19,7 @@ export {
   FrameworkService,
   SettingsService,
   TestimonialService,
+  BlogService,
 };
 
 // Create singleton instances
@@ -29,3 +31,4 @@ export const languageService = new LanguageService();
 export const frameworkService = new FrameworkService();
 export const settingsService = new SettingsService();
 export const testimonialService = new TestimonialService();
+export const blogService = new BlogService();
