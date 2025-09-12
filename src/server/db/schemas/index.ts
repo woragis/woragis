@@ -7,3 +7,4 @@ export * from "./categories";
 export * from "./languages";
 export * from "./frameworks";
 export * from "./testimonials";
+export * from "./blog";
