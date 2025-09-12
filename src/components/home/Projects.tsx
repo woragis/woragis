@@ -1,31 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Section, Container, Card, Button } from "../ui";
+import { Section, Container, Card, Button, EmptyState } from "../ui";
 import { Project } from "@/server/db/schema";
 import { ExternalLink, Github } from "lucide-react";
+import { usePublicFeaturedProjects } from "@/hooks/usePublicProjects";
 
 export const Projects: React.FC = () => {
   const { t } = useLanguage();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetchFeaturedProjects();
-  }, []);
-
-  const fetchFeaturedProjects = async () => {
-    try {
-      const response = await fetch("/api/projects?featured=true&limit=3");
-      const data = await response.json();
-      setProjects(data);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    data: projects = [],
+    isLoading,
+    error,
+  } = usePublicFeaturedProjects(3);
 
   if (isLoading) {
     return (
@@ -52,6 +40,40 @@ export const Projects: React.FC = () => {
               </Card>
             ))}
           </div>
+        </Container>
+      </Section>
+    );
+  }
+
+  if (error) {
+    return (
+      <Section
+        id="projects"
+        title={t("projects.title")}
+        subtitle={t("projects.subtitle")}
+      >
+        <Container>
+          <EmptyState
+            title="Unable to Load Projects"
+            description="There was an error loading the projects. Please try again later."
+          />
+        </Container>
+      </Section>
+    );
+  }
+
+  if (projects.length === 0) {
+    return (
+      <Section
+        id="projects"
+        title={t("projects.title")}
+        subtitle={t("projects.subtitle")}
+      >
+        <Container>
+          <EmptyState
+            title="No Featured Projects Yet"
+            description="Featured projects will appear here once they are added to the portfolio."
+          />
         </Container>
       </Section>
     );

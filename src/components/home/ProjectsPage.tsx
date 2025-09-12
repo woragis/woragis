@@ -1,31 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Project } from "@/server/db/schema";
-import { Section, Container, Card, Button } from "../ui";
+import { Section, Container, Card, Button, EmptyState } from "../ui";
 import { ExternalLink, Github } from "lucide-react";
+import { usePublicProjects } from "@/hooks/usePublicProjects";
 
 export const ProjectsPage: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [projectsPerPage] = useState(9);
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch("/api/projects");
-      const data = await response.json();
-      setProjects(data);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: projects = [], isLoading, error } = usePublicProjects();
 
   // Pagination
   const totalPages = Math.ceil(projects.length / projectsPerPage);
@@ -68,6 +52,28 @@ export const ProjectsPage: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              My Projects
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              A collection of my recent work and side projects
+            </p>
+          </div>
+
+          <EmptyState
+            title="Unable to Load Projects"
+            description="There was an error loading the projects. Please try again later."
+          />
+        </Container>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
       <Container>
@@ -81,14 +87,10 @@ export const ProjectsPage: React.FC = () => {
         </div>
 
         {projects.length === 0 ? (
-          <Card className="p-12 text-center">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No Projects Yet
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Projects will appear here once they are added to the portfolio.
-            </p>
-          </Card>
+          <EmptyState
+            title="No Projects Yet"
+            description="Projects will appear here once they are added to the portfolio."
+          />
         ) : (
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -194,7 +196,7 @@ export const ProjectsPage: React.FC = () => {
                     return (
                       <Button
                         key={page}
-                        variant={currentPage === page ? "default" : "outline"}
+                        variant={currentPage === page ? "primary" : "outline"}
                         size="sm"
                         onClick={() => setCurrentPage(page)}
                         className="w-10 h-10"
