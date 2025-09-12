@@ -30,6 +30,7 @@ export interface CategoryFormData {
   color?: string;
   order: number;
   visible: boolean;
+  public: boolean;
 }
 
 // API response types

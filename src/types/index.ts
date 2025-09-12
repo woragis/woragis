@@ -1,4 +1,5 @@
 // Export all types from domain files
+export * from "./auth";
 export * from "./projects";
 export * from "./settings";
 export * from "./tags";

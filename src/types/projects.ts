@@ -45,6 +45,7 @@ export interface ProjectFormData {
   featured: boolean;
   order: number;
   visible: boolean;
+  public: boolean;
 }
 
 // API response types
