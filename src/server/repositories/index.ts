@@ -6,6 +6,7 @@ import { CategoryRepository } from "./category.repository";
 import { LanguageRepository } from "./language.repository";
 import { FrameworkRepository } from "./framework.repository";
 import { SettingsRepository } from "./settings.repository";
+import { TestimonialRepository } from "./testimonial.repository";
 
 // Export all repositories
 export {
@@ -16,6 +17,7 @@ export {
   LanguageRepository,
   FrameworkRepository,
   SettingsRepository,
+  TestimonialRepository,
 };
 
 // Create singleton instances
@@ -26,3 +28,4 @@ export const categoryRepository = new CategoryRepository();
 export const languageRepository = new LanguageRepository();
 export const frameworkRepository = new FrameworkRepository();
 export const settingsRepository = new SettingsRepository();
+export const testimonialRepository = new TestimonialRepository();
