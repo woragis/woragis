@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { Navigation, Footer } from "@/components/home";
 import { ClientOnly } from "@/components/ClientOnly";
+import { QueryClientProviderWrapper } from "@/components/QueryClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -94,17 +95,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <LanguageProvider>
-          <ThemeProvider>
-            <ClientOnly>
-              <Navigation />
-            </ClientOnly>
-            <main className="min-h-screen">{children}</main>
-            <ClientOnly>
-              <Footer />
-            </ClientOnly>
-          </ThemeProvider>
-        </LanguageProvider>
+        <QueryClientProviderWrapper>
+          <LanguageProvider>
+            <ThemeProvider>
+              <ClientOnly>
+                <Navigation />
+              </ClientOnly>
+              <main className="min-h-screen">{children}</main>
+              <ClientOnly>
+                <Footer />
+              </ClientOnly>
+            </ThemeProvider>
+          </LanguageProvider>
+        </QueryClientProviderWrapper>
       </body>
     </html>
   );
