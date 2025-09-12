@@ -1,0 +1,7 @@
+// Export all schemas from domain files
+export * from "./projects";
+export * from "./settings";
+export * from "./tags";
+export * from "./categories";
+export * from "./languages";
+export * from "./frameworks";
