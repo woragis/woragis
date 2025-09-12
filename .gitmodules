@@ -1,6 +1,0 @@
-[submodule "lizard/dashboard_frontend"]
-	path = lizard/dashboard_frontend
-	url = git@github.com:MovCargas/dashboard_frontend.git
-[submodule "lizard/fixed-invoicing-frontend"]
-	path = lizard/fixed-invoicing-frontend
-	url = git@github.com:MovCargas/fixed-invoicing-frontend.git
