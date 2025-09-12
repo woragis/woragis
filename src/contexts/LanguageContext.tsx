@@ -64,11 +64,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
 
   // Load language from localStorage on mount
   useEffect(() => {
-    const savedLanguage = localStorage.getItem("language") as Language;
-    if (savedLanguage && Object.keys(languageNames).includes(savedLanguage)) {
-      setLanguageState(savedLanguage);
+    if (typeof window !== "undefined") {
+      const savedLanguage = localStorage.getItem("language") as Language;
+      if (savedLanguage && Object.keys(languageNames).includes(savedLanguage)) {
+        setLanguageState(savedLanguage);
+      }
+      setIsHydrated(true);
     }
-    setIsHydrated(true);
   }, []);
 
   // Load messages when language changes
@@ -80,7 +82,9 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
 
   const setLanguage = (newLanguage: Language) => {
     setLanguageState(newLanguage);
-    localStorage.setItem("language", newLanguage);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("language", newLanguage);
+    }
   };
 
   const t = (key: string): string => {
@@ -98,18 +102,12 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
     return typeof value === "string" ? value : key;
   };
 
-  // Don't render until hydrated to avoid SSR mismatch
-  if (!isHydrated) {
-    return (
+  // Always provide the context, but handle hydration carefully
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
       <IntlProvider messages={messages} locale={language}>
         {children}
       </IntlProvider>
-    );
-  }
-
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
     </LanguageContext.Provider>
   );
 };
