@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAuthActions } from "@/stores/auth-store";
 
 interface AuthProviderProps {
@@ -9,11 +9,15 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const { checkAuth } = useAuthActions();
+  const hasCheckedAuth = useRef(false);
 
   useEffect(() => {
-    // Check authentication status on app load
-    checkAuth();
-  }, [checkAuth]);
+    // Only check auth once on mount
+    if (!hasCheckedAuth.current) {
+      hasCheckedAuth.current = true;
+      checkAuth();
+    }
+  }, []); // Empty dependency array to run only once
 
   return <>{children}</>;
 }
