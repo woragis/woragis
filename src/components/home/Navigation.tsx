@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button, ThemeToggle, LanguageSwitcher } from "../ui";
+import { ClientOnly } from "../ClientOnly";
 
 export const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -73,7 +74,13 @@ export const Navigation: React.FC = () => {
 
           {/* Language Switcher, Theme Toggle and CTA Button */}
           <div className="hidden md:flex items-center space-x-4">
-            <LanguageSwitcher />
+            <ClientOnly
+              fallback={
+                <div className="w-24 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              }
+            >
+              <LanguageSwitcher />
+            </ClientOnly>
             <ThemeToggle />
             <Button
               variant="outline"
@@ -131,7 +138,13 @@ export const Navigation: React.FC = () => {
               ))}
               <div className="pt-4 space-y-3">
                 <div className="flex justify-center space-x-2">
-                  <LanguageSwitcher />
+                  <ClientOnly
+                    fallback={
+                      <div className="w-24 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    }
+                  >
+                    <LanguageSwitcher />
+                  </ClientOnly>
                   <ThemeToggle />
                 </div>
                 <Button
