@@ -1,0 +1,127 @@
+{
+  "navigation": {
+    "logo": "</> 개발자",
+    "about": "소개",
+    "skills": "기술",
+    "projects": "프로젝트",
+    "contact": "연락처",
+    "getInTouch": "연락하기"
+  },
+  "hero": {
+    "greeting": "👋 안녕하세요, 저는 프로그래머입니다",
+    "title": "디지털 경험을",
+    "titleHighlight": "구축합니다",
+    "subtitle": "현대적인 기술로 혁신적인 솔루션을 만드는 열정적인 풀스택 개발자입니다. 깔끔한 코드와 창의적인 문제 해결을 통해 아이디어를 현실로 만듭니다.",
+    "viewWork": "작품 보기",
+    "getInTouch": "연락하기",
+    "scrollToExplore": "스크롤하여 탐색"
+  },
+  "about": {
+    "title": "소개",
+    "subtitle": "놀라운 디지털 경험을 만드는 것을 사랑하는 열정적인 개발자",
+    "heading": "안녕하세요, 저는 풀스택 개발자입니다",
+    "description1": "5년 이상의 소프트웨어 개발 경험을 바탕으로 확장 가능한 웹 애플리케이션과 모바일 솔루션 구축을 전문으로 합니다. 제 여정은 사물이 어떻게 작동하는지에 대한 호기심으로 시작되었고, 차이를 만드는 디지털 경험을 만드는 열정으로 발전했습니다.",
+    "description2": "저는 깔끔한 코드, 사용자 중심 디자인, 지속적인 학습을 믿습니다. 코딩하지 않을 때는 새로운 기술을 탐구하거나, 오픈소스 프로젝트에 기여하거나, 개발자 커뮤니티와 지식을 공유하는 모습을 보실 수 있습니다.",
+    "description3": "제 목표는 혁신적인 기술 솔루션을 통해 기업과 개인이 아이디어를 현실로 만드는 것을 돕는 것입니다.",
+    "stats": {
+      "yearsExperience": "년 경험",
+      "projectsCompleted": "완료 프로젝트",
+      "technologies": "기술",
+      "happyClients": "만족한 클라이언트"
+    }
+  },
+  "skills": {
+    "title": "기술 및 기술 스택",
+    "subtitle": "아이디어를 현실로 만드는 데 사용하는 기술들",
+    "categories": {
+      "frontend": "프론트엔드",
+      "backend": "백엔드",
+      "tools": "도구 및 기타"
+    }
+  },
+  "projects": {
+    "title": "주요 프로젝트",
+    "subtitle": "자랑스러워하는 최근 작업들",
+    "viewAllProjects": "모든 프로젝트 보기",
+    "code": "코드",
+    "live": "라이브",
+    "items": {
+      "ecommerce": {
+        "title": "전자상거래 플랫폼",
+        "description": "React, Node.js, PostgreSQL로 구축된 풀스택 전자상거래 솔루션. 사용자 인증, 결제 처리, 관리자 대시보드 기능을 포함합니다."
+      },
+      "taskManagement": {
+        "title": "작업 관리 앱",
+        "description": "실시간 업데이트, 드래그 앤 드롭 기능, 팀 협업 기능을 갖춘 협업 작업 관리 애플리케이션."
+      },
+      "weatherDashboard": {
+        "title": "날씨 대시보드",
+        "description": "현재 날씨 조건, 예보, 위치 기반 날씨 알림을 제공하는 반응형 날씨 대시보드."
+      }
+    }
+  },
+  "contact": {
+    "title": "연락하기",
+    "subtitle": "함께 아이디어를 현실로 만들어봅시다",
+    "conversationTitle": "대화를 시작해봅시다",
+    "conversationDescription": "저는 항상 새로운 기회와 흥미로운 프로젝트에 관심이 있습니다. 질문이 있으시거나, 협업하고 싶으시거나, 단순히 인사하고 싶으시다면 언제든 연락주세요!",
+    "sendMessageTitle": "메시지 보내기",
+    "form": {
+      "name": "이름",
+      "namePlaceholder": "귀하의 이름",
+      "email": "이메일",
+      "emailPlaceholder": "your@email.com",
+      "message": "메시지",
+      "messagePlaceholder": "프로젝트에 대해 알려주세요...",
+      "sendMessage": "메시지 보내기"
+    },
+    "methods": {
+      "email": {
+        "title": "이메일",
+        "description": "이메일로 연락하기",
+        "value": "hello@example.com"
+      },
+      "linkedin": {
+        "title": "LinkedIn",
+        "description": "전문적으로 연결하기",
+        "value": "linkedin.com/in/yourprofile"
+      },
+      "github": {
+        "title": "GitHub",
+        "description": "코드 확인하기",
+        "value": "github.com/yourusername"
+      },
+      "twitter": {
+        "title": "Twitter",
+        "description": "업데이트 팔로우하기",
+        "value": "@yourusername"
+      }
+    }
+  },
+  "footer": {
+    "description": "현대적인 기술로 혁신적인 솔루션을 만드는 열정적인 풀스택 개발자.",
+    "quickLinks": "빠른 링크",
+    "getInTouch": "연락하기",
+    "contactInfo": {
+      "email": "📧 hello@example.com",
+      "location": "📍 귀하의 도시, 국가",
+      "availability": "💼 프리랜서 작업 가능"
+    },
+    "copyright": "© {year} 귀하의 이름. 모든 권리 보유. Next.js와 Tailwind CSS로 ❤️과 함께 구축."
+  },
+  "theme": {
+    "light": "라이트",
+    "dark": "다크",
+    "system": "시스템"
+  },
+  "language": {
+    "english": "English",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "italian": "Italiano",
+    "french": "Français",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "korean": "한국어"
+  }
+}

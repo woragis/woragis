@@ -1,0 +1,127 @@
+{
+  "navigation": {
+    "logo": "</> 開発者",
+    "about": "私について",
+    "skills": "スキル",
+    "projects": "プロジェクト",
+    "contact": "お問い合わせ",
+    "getInTouch": "お問い合わせ"
+  },
+  "hero": {
+    "greeting": "👋 こんにちは、プログラマーです",
+    "title": "デジタル体験を",
+    "titleHighlight": "構築",
+    "subtitle": "モダンなテクノロジーで革新的なソリューションを創造する情熱的なフルスタック開発者。クリーンなコードと創造的な問題解決を通じて、アイデアを現実に変えます。",
+    "viewWork": "作品を見る",
+    "getInTouch": "お問い合わせ",
+    "scrollToExplore": "スクロールして探索"
+  },
+  "about": {
+    "title": "私について",
+    "subtitle": "素晴らしいデジタル体験を創造することへの愛を持つ情熱的な開発者",
+    "heading": "こんにちは、フルスタック開発者です",
+    "description1": "5年以上のソフトウェア開発経験を持ち、スケーラブルなWebアプリケーションとモバイルソリューションの構築を専門としています。物事の仕組みへの好奇心から始まった私の旅は、違いを生むデジタル体験を創造することへの情熱へと進化しました。",
+    "description2": "クリーンなコード、ユーザー中心のデザイン、継続的な学習を信じています。コーディングしていない時は、新しいテクノロジーの探索、オープンソースプロジェクトへの貢献、開発者コミュニティとの知識共有に従事しています。",
+    "description3": "私の目標は、革新的なテクノロジーソリューションを通じて、企業や個人がアイデアを実現するのを支援することです。",
+    "stats": {
+      "yearsExperience": "年の経験",
+      "projectsCompleted": "完了プロジェクト",
+      "technologies": "テクノロジー",
+      "happyClients": "満足したクライアント"
+    }
+  },
+  "skills": {
+    "title": "スキルとテクノロジー",
+    "subtitle": "アイデアを実現するために使用するテクノロジー",
+    "categories": {
+      "frontend": "フロントエンド",
+      "backend": "バックエンド",
+      "tools": "ツールとその他"
+    }
+  },
+  "projects": {
+    "title": "注目のプロジェクト",
+    "subtitle": "誇りに思う最近の作品の一部",
+    "viewAllProjects": "すべてのプロジェクトを見る",
+    "code": "コード",
+    "live": "ライブ",
+    "items": {
+      "ecommerce": {
+        "title": "Eコマースプラットフォーム",
+        "description": "React、Node.js、PostgreSQLで構築されたフルスタックEコマースソリューション。ユーザー認証、支払い処理、管理ダッシュボードを含みます。"
+      },
+      "taskManagement": {
+        "title": "タスク管理アプリ",
+        "description": "リアルタイム更新、ドラッグアンドドロップ機能、チームコラボレーション機能を備えた協調タスク管理アプリケーション。"
+      },
+      "weatherDashboard": {
+        "title": "天気ダッシュボード",
+        "description": "現在の天気状況、予報、位置ベースの天気アラートを提供するレスポンシブな天気ダッシュボード。"
+      }
+    }
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "一緒にあなたのアイデアを実現しましょう",
+    "conversationTitle": "会話を始めましょう",
+    "conversationDescription": "新しい機会やエキサイティングなプロジェクトに常に興味があります。質問がある、コラボレーションしたい、または単に挨拶したい場合でも、お気軽にお声がけください！",
+    "sendMessageTitle": "メッセージを送信",
+    "form": {
+      "name": "名前",
+      "namePlaceholder": "お名前",
+      "email": "メール",
+      "emailPlaceholder": "your@email.com",
+      "message": "メッセージ",
+      "messagePlaceholder": "プロジェクトについて教えてください...",
+      "sendMessage": "メッセージを送信"
+    },
+    "methods": {
+      "email": {
+        "title": "メール",
+        "description": "メールでお問い合わせ",
+        "value": "hello@example.com"
+      },
+      "linkedin": {
+        "title": "LinkedIn",
+        "description": "プロフェッショナルに繋がる",
+        "value": "linkedin.com/in/yourprofile"
+      },
+      "github": {
+        "title": "GitHub",
+        "description": "コードをチェック",
+        "value": "github.com/yourusername"
+      },
+      "twitter": {
+        "title": "Twitter",
+        "description": "更新情報をフォロー",
+        "value": "@yourusername"
+      }
+    }
+  },
+  "footer": {
+    "description": "モダンなテクノロジーで革新的なソリューションを創造する情熱的なフルスタック開発者。",
+    "quickLinks": "クイックリンク",
+    "getInTouch": "お問い合わせ",
+    "contactInfo": {
+      "email": "📧 hello@example.com",
+      "location": "📍 あなたの都市、国",
+      "availability": "💼 フリーランス作業可能"
+    },
+    "copyright": "© {year} あなたの名前。全著作権所有。Next.jsとTailwind CSSで❤️と共に構築。"
+  },
+  "theme": {
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム"
+  },
+  "language": {
+    "english": "English",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "italian": "Italiano",
+    "french": "Français",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "korean": "한국어"
+  }
+}

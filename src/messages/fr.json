@@ -1,0 +1,127 @@
+{
+  "navigation": {
+    "logo": "</> Développeur",
+    "about": "À Propos",
+    "skills": "Compétences",
+    "projects": "Projets",
+    "contact": "Contact",
+    "getInTouch": "Entrer en Contact"
+  },
+  "hero": {
+    "greeting": "👋 Bonjour, je suis un Programmeur",
+    "title": "Créer des Expériences",
+    "titleHighlight": "Numériques",
+    "subtitle": "Développeur full-stack passionné créant des solutions innovantes avec des technologies modernes. Je transforme les idées en réalité grâce à un code propre et une résolution créative de problèmes.",
+    "viewWork": "Voir Mon Travail",
+    "getInTouch": "Entrer en Contact",
+    "scrollToExplore": "Faites défiler pour explorer"
+  },
+  "about": {
+    "title": "À Propos de Moi",
+    "subtitle": "Développeur passionné avec un amour pour créer des expériences numériques incroyables",
+    "heading": "Salut, je suis un Développeur Full-Stack",
+    "description1": "Avec plus de 5 ans d'expérience en développement logiciel, je me spécialise dans la construction d'applications web évolutives et de solutions mobiles. Mon parcours a commencé par la curiosité de comprendre comment les choses fonctionnent, et a évolué vers une passion pour créer des expériences numériques qui font la différence.",
+    "description2": "Je crois en un code propre, un design centré sur l'utilisateur et un apprentissage continu. Quand je ne code pas, vous me trouverez en train d'explorer de nouvelles technologies, contribuer à des projets open-source, ou partager des connaissances avec la communauté de développeurs.",
+    "description3": "Mon objectif est d'aider les entreprises et les individus à donner vie à leurs idées grâce à des solutions technologiques innovantes.",
+    "stats": {
+      "yearsExperience": "Années d'Expérience",
+      "projectsCompleted": "Projets Terminés",
+      "technologies": "Technologies",
+      "happyClients": "Clients Satisfaits"
+    }
+  },
+  "skills": {
+    "title": "Compétences et Technologies",
+    "subtitle": "Technologies avec lesquelles je travaille pour donner vie aux idées",
+    "categories": {
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "tools": "Outils et Autres"
+    }
+  },
+  "projects": {
+    "title": "Projets en Vedette",
+    "subtitle": "Quelques-uns de mes travaux récents dont je suis fier",
+    "viewAllProjects": "Voir Tous les Projets",
+    "code": "Code",
+    "live": "En Direct",
+    "items": {
+      "ecommerce": {
+        "title": "Plateforme E-Commerce",
+        "description": "Une solution e-commerce full-stack construite avec React, Node.js et PostgreSQL. Comprend l'authentification utilisateur, le traitement des paiements et un tableau de bord administrateur."
+      },
+      "taskManagement": {
+        "title": "Application de Gestion de Tâches",
+        "description": "Une application collaborative de gestion de tâches avec des mises à jour en temps réel, une fonctionnalité de glisser-déposer et des fonctionnalités de collaboration d'équipe."
+      },
+      "weatherDashboard": {
+        "title": "Tableau de Bord Météo",
+        "description": "Un tableau de bord météo responsive qui fournit les conditions météorologiques actuelles, les prévisions et les alertes météo basées sur la localisation."
+      }
+    }
+  },
+  "contact": {
+    "title": "Entrer en Contact",
+    "subtitle": "Travaillons ensemble pour donner vie à vos idées",
+    "conversationTitle": "Commençons une Conversation",
+    "conversationDescription": "Je suis toujours intéressé par de nouvelles opportunités et des projets passionnants. Que vous ayez une question, souhaitiez collaborer, ou vouliez simplement dire bonjour, j'aimerais avoir de vos nouvelles !",
+    "sendMessageTitle": "Envoyez-moi un message",
+    "form": {
+      "name": "Nom",
+      "namePlaceholder": "Votre nom",
+      "email": "Email",
+      "emailPlaceholder": "votre@email.com",
+      "message": "Message",
+      "messagePlaceholder": "Parlez-moi de votre projet...",
+      "sendMessage": "Envoyer le Message"
+    },
+    "methods": {
+      "email": {
+        "title": "Email",
+        "description": "Entrer en contact par email",
+        "value": "bonjour@exemple.com"
+      },
+      "linkedin": {
+        "title": "LinkedIn",
+        "description": "Connectez-vous avec moi professionnellement",
+        "value": "linkedin.com/in/votreprofil"
+      },
+      "github": {
+        "title": "GitHub",
+        "description": "Consultez mon code",
+        "value": "github.com/votreutilisateur"
+      },
+      "twitter": {
+        "title": "Twitter",
+        "description": "Suivez-moi pour les mises à jour",
+        "value": "@votreutilisateur"
+      }
+    }
+  },
+  "footer": {
+    "description": "Développeur full-stack passionné créant des solutions innovantes avec des technologies modernes.",
+    "quickLinks": "Liens Rapides",
+    "getInTouch": "Entrer en Contact",
+    "contactInfo": {
+      "email": "📧 bonjour@exemple.com",
+      "location": "📍 Votre Ville, Pays",
+      "availability": "💼 Disponible pour travail freelance"
+    },
+    "copyright": "© {year} Votre Nom. Tous droits réservés. Construit avec ❤️ en utilisant Next.js et Tailwind CSS."
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
+  "language": {
+    "english": "English",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "italian": "Italiano",
+    "french": "Français",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "korean": "한국어"
+  }
+}

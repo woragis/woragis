@@ -1,0 +1,127 @@
+{
+  "navigation": {
+    "logo": "</> Developer",
+    "about": "About",
+    "skills": "Skills",
+    "projects": "Projects",
+    "contact": "Contact",
+    "getInTouch": "Get In Touch"
+  },
+  "hero": {
+    "greeting": "👋 Hello, I'm a Programmer",
+    "title": "Building Digital",
+    "titleHighlight": "Experiences",
+    "subtitle": "Passionate full-stack developer crafting innovative solutions with modern technologies. I turn ideas into reality through clean code and creative problem-solving.",
+    "viewWork": "View My Work",
+    "getInTouch": "Get In Touch",
+    "scrollToExplore": "Scroll to explore"
+  },
+  "about": {
+    "title": "About Me",
+    "subtitle": "Passionate developer with a love for creating amazing digital experiences",
+    "heading": "Hi, I'm a Full-Stack Developer",
+    "description1": "With over 5 years of experience in software development, I specialize in building scalable web applications and mobile solutions. My journey began with curiosity about how things work, and it has evolved into a passion for creating digital experiences that make a difference.",
+    "description2": "I believe in clean code, user-centered design, and continuous learning. When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects, or sharing knowledge with the developer community.",
+    "description3": "My goal is to help businesses and individuals bring their ideas to life through innovative technology solutions.",
+    "stats": {
+      "yearsExperience": "Years Experience",
+      "projectsCompleted": "Projects Completed",
+      "technologies": "Technologies",
+      "happyClients": "Happy Clients"
+    }
+  },
+  "skills": {
+    "title": "Skills & Technologies",
+    "subtitle": "Technologies I work with to bring ideas to life",
+    "categories": {
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "tools": "Tools & Others"
+    }
+  },
+  "projects": {
+    "title": "Featured Projects",
+    "subtitle": "Some of my recent work that I'm proud of",
+    "viewAllProjects": "View All Projects",
+    "code": "Code",
+    "live": "Live",
+    "items": {
+      "ecommerce": {
+        "title": "E-Commerce Platform",
+        "description": "A full-stack e-commerce solution built with React, Node.js, and PostgreSQL. Features include user authentication, payment processing, and admin dashboard."
+      },
+      "taskManagement": {
+        "title": "Task Management App",
+        "description": "A collaborative task management application with real-time updates, drag-and-drop functionality, and team collaboration features."
+      },
+      "weatherDashboard": {
+        "title": "Weather Dashboard",
+        "description": "A responsive weather dashboard that provides current weather conditions, forecasts, and location-based weather alerts."
+      }
+    }
+  },
+  "contact": {
+    "title": "Get In Touch",
+    "subtitle": "Let's work together to bring your ideas to life",
+    "conversationTitle": "Let's Start a Conversation",
+    "conversationDescription": "I'm always interested in new opportunities and exciting projects. Whether you have a question, want to collaborate, or just want to say hi, I'd love to hear from you!",
+    "sendMessageTitle": "Send me a message",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "message": "Message",
+      "messagePlaceholder": "Tell me about your project...",
+      "sendMessage": "Send Message"
+    },
+    "methods": {
+      "email": {
+        "title": "Email",
+        "description": "Get in touch via email",
+        "value": "hello@example.com"
+      },
+      "linkedin": {
+        "title": "LinkedIn",
+        "description": "Connect with me professionally",
+        "value": "linkedin.com/in/yourprofile"
+      },
+      "github": {
+        "title": "GitHub",
+        "description": "Check out my code",
+        "value": "github.com/yourusername"
+      },
+      "twitter": {
+        "title": "Twitter",
+        "description": "Follow me for updates",
+        "value": "@yourusername"
+      }
+    }
+  },
+  "footer": {
+    "description": "Passionate full-stack developer crafting innovative solutions with modern technologies.",
+    "quickLinks": "Quick Links",
+    "getInTouch": "Get In Touch",
+    "contactInfo": {
+      "email": "📧 hello@example.com",
+      "location": "📍 Your City, Country",
+      "availability": "💼 Available for freelance work"
+    },
+    "copyright": "© {year} Your Name. All rights reserved. Built with ❤️ using Next.js & Tailwind CSS."
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "english": "English",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "italian": "Italiano",
+    "french": "Français",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "korean": "한국어"
+  }
+}
