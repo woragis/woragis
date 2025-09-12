@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button } from "../ui";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Button, ThemeToggle, LanguageSwitcher } from "../ui";
 
 export const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,10 +19,10 @@ export const Navigation: React.FC = () => {
   }, []);
 
   const navItems = [
-    { name: "About", href: "#about" },
-    { name: "Skills", href: "#skills" },
-    { name: "Projects", href: "#projects" },
-    { name: "Contact", href: "#contact" },
+    { name: t("navigation.about"), href: "#about" },
+    { name: t("navigation.skills"), href: "#skills" },
+    { name: t("navigation.projects"), href: "#projects" },
+    { name: t("navigation.contact"), href: "#contact" },
   ];
 
   const scrollToSection = (href: string) => {
@@ -47,7 +49,7 @@ export const Navigation: React.FC = () => {
               onClick={() => scrollToSection("#")}
               className="text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
-              &lt;/&gt; Developer
+              {t("logo")}
             </button>
           </div>
 
@@ -66,14 +68,16 @@ export const Navigation: React.FC = () => {
             </div>
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
+          {/* Language Switcher, Theme Toggle and CTA Button */}
+          <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitcher />
+            <ThemeToggle />
             <Button
               variant="outline"
               size="sm"
               onClick={() => scrollToSection("#contact")}
             >
-              Get In Touch
+              {t("getInTouch")}
             </Button>
           </div>
 
@@ -122,14 +126,18 @@ export const Navigation: React.FC = () => {
                   {item.name}
                 </button>
               ))}
-              <div className="pt-4">
+              <div className="pt-4 space-y-3">
+                <div className="flex justify-center space-x-2">
+                  <LanguageSwitcher />
+                  <ThemeToggle />
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
                   className="w-full"
                   onClick={() => scrollToSection("#contact")}
                 >
-                  Get In Touch
+                  {t("getInTouch")}
                 </Button>
               </div>
             </div>

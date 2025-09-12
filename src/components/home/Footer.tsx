@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
 
   const socialLinks = [
     { name: "GitHub", href: "https://github.com/yourusername", icon: "🐙" },
@@ -26,8 +28,7 @@ export const Footer: React.FC = () => {
               &lt;/&gt; Developer
             </div>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Passionate full-stack developer crafting innovative solutions with
-              modern technologies.
+              {t("footer.description")}
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((link) => (
@@ -48,7 +49,7 @@ export const Footer: React.FC = () => {
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Quick Links
+              {t("footer.quickLinks")}
             </h3>
             <ul className="space-y-2">
               {[
@@ -77,20 +78,19 @@ export const Footer: React.FC = () => {
           {/* Contact Info */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Get In Touch
+              {t("footer.getInTouch")}
             </h3>
             <div className="space-y-2 text-gray-600 dark:text-gray-300">
-              <p>📧 hello@example.com</p>
-              <p>📍 Your City, Country</p>
-              <p>💼 Available for freelance work</p>
+              <p>{t("footer.contactInfo.email")}</p>
+              <p>{t("footer.contactInfo.location")}</p>
+              <p>{t("footer.contactInfo.availability")}</p>
             </div>
           </div>
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center">
           <p className="text-gray-500 dark:text-gray-400">
-            © {currentYear} Your Name. All rights reserved. Built with ❤️ using
-            Next.js & Tailwind CSS.
+            {t("footer.copyright").replace("{year}", currentYear.toString())}
           </p>
         </div>
       </div>

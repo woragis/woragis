@@ -1,36 +1,39 @@
 "use client";
 
 import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Section, Container, Card, Button } from "../ui";
 
 export const Contact: React.FC = () => {
+  const { t } = useLanguage();
+
   const contactMethods = [
     {
       icon: "📧",
-      title: "Email",
-      description: "Get in touch via email",
-      value: "hello@example.com",
+      title: t("contact.methods.email.title"),
+      description: t("contact.methods.email.description"),
+      value: t("contact.methods.email.value"),
       action: "mailto:hello@example.com",
     },
     {
       icon: "💼",
-      title: "LinkedIn",
-      description: "Connect with me professionally",
-      value: "linkedin.com/in/yourprofile",
+      title: t("contact.methods.linkedin.title"),
+      description: t("contact.methods.linkedin.description"),
+      value: t("contact.methods.linkedin.value"),
       action: "https://linkedin.com/in/yourprofile",
     },
     {
       icon: "🐙",
-      title: "GitHub",
-      description: "Check out my code",
-      value: "github.com/yourusername",
+      title: t("contact.methods.github.title"),
+      description: t("contact.methods.github.description"),
+      value: t("contact.methods.github.value"),
       action: "https://github.com/yourusername",
     },
     {
       icon: "🐦",
-      title: "Twitter",
-      description: "Follow me for updates",
-      value: "@yourusername",
+      title: t("contact.methods.twitter.title"),
+      description: t("contact.methods.twitter.description"),
+      value: t("contact.methods.twitter.value"),
       action: "https://twitter.com/yourusername",
     },
   ];
@@ -38,19 +41,17 @@ export const Contact: React.FC = () => {
   return (
     <Section
       id="contact"
-      title="Get In Touch"
-      subtitle="Let's work together to bring your ideas to life"
+      title={t("contact.title")}
+      subtitle={t("contact.subtitle")}
     >
       <Container>
         <div className="grid lg:grid-cols-2 gap-12">
           <div>
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Let's Start a Conversation
+              {t("contact.conversationTitle")}
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-8">
-              I'm always interested in new opportunities and exciting projects.
-              Whether you have a question, want to collaborate, or just want to
-              say hi, I'd love to hear from you!
+              {t("contact.conversationDescription")}
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4">
@@ -79,7 +80,7 @@ export const Contact: React.FC = () => {
           <div>
             <Card>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                Send me a message
+                {t("contact.sendMessageTitle")}
               </h3>
               <form className="space-y-4">
                 <div>
@@ -87,14 +88,14 @@ export const Contact: React.FC = () => {
                     htmlFor="name"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
-                    Name
+                    {t("contact.form.name")}
                   </label>
                   <input
                     type="text"
                     id="name"
                     name="name"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="Your name"
+                    placeholder={t("contact.form.namePlaceholder")}
                   />
                 </div>
                 <div>
@@ -102,14 +103,14 @@ export const Contact: React.FC = () => {
                     htmlFor="email"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
-                    Email
+                    {t("contact.form.email")}
                   </label>
                   <input
                     type="email"
                     id="email"
                     name="email"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="your@email.com"
+                    placeholder={t("contact.form.emailPlaceholder")}
                   />
                 </div>
                 <div>
@@ -117,18 +118,18 @@ export const Contact: React.FC = () => {
                     htmlFor="message"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
-                    Message
+                    {t("contact.form.message")}
                   </label>
                   <textarea
                     id="message"
                     name="message"
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="Tell me about your project..."
+                    placeholder={t("contact.form.messagePlaceholder")}
                   />
                 </div>
                 <Button size="lg" className="w-full">
-                  Send Message
+                  {t("contact.form.sendMessage")}
                 </Button>
               </form>
             </Card>

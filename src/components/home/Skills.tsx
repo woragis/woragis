@@ -1,10 +1,15 @@
+"use client";
+
 import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Section, Container, Card } from "../ui";
 
 export const Skills: React.FC = () => {
+  const { t } = useLanguage();
+
   const skillCategories = [
     {
-      title: "Frontend",
+      title: t("skills.categories.frontend"),
       skills: [
         { name: "React", level: 95 },
         { name: "TypeScript", level: 90 },
@@ -14,7 +19,7 @@ export const Skills: React.FC = () => {
       ],
     },
     {
-      title: "Backend",
+      title: t("skills.categories.backend"),
       skills: [
         { name: "Node.js", level: 90 },
         { name: "Python", level: 85 },
@@ -24,7 +29,7 @@ export const Skills: React.FC = () => {
       ],
     },
     {
-      title: "Tools & Others",
+      title: t("skills.categories.tools"),
       skills: [
         { name: "Git", level: 95 },
         { name: "Docker", level: 80 },
@@ -38,8 +43,8 @@ export const Skills: React.FC = () => {
   return (
     <Section
       id="skills"
-      title="Skills & Technologies"
-      subtitle="Technologies I work with to bring ideas to life"
+      title={t("skills.title")}
+      subtitle={t("skills.subtitle")}
     >
       <Container>
         <div className="grid md:grid-cols-3 gap-8">
