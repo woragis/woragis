@@ -6,6 +6,7 @@ import { TagService } from "./tag.service";
 import { LanguageService } from "./language.service";
 import { FrameworkService } from "./framework.service";
 import { SettingsService } from "./settings.service";
+import { TestimonialService } from "./testimonial.service";
 
 // Export all services
 export {
@@ -16,6 +17,7 @@ export {
   LanguageService,
   FrameworkService,
   SettingsService,
+  TestimonialService,
 };
 
 // Create singleton instances
@@ -26,3 +28,4 @@ export const tagService = new TagService();
 export const languageService = new LanguageService();
 export const frameworkService = new FrameworkService();
 export const settingsService = new SettingsService();
+export const testimonialService = new TestimonialService();
