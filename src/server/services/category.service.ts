@@ -8,25 +8,39 @@ import type {
 import { BaseService } from "./base.service";
 
 export class CategoryService extends BaseService {
-  async getAllCategories(): Promise<ApiResponse<Category[]>> {
+  async getAllCategories(userId?: string): Promise<ApiResponse<Category[]>> {
     try {
-      const categories = await categoryRepository.findAll();
+      const categories = await categoryRepository.findAll(userId);
       return this.success(categories);
     } catch (error) {
       return this.handleError(error, "getAllCategories");
     }
   }
 
-  async getVisibleCategories(): Promise<ApiResponse<Category[]>> {
+  async getVisibleCategories(
+    userId?: string
+  ): Promise<ApiResponse<Category[]>> {
     try {
-      const categories = await categoryRepository.findVisible();
+      const categories = await categoryRepository.findVisible(userId);
       return this.success(categories);
     } catch (error) {
       return this.handleError(error, "getVisibleCategories");
     }
   }
 
-  async getCategoryById(id: string): Promise<ApiResponse<Category | null>> {
+  async getPublicCategories(): Promise<ApiResponse<Category[]>> {
+    try {
+      const categories = await categoryRepository.findPublic();
+      return this.success(categories);
+    } catch (error) {
+      return this.handleError(error, "getPublicCategories");
+    }
+  }
+
+  async getCategoryById(
+    id: string,
+    userId?: string
+  ): Promise<ApiResponse<Category | null>> {
     try {
       if (!this.validateId(id)) {
         return {
@@ -35,14 +49,17 @@ export class CategoryService extends BaseService {
         };
       }
 
-      const category = await categoryRepository.findById(id);
+      const category = await categoryRepository.findById(id, userId);
       return this.success(category);
     } catch (error) {
       return this.handleError(error, "getCategoryById");
     }
   }
 
-  async getCategoryBySlug(slug: string): Promise<ApiResponse<Category | null>> {
+  async getCategoryBySlug(
+    slug: string,
+    userId?: string
+  ): Promise<ApiResponse<Category | null>> {
     try {
       if (!slug || !slug.trim()) {
         return {
@@ -51,15 +68,34 @@ export class CategoryService extends BaseService {
         };
       }
 
-      const category = await categoryRepository.findBySlug(slug);
+      const category = await categoryRepository.findBySlug(slug, userId);
       return this.success(category);
     } catch (error) {
       return this.handleError(error, "getCategoryBySlug");
     }
   }
 
+  async getPublicCategoryBySlug(
+    slug: string
+  ): Promise<ApiResponse<Category | null>> {
+    try {
+      if (!slug || !slug.trim()) {
+        return {
+          success: false,
+          error: "Invalid category slug",
+        };
+      }
+
+      const category = await categoryRepository.findPublicBySlug(slug);
+      return this.success(category);
+    } catch (error) {
+      return this.handleError(error, "getPublicCategoryBySlug");
+    }
+  }
+
   async createCategory(
-    categoryData: NewCategory
+    categoryData: NewCategory,
+    userId: string
   ): Promise<ApiResponse<Category>> {
     try {
       const requiredFields: (keyof NewCategory)[] = ["name", "slug"];
@@ -75,7 +111,9 @@ export class CategoryService extends BaseService {
         };
       }
 
-      const category = await categoryRepository.create(categoryData);
+      // Add userId to category data
+      const categoryWithUser = { ...categoryData, userId };
+      const category = await categoryRepository.create(categoryWithUser);
       return this.success(category, "Category created successfully");
     } catch (error) {
       return this.handleError(error, "createCategory");
@@ -84,7 +122,8 @@ export class CategoryService extends BaseService {
 
   async updateCategory(
     id: string,
-    categoryData: Partial<NewCategory>
+    categoryData: Partial<NewCategory>,
+    userId?: string
   ): Promise<ApiResponse<Category | null>> {
     try {
       if (!this.validateId(id)) {
@@ -94,7 +133,11 @@ export class CategoryService extends BaseService {
         };
       }
 
-      const category = await categoryRepository.update(id, categoryData);
+      const category = await categoryRepository.update(
+        id,
+        categoryData,
+        userId
+      );
       if (!category) {
         return {
           success: false,
@@ -108,7 +151,10 @@ export class CategoryService extends BaseService {
     }
   }
 
-  async deleteCategory(id: string): Promise<ApiResponse<void>> {
+  async deleteCategory(
+    id: string,
+    userId?: string
+  ): Promise<ApiResponse<void>> {
     try {
       if (!this.validateId(id)) {
         return {
@@ -117,7 +163,7 @@ export class CategoryService extends BaseService {
         };
       }
 
-      await categoryRepository.delete(id);
+      await categoryRepository.delete(id, userId);
       return this.success(undefined, "Category deleted successfully");
     } catch (error) {
       return this.handleError(error, "deleteCategory");
@@ -125,10 +171,11 @@ export class CategoryService extends BaseService {
   }
 
   async searchCategories(
-    filters: CategoryFilters
+    filters: CategoryFilters,
+    userId?: string
   ): Promise<ApiResponse<Category[]>> {
     try {
-      const categories = await categoryRepository.search(filters);
+      const categories = await categoryRepository.search(filters, userId);
       return this.success(categories);
     } catch (error) {
       return this.handleError(error, "searchCategories");

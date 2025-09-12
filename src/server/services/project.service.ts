@@ -10,36 +10,60 @@ import type {
 import { BaseService } from "./base.service";
 
 export class ProjectService extends BaseService {
-  async getAllProjects(): Promise<ApiResponse<Project[]>> {
+  async getAllProjects(userId?: string): Promise<ApiResponse<Project[]>> {
     try {
-      const projects = await projectRepository.findAll();
+      const projects = await projectRepository.findAll(userId);
       return this.success(projects);
     } catch (error) {
       return this.handleError(error, "getAllProjects");
     }
   }
 
-  async getVisibleProjects(): Promise<ApiResponse<Project[]>> {
+  async getVisibleProjects(userId?: string): Promise<ApiResponse<Project[]>> {
     try {
-      const projects = await projectRepository.findVisible();
+      const projects = await projectRepository.findVisible(userId);
       return this.success(projects);
     } catch (error) {
       return this.handleError(error, "getVisibleProjects");
     }
   }
 
+  async getPublicProjects(): Promise<ApiResponse<Project[]>> {
+    try {
+      const projects = await projectRepository.findPublic();
+      return this.success(projects);
+    } catch (error) {
+      return this.handleError(error, "getPublicProjects");
+    }
+  }
+
   async getFeaturedProjects(
-    limit: number = 3
+    limit: number = 3,
+    userId?: string
   ): Promise<ApiResponse<Project[]>> {
     try {
-      const projects = await projectRepository.findFeatured(limit);
+      const projects = await projectRepository.findFeatured(limit, userId);
       return this.success(projects);
     } catch (error) {
       return this.handleError(error, "getFeaturedProjects");
     }
   }
 
-  async getProjectById(id: string): Promise<ApiResponse<Project | null>> {
+  async getPublicFeaturedProjects(
+    limit: number = 3
+  ): Promise<ApiResponse<Project[]>> {
+    try {
+      const projects = await projectRepository.findPublicFeatured(limit);
+      return this.success(projects);
+    } catch (error) {
+      return this.handleError(error, "getPublicFeaturedProjects");
+    }
+  }
+
+  async getProjectById(
+    id: string,
+    userId?: string
+  ): Promise<ApiResponse<Project | null>> {
     try {
       if (!this.validateId(id)) {
         return {
@@ -48,7 +72,7 @@ export class ProjectService extends BaseService {
         };
       }
 
-      const project = await projectRepository.findById(id);
+      const project = await projectRepository.findById(id, userId);
       return this.success(project);
     } catch (error) {
       return this.handleError(error, "getProjectById");
@@ -56,6 +80,41 @@ export class ProjectService extends BaseService {
   }
 
   async getProjectWithRelations(
+    id: string,
+    userId?: string
+  ): Promise<ApiResponse<ProjectWithRelations | null>> {
+    try {
+      if (!this.validateId(id)) {
+        return {
+          success: false,
+          error: "Invalid project ID",
+        };
+      }
+
+      const project = await projectRepository.findWithRelations(id, userId);
+      return this.success(project);
+    } catch (error) {
+      return this.handleError(error, "getProjectWithRelations");
+    }
+  }
+
+  async getPublicProjectById(id: string): Promise<ApiResponse<Project | null>> {
+    try {
+      if (!this.validateId(id)) {
+        return {
+          success: false,
+          error: "Invalid project ID",
+        };
+      }
+
+      const project = await projectRepository.findPublicById(id);
+      return this.success(project);
+    } catch (error) {
+      return this.handleError(error, "getPublicProjectById");
+    }
+  }
+
+  async getPublicProjectWithRelations(
     id: string
   ): Promise<ApiResponse<ProjectWithRelations | null>> {
     try {
@@ -66,14 +125,17 @@ export class ProjectService extends BaseService {
         };
       }
 
-      const project = await projectRepository.findWithRelations(id);
+      const project = await projectRepository.findPublicWithRelations(id);
       return this.success(project);
     } catch (error) {
-      return this.handleError(error, "getProjectWithRelations");
+      return this.handleError(error, "getPublicProjectWithRelations");
     }
   }
 
-  async createProject(projectData: NewProject): Promise<ApiResponse<Project>> {
+  async createProject(
+    projectData: NewProject,
+    userId: string
+  ): Promise<ApiResponse<Project>> {
     try {
       const requiredFields: (keyof NewProject)[] = [
         "title",
@@ -92,7 +154,9 @@ export class ProjectService extends BaseService {
         };
       }
 
-      const project = await projectRepository.create(projectData);
+      // Add userId to project data
+      const projectWithUser = { ...projectData, userId };
+      const project = await projectRepository.create(projectWithUser);
       return this.success(project, "Project created successfully");
     } catch (error) {
       return this.handleError(error, "createProject");
@@ -101,7 +165,8 @@ export class ProjectService extends BaseService {
 
   async updateProject(
     id: string,
-    projectData: Partial<NewProject>
+    projectData: Partial<NewProject>,
+    userId?: string
   ): Promise<ApiResponse<Project | null>> {
     try {
       if (!this.validateId(id)) {
@@ -111,7 +176,7 @@ export class ProjectService extends BaseService {
         };
       }
 
-      const project = await projectRepository.update(id, projectData);
+      const project = await projectRepository.update(id, projectData, userId);
       if (!project) {
         return {
           success: false,
@@ -125,7 +190,7 @@ export class ProjectService extends BaseService {
     }
   }
 
-  async deleteProject(id: string): Promise<ApiResponse<void>> {
+  async deleteProject(id: string, userId?: string): Promise<ApiResponse<void>> {
     try {
       if (!this.validateId(id)) {
         return {
@@ -134,7 +199,7 @@ export class ProjectService extends BaseService {
         };
       }
 
-      await projectRepository.delete(id);
+      await projectRepository.delete(id, userId);
       return this.success(undefined, "Project deleted successfully");
     } catch (error) {
       return this.handleError(error, "deleteProject");
@@ -142,10 +207,11 @@ export class ProjectService extends BaseService {
   }
 
   async searchProjects(
-    filters: ProjectFilters
+    filters: ProjectFilters,
+    userId?: string
   ): Promise<ApiResponse<Project[]>> {
     try {
-      const projects = await projectRepository.search(filters);
+      const projects = await projectRepository.search(filters, userId);
       return this.success(projects);
     } catch (error) {
       return this.handleError(error, "searchProjects");
