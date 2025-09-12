@@ -36,9 +36,9 @@ export class BlogRepository {
       .from(blogPosts)
       .where(
         and(
+          eq(blogPosts.published, true),
           eq(blogPosts.visible, true),
-          eq(blogPosts.public, true),
-          eq(blogPosts.published, true)
+          eq(blogPosts.public, true)
         )
       )
       .orderBy(desc(blogPosts.createdAt));
