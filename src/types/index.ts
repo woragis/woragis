@@ -6,6 +6,7 @@ export * from "./tags";
 export * from "./categories";
 export * from "./languages";
 export * from "./frameworks";
+export * from "./testimonials";
 
 // Common types that might be shared across domains
 export interface ApiResponse<T = any> {
