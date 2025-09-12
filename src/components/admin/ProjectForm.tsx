@@ -28,8 +28,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     image: project?.image || "",
     githubUrl: project?.githubUrl || "",
     liveUrl: project?.liveUrl || "",
-    featured: project?.featured || false,
+    featured: project?.featured ?? true,
     visible: project?.visible ?? true,
+    public: project?.public ?? true,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -187,6 +188,19 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             />
             <span className="text-sm text-gray-700 dark:text-gray-300">
               Visible
+            </span>
+          </label>
+
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="public"
+              checked={formData.public}
+              onChange={handleInputChange}
+              className="mr-2"
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              Public
             </span>
           </label>
         </div>

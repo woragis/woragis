@@ -1,80 +1,61 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Project } from "@/server/db/schema";
 import { ProjectForm } from "./ProjectForm";
 import { ProjectList } from "./ProjectList";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { Plus, Settings, BarChart3 } from "lucide-react";
+import {
+  useProjects,
+  useCreateProject,
+  useUpdateProject,
+  useDeleteProject,
+  useUpdateProjectOrder,
+  useToggleProjectVisibility,
+  useToggleProjectFeatured,
+} from "@/hooks/useProjects";
+import { useSettings, useUpdateSetting } from "@/hooks/useSettings";
 
 export const AdminDashboard: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [projectsPerPage, setProjectsPerPage] = useState(6);
-  const [isSaving, setIsSaving] = useState(false);
 
-  // Fetch projects
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch("/api/admin/projects");
-      const data = await response.json();
-      setProjects(data);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // TanStack Query hooks
+  const { data: projects = [], isLoading } = useProjects();
+  const { data: settings = [] } = useSettings();
+  const createProjectMutation = useCreateProject();
+  const updateProjectMutation = useUpdateProject();
+  const deleteProjectMutation = useDeleteProject();
+  const updateProjectOrderMutation = useUpdateProjectOrder();
+  const toggleVisibilityMutation = useToggleProjectVisibility();
+  const toggleFeaturedMutation = useToggleProjectFeatured();
+  const updateSettingMutation = useUpdateSetting();
 
-  // Fetch settings
-  const fetchSettings = async () => {
-    try {
-      const response = await fetch("/api/admin/settings");
-      const data = await response.json();
-      setProjectsPerPage(data.projectsPerPage || 6);
-    } catch (error) {
-      console.error("Error fetching settings:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchProjects();
-    fetchSettings();
-  }, []);
+  // Get projects per page setting
+  const projectsPerPageSetting = settings.find(
+    (s) => s.key === "projects_per_page"
+  );
+  const projectsPerPage = projectsPerPageSetting
+    ? parseInt(projectsPerPageSetting.value)
+    : 6;
 
   // Create or update project
   const handleSaveProject = async (projectData: Partial<Project>) => {
-    setIsSaving(true);
     try {
-      const url = editingProject
-        ? "/api/admin/projects"
-        : "/api/admin/projects";
-
-      const method = editingProject ? "PUT" : "POST";
-      const body = editingProject
-        ? { action: "update", id: editingProject.id, ...projectData }
-        : projectData;
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (response.ok) {
-        await fetchProjects();
-        setShowForm(false);
-        setEditingProject(null);
+      if (editingProject) {
+        await updateProjectMutation.mutateAsync({
+          id: editingProject.id.toString(),
+          project: projectData,
+        });
       } else {
-        console.error("Error saving project");
+        await createProjectMutation.mutateAsync(projectData as any);
       }
+      setShowForm(false);
+      setEditingProject(null);
     } catch (error) {
       console.error("Error saving project:", error);
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -83,15 +64,7 @@ export const AdminDashboard: React.FC = () => {
     if (!confirm("Are you sure you want to delete this project?")) return;
 
     try {
-      const response = await fetch(`/api/admin/projects?id=${id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        await fetchProjects();
-      } else {
-        console.error("Error deleting project");
-      }
+      await deleteProjectMutation.mutateAsync(id.toString());
     } catch (error) {
       console.error("Error deleting project:", error);
     }
@@ -100,15 +73,7 @@ export const AdminDashboard: React.FC = () => {
   // Toggle project visibility
   const handleToggleVisibility = async (id: number) => {
     try {
-      const response = await fetch("/api/admin/projects", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "toggle-visibility", id }),
-      });
-
-      if (response.ok) {
-        await fetchProjects();
-      }
+      await toggleVisibilityMutation.mutateAsync(id.toString());
     } catch (error) {
       console.error("Error toggling visibility:", error);
     }
@@ -117,15 +82,7 @@ export const AdminDashboard: React.FC = () => {
   // Toggle project featured status
   const handleToggleFeatured = async (id: number) => {
     try {
-      const response = await fetch("/api/admin/projects", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "toggle-featured", id }),
-      });
-
-      if (response.ok) {
-        await fetchProjects();
-      }
+      await toggleFeaturedMutation.mutateAsync(id.toString());
     } catch (error) {
       console.error("Error toggling featured:", error);
     }
@@ -136,15 +93,11 @@ export const AdminDashboard: React.FC = () => {
     projectOrders: { id: number; order: number }[]
   ) => {
     try {
-      const response = await fetch("/api/admin/projects", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reorder", projectOrders }),
-      });
-
-      if (response.ok) {
-        await fetchProjects();
-      }
+      const formattedOrders = projectOrders.map((order) => ({
+        id: order.id.toString(),
+        order: order.order,
+      }));
+      await updateProjectOrderMutation.mutateAsync(formattedOrders);
     } catch (error) {
       console.error("Error reordering projects:", error);
     }
@@ -153,15 +106,10 @@ export const AdminDashboard: React.FC = () => {
   // Update projects per page
   const handleUpdateProjectsPerPage = async (count: number) => {
     try {
-      const response = await fetch("/api/admin/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: "projects_per_page", value: count }),
+      await updateSettingMutation.mutateAsync({
+        key: "projects_per_page",
+        value: count.toString(),
       });
-
-      if (response.ok) {
-        setProjectsPerPage(count);
-      }
     } catch (error) {
       console.error("Error updating settings:", error);
     }
@@ -287,7 +235,10 @@ export const AdminDashboard: React.FC = () => {
               project={editingProject}
               onSave={handleSaveProject}
               onCancel={handleCancelForm}
-              isLoading={isSaving}
+              isLoading={
+                createProjectMutation.isPending ||
+                updateProjectMutation.isPending
+              }
             />
           </div>
         )}
