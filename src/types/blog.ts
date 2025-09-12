@@ -6,9 +6,9 @@ export type NewBlogPost = typeof blogPosts.$inferInsert;
 
 // Extended types for specific use cases
 export interface BlogPostWithStats extends BlogPost {
-  viewCount?: number;
-  likeCount?: number;
-  readingTime?: number;
+  viewCount: number | null;
+  likeCount: number | null;
+  readingTime: number | null;
 }
 
 export interface BlogPostFilters {
