@@ -1,9 +1,25 @@
-import Image from "next/image";
+import {
+  Navigation,
+  Hero,
+  About,
+  Skills,
+  Projects,
+  Contact,
+  Footer,
+} from "@/components/home";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      hello world
-    </div>
+    <>
+      <Navigation />
+      <main className="min-h-screen">
+        <Hero />
+        <About />
+        <Skills />
+        <Projects />
+        <Contact />
+      </main>
+      <Footer />
+    </>
   );
 }
