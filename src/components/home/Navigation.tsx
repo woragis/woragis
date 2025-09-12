@@ -21,7 +21,10 @@ export const Navigation: React.FC = () => {
   const navItems = [
     { name: t("navigation.about"), href: "#about" },
     { name: t("navigation.skills"), href: "#skills" },
+    { name: t("navigation.experience"), href: "#experience" },
     { name: t("navigation.projects"), href: "#projects" },
+    { name: t("navigation.testimonials"), href: "#testimonials" },
+    { name: t("navigation.blog"), href: "#blog" },
     { name: t("navigation.contact"), href: "#contact" },
   ];
 

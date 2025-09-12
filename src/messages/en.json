@@ -3,7 +3,10 @@
     "logo": "</> Developer",
     "about": "About",
     "skills": "Skills",
+    "experience": "Experience",
     "projects": "Projects",
+    "testimonials": "Testimonials",
+    "blog": "Blog",
     "contact": "Contact",
     "getInTouch": "Get In Touch"
   },
@@ -14,6 +17,8 @@
     "subtitle": "Passionate full-stack developer crafting innovative solutions with modern technologies. I turn ideas into reality through clean code and creative problem-solving.",
     "viewWork": "View My Work",
     "getInTouch": "Get In Touch",
+    "downloadResume": "Download Resume",
+    "experienceYears": "5+",
     "scrollToExplore": "Scroll to explore"
   },
   "about": {
@@ -73,7 +78,10 @@
       "emailPlaceholder": "your@email.com",
       "message": "Message",
       "messagePlaceholder": "Tell me about your project...",
-      "sendMessage": "Send Message"
+      "sendMessage": "Send Message",
+      "sending": "Sending...",
+      "successMessage": "Thank you! Your message has been sent successfully.",
+      "errorMessage": "Sorry, there was an error sending your message. Please try again."
     },
     "methods": {
       "email": {
@@ -123,5 +131,168 @@
     "japanese": "日本語",
     "chinese": "中文",
     "korean": "한국어"
+  },
+  "experience": {
+    "title": "Work Experience",
+    "subtitle": "My professional journey and career milestones",
+    "keyAchievements": "Key Achievements",
+    "technologies": "Technologies Used",
+    "items": {
+      "seniorDeveloper": {
+        "title": "Senior Full-Stack Developer",
+        "company": "TechCorp Solutions",
+        "period": "2022 - Present",
+        "location": "San Francisco, CA",
+        "description": "Leading development of enterprise-scale applications and mentoring junior developers. Responsible for architectural decisions and technical strategy.",
+        "achievements": [
+          "Led a team of 5 developers in building a microservices architecture",
+          "Improved application performance by 40% through optimization",
+          "Mentored 3 junior developers and conducted code reviews"
+        ]
+      },
+      "fullStackDeveloper": {
+        "title": "Full-Stack Developer",
+        "company": "StartupXYZ",
+        "period": "2020 - 2022",
+        "location": "Remote",
+        "description": "Developed full-stack web applications using modern technologies. Collaborated with cross-functional teams to deliver high-quality products.",
+        "achievements": [
+          "Built 3 major features that increased user engagement by 25%",
+          "Implemented CI/CD pipeline reducing deployment time by 60%",
+          "Collaborated with design team to improve user experience"
+        ]
+      },
+      "frontendDeveloper": {
+        "title": "Frontend Developer",
+        "company": "WebAgency Inc",
+        "period": "2019 - 2020",
+        "location": "New York, NY",
+        "description": "Focused on creating responsive and interactive user interfaces. Worked closely with designers to implement pixel-perfect designs.",
+        "achievements": [
+          "Developed 15+ responsive websites for various clients",
+          "Reduced page load time by 30% through optimization",
+          "Implemented accessibility features improving WCAG compliance"
+        ]
+      }
+    }
+  },
+  "testimonials": {
+    "title": "What Clients Say",
+    "subtitle": "Testimonials from satisfied clients and colleagues",
+    "items": {
+      "client1": {
+        "name": "Sarah Johnson",
+        "role": "Product Manager",
+        "company": "TechStart Inc",
+        "content": "Working with this developer was an absolute pleasure. The code quality was exceptional and the communication throughout the project was outstanding. Highly recommended!"
+      },
+      "client2": {
+        "name": "Michael Chen",
+        "role": "CTO",
+        "company": "InnovateLab",
+        "content": "The technical expertise and problem-solving skills are top-notch. Delivered our project ahead of schedule with zero bugs. Will definitely work together again."
+      },
+      "client3": {
+        "name": "Emily Rodriguez",
+        "role": "Design Director",
+        "company": "CreativeStudio",
+        "content": "Amazing attention to detail and ability to translate complex designs into beautiful, functional code. The collaboration was seamless and the results exceeded expectations."
+      }
+    }
+  },
+  "blog": {
+    "title": "Latest Articles",
+    "subtitle": "Thoughts and insights on web development and technology",
+    "viewAllArticles": "View All Articles",
+    "readMore": "Read More",
+    "items": {
+      "reactBestPractices": {
+        "title": "React Best Practices for 2024",
+        "excerpt": "Essential patterns and practices every React developer should know to write maintainable and performant code.",
+        "date": "Dec 15, 2024",
+        "readTime": "5 min read",
+        "category": "React"
+      },
+      "typescriptTips": {
+        "title": "Advanced TypeScript Tips",
+        "excerpt": "Powerful TypeScript features that can help you write more robust and type-safe applications.",
+        "date": "Dec 10, 2024",
+        "readTime": "7 min read",
+        "category": "TypeScript"
+      },
+      "nextjsOptimization": {
+        "title": "Next.js Performance Optimization",
+        "excerpt": "Learn how to optimize your Next.js applications for better performance and user experience.",
+        "date": "Dec 5, 2024",
+        "readTime": "6 min read",
+        "category": "Next.js"
+      }
+    }
+  },
+  "certifications": {
+    "title": "Education & Certifications",
+    "subtitle": "Continuous learning and professional development",
+    "certificationsTitle": "Certifications",
+    "items": {
+      "aws": {
+        "title": "AWS Solutions Architect",
+        "issuer": "Amazon Web Services",
+        "date": "2023",
+        "credential": "AWS-SAA-2023"
+      },
+      "react": {
+        "title": "React Developer Certification",
+        "issuer": "Meta",
+        "date": "2023",
+        "credential": "META-REACT-2023"
+      },
+      "typescript": {
+        "title": "TypeScript Fundamentals",
+        "issuer": "Microsoft",
+        "date": "2022",
+        "credential": "MS-TS-2022"
+      },
+      "docker": {
+        "title": "Docker Certified Associate",
+        "issuer": "Docker Inc",
+        "date": "2022",
+        "credential": "DCA-2022"
+      }
+    }
+  },
+  "education": {
+    "title": "Education",
+    "items": {
+      "computerScience": {
+        "degree": "Bachelor of Science in Computer Science",
+        "school": "University of Technology",
+        "year": "2015 - 2019",
+        "description": "Graduated with honors, focusing on software engineering and web technologies"
+      }
+    }
+  },
+  "githubStats": {
+    "title": "GitHub Activity",
+    "subtitle": "My coding journey and open source contributions",
+    "commits": "Commits",
+    "repositories": "Repositories",
+    "stars": "Stars Earned",
+    "contributions": "Contributions",
+    "languageDistribution": "Language Distribution",
+    "recentRepositories": "Recent Repositories",
+    "contributionGraph": "Contribution Activity",
+    "graphPlaceholder": "GitHub contribution graph would be displayed here",
+    "graphDescription": "This shows my coding activity over the past year",
+    "repos": {
+      "portfolio": {
+        "description": "My personal portfolio website built with Next.js and TypeScript"
+      },
+      "componentLibrary": {
+        "description": "A reusable React component library with TypeScript support"
+      },
+      "apiBoilerplate": {
+        "description": "Production-ready Node.js API boilerplate with authentication"
+      }
+    }
   }
 }

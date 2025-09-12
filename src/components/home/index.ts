@@ -5,3 +5,8 @@ export { Skills } from "./Skills";
 export { Projects } from "./Projects";
 export { Contact } from "./Contact";
 export { Footer } from "./Footer";
+export { Testimonials } from "./Testimonials";
+export { Blog } from "./Blog";
+export { Certifications } from "./Certifications";
+export { Experience } from "./Experience";
+export { GitHubStats } from "./GitHubStats";

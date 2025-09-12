@@ -1,12 +1,50 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Section, Container, Card, Button } from "../ui";
 import { FaEnvelope, FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
 
 export const Contact: React.FC = () => {
   const { t } = useLanguage();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+
+    try {
+      // Simulate form submission - replace with actual form handling
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // For demo purposes, we'll just show success
+      setSubmitStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const contactMethods = [
     {
@@ -88,7 +126,20 @@ export const Contact: React.FC = () => {
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
                 {t("contact.sendMessageTitle")}
               </h3>
-              <form className="space-y-4">
+
+              {submitStatus === "success" && (
+                <div className="mb-4 p-4 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg">
+                  {t("contact.form.successMessage")}
+                </div>
+              )}
+
+              {submitStatus === "error" && (
+                <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-lg">
+                  {t("contact.form.errorMessage")}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label
                     htmlFor="name"
@@ -100,6 +151,9 @@ export const Contact: React.FC = () => {
                     type="text"
                     id="name"
                     name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     placeholder={t("contact.form.namePlaceholder")}
                   />
@@ -115,6 +169,9 @@ export const Contact: React.FC = () => {
                     type="email"
                     id="email"
                     name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     placeholder={t("contact.form.emailPlaceholder")}
                   />
@@ -130,12 +187,22 @@ export const Contact: React.FC = () => {
                     id="message"
                     name="message"
                     rows={4}
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     placeholder={t("contact.form.messagePlaceholder")}
                   />
                 </div>
-                <Button size="lg" className="w-full">
-                  {t("contact.form.sendMessage")}
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? t("contact.form.sending")
+                    : t("contact.form.sendMessage")}
                 </Button>
               </form>
             </Card>

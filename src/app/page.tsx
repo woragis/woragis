@@ -1,4 +1,15 @@
-import { Hero, About, Skills, Projects, Contact } from "@/components/home";
+import {
+  Hero,
+  About,
+  Skills,
+  Projects,
+  Experience,
+  Testimonials,
+  Blog,
+  Certifications,
+  GitHubStats,
+  Contact,
+} from "@/components/home";
 import { ClientOnly } from "@/components/ClientOnly";
 
 export default function Home() {
@@ -7,7 +18,12 @@ export default function Home() {
       <Hero />
       <About />
       <Skills />
+      <Experience />
       <Projects />
+      <Testimonials />
+      <Blog />
+      <Certifications />
+      <GitHubStats />
       <Contact />
     </ClientOnly>
   );
