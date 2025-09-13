@@ -59,7 +59,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [language, setLanguageState] = useState<Language>("en");
-  const [messages, setMessages] = useState<Record<string, any>>({});
+  const [messages, setMessages] = useState<Record<string, string>>({});
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Load language from localStorage on mount
@@ -89,11 +89,11 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
 
   const t = (key: string): string => {
     const keys = key.split(".");
-    let value: any = messages;
+    let value: string | Record<string, string> = messages;
 
     for (const k of keys) {
       if (value && typeof value === "object" && value !== null && k in value) {
-        value = (value as Record<string, any>)[k];
+        value = (value as Record<string, string>)[k];
       } else {
         return key; // Return key if translation not found
       }
