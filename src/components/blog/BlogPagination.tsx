@@ -70,7 +70,7 @@ export const BlogPagination: React.FC<BlogPaginationProps> = ({
               </span>
             ) : (
               <Button
-                variant={page === currentPage ? "default" : "outline"}
+                variant={page === currentPage ? "primary" : "outline"}
                 onClick={() => onPageChange(page as number)}
                 className="w-10 h-10"
               >
@@ -93,4 +93,3 @@ export const BlogPagination: React.FC<BlogPaginationProps> = ({
     </div>
   );
 };
-
