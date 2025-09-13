@@ -267,46 +267,47 @@ export class BlogRepository {
       );
     }
 
-    let query = db.select().from(blogPosts);
-
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    // Build the query step by step to avoid TypeScript issues
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
     // Apply sorting
     const sortBy = filters.sortBy || "createdAt";
     const sortOrder = filters.sortOrder || "desc";
 
+    let orderByClause;
     if (sortBy === "title") {
-      query = query.orderBy(
-        sortOrder === "asc" ? asc(blogPosts.title) : desc(blogPosts.title)
-      );
+      orderByClause =
+        sortOrder === "asc" ? asc(blogPosts.title) : desc(blogPosts.title);
     } else if (sortBy === "publishedAt") {
-      // Use createdAt as fallback for publishedAt since it might be null
-      query = query.orderBy(
+      orderByClause =
         sortOrder === "asc"
           ? asc(blogPosts.createdAt)
-          : desc(blogPosts.createdAt)
-      );
+          : desc(blogPosts.createdAt);
     } else if (sortBy === "viewCount") {
-      query = query.orderBy(
+      orderByClause =
         sortOrder === "asc"
           ? asc(blogPosts.viewCount)
-          : desc(blogPosts.viewCount)
-      );
+          : desc(blogPosts.viewCount);
     } else if (sortBy === "updatedAt") {
-      query = query.orderBy(
+      orderByClause =
         sortOrder === "asc"
           ? asc(blogPosts.updatedAt)
-          : desc(blogPosts.updatedAt)
-      );
+          : desc(blogPosts.updatedAt);
     } else {
-      query = query.orderBy(
+      orderByClause =
         sortOrder === "asc"
           ? asc(blogPosts.createdAt)
-          : desc(blogPosts.createdAt)
-      );
+          : desc(blogPosts.createdAt);
     }
+
+    // Execute the query with type assertion to handle Drizzle typing issues
+    let query = db.select().from(blogPosts) as any;
+
+    if (whereClause) {
+      query = query.where(whereClause);
+    }
+
+    query = query.orderBy(orderByClause);
 
     if (filters.limit) {
       query = query.limit(filters.limit);
@@ -427,5 +428,35 @@ export class BlogRepository {
       name,
       count,
     }));
+  }
+
+  async getTotalLikes(userId?: string): Promise<number> {
+    const conditions = [];
+    if (userId) {
+      conditions.push(eq(blogPosts.userId, userId));
+    }
+
+    const result = await db
+      .select({
+        totalLikes: sql<number>`COALESCE(SUM(${blogPosts.likeCount}), 0)`,
+      })
+      .from(blogPosts)
+      .where(conditions.length > 0 ? and(...conditions) : undefined);
+
+    return result[0]?.totalLikes || 0;
+  }
+
+  async getFeaturedCount(userId?: string): Promise<number> {
+    const conditions = [eq(blogPosts.featured, true)];
+    if (userId) {
+      conditions.push(eq(blogPosts.userId, userId));
+    }
+
+    const result = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(blogPosts)
+      .where(and(...conditions));
+
+    return result[0]?.count || 0;
   }
 }

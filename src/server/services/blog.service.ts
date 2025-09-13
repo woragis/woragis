@@ -451,4 +451,32 @@ export class BlogService extends BaseService {
       return this.handleError(error, "getBlogTags");
     }
   }
+
+  async getPublicBlogStats(): Promise<
+    ApiResponse<{
+      totalPublished: number;
+      totalViews: number;
+      totalLikes: number;
+      featuredCount: number;
+    }>
+  > {
+    try {
+      const [totalPublished, totalViews, totalLikes, featuredCount] =
+        await Promise.all([
+          blogRepository.getPublishedCount(),
+          blogRepository.getTotalViews(),
+          blogRepository.getTotalLikes(),
+          blogRepository.getFeaturedCount(),
+        ]);
+
+      return this.success({
+        totalPublished,
+        totalViews,
+        totalLikes,
+        featuredCount,
+      });
+    } catch (error) {
+      return this.handleError(error, "getPublicBlogStats");
+    }
+  }
 }
