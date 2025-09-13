@@ -47,7 +47,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
               Access Denied
             </h2>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              You don't have permission to access the admin dashboard.
+              You don&apos;t have permission to access the admin dashboard.
             </p>
             <button
               onClick={() => router.push("/")}
