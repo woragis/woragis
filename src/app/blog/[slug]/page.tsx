@@ -11,7 +11,7 @@ import {
   Button,
   Breadcrumb,
 } from "@/components/ui";
-import { BlogMeta, BlogShare } from "@/components/blog";
+import { BlogMeta, BlogShare } from "@/components/pages/blog";
 import { ArrowLeft, User } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";

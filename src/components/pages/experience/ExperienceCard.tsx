@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Card } from "../ui";
+import { Card } from "../../ui";
 import { Experience } from "@/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 

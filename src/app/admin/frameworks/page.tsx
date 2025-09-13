@@ -83,7 +83,7 @@ export default function FrameworksAdminPage() {
     }
   };
 
-  const handleEdit = (framework: any) => {
+  const handleEdit = (framework: Framework) => {
     setEditingFramework(framework.id);
     setFormData(framework);
   };

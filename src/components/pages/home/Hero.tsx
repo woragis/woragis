@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Button, Container } from "../ui";
+import { Button, Container } from "../../ui";
 
 export const Hero: React.FC = () => {
   const { t } = useLanguage();

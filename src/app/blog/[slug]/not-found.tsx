@@ -14,8 +14,8 @@ export default function BlogPostNotFound() {
                 Article Not Found
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-                The article you're looking for doesn't exist or has been
-                removed.
+                The article you&apos;re looking for doesn&apos;t exist or has
+                been removed.
               </p>
             </div>
 
@@ -43,4 +43,3 @@ export default function BlogPostNotFound() {
     </div>
   );
 }
-

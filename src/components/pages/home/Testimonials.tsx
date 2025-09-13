@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Section, Container, Card, EmptyState } from "../ui";
+import { Section, Container, Card, EmptyState } from "../../ui";
 import { usePublicFeaturedTestimonials } from "@/hooks/usePublicTestimonials";
 import { Star, Quote } from "lucide-react";
 

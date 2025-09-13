@@ -9,7 +9,7 @@ import {
   Certifications,
   GitHubStats,
   Contact,
-} from "@/components/home";
+} from "@/components/pages/home";
 import { ClientOnly } from "@/components/ClientOnly";
 
 export default function Home() {

@@ -68,7 +68,7 @@ export default function TagsAdminPage() {
     }
   };
 
-  const handleEdit = (tag: any) => {
+  const handleEdit = (tag: Tag) => {
     setEditingTag(tag.id);
     setFormData(tag);
   };

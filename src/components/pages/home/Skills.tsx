@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Section, Container, Card } from "../ui";
+import { Section, Container, Card } from "../../ui";
 
 export const Skills: React.FC = () => {
   const { t } = useLanguage();

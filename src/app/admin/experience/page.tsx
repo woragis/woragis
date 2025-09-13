@@ -9,7 +9,7 @@ import {
   useUpdateExperience,
 } from "@/hooks/useExperience";
 import { ExperienceFormData } from "@/types";
-import { ExperienceForm } from "@/components/experience";
+import { ExperienceForm } from "@/components/pages/experience";
 
 export default function ExperienceAdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,7 +38,7 @@ export default function ExperienceAdminPage() {
     await toggleVisible.mutateAsync(id);
   };
 
-  const handleEdit = (experience: any) => {
+  const handleEdit = (experience: Experience) => {
     setEditingExperience({
       title: experience.title,
       company: experience.company,

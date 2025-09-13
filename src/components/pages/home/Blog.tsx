@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Section, Container, EmptyState, Card } from "../ui";
+import { Section, Container, EmptyState, Card } from "../../ui";
 import { BlogCard } from "../blog";
 import { usePublicFeaturedBlogPosts } from "@/hooks/usePublicBlog";
 import { ArrowRight } from "lucide-react";

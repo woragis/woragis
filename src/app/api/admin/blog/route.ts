@@ -38,8 +38,15 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     search: search || undefined,
     limit: limit ? parseInt(limit) : undefined,
     offset: offset ? parseInt(offset) : undefined,
-    sortBy: (sortBy as any) || "createdAt",
-    sortOrder: (sortOrder as any) || "desc",
+    sortBy:
+      (sortBy as
+        | "title"
+        | "createdAt"
+        | "updatedAt"
+        | "publishedAt"
+        | "viewCount"
+        | "likeCount") || "createdAt",
+    sortOrder: (sortOrder as "asc" | "desc") || "desc",
   };
 
   const result = await blogService.searchBlogPosts(filters, authResult.userId);

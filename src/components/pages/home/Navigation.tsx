@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Button, ThemeToggle, LanguageSwitcher } from "../ui";
-import { ClientOnly } from "../ClientOnly";
+import { Button, ThemeToggle, LanguageSwitcher } from "../../ui";
+import { ClientOnly } from "../../ClientOnly";
 import { useAuthStore } from "@/stores/auth-store";
 import { usePathname } from "next/navigation";
 

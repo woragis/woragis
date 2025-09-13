@@ -11,7 +11,7 @@ import {
   Button,
   Breadcrumb,
 } from "@/components/ui";
-import { BlogCard, BlogFilters, BlogPagination } from "@/components/blog";
+import { BlogCard, BlogFilters, BlogPagination } from "@/components/pages/blog";
 import Link from "next/link";
 import type { BlogPost } from "@/types";
 
@@ -55,7 +55,7 @@ export default function BlogPage() {
 
   // Filter and sort posts
   const filteredAndSortedPosts = useMemo(() => {
-    let filtered = allPosts.filter((post) => {
+    const filtered = allPosts.filter((post) => {
       const matchesSearch =
         !searchTerm ||
         post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

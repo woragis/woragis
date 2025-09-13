@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { Navigation, Footer } from "@/components/home";
+import { Navigation, Footer } from "@/components/pages/home";
 import { ClientOnly } from "@/components/ClientOnly";
 import { QueryClientProviderWrapper } from "@/components/QueryClientProvider";
 

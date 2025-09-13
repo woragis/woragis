@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Section, Container, Card, Button, EmptyState } from "../ui";
+import { Section, Container, Card, Button, EmptyState } from "../../ui";
 import { Project } from "@/server/db/schema";
 import { ExternalLink, Github } from "lucide-react";
 import { usePublicFeaturedProjects } from "@/hooks/usePublicProjects";

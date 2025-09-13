@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Section, Container, Card, Button } from "../ui";
+import { Section, Container, Card, Button } from "../../ui";
 import { FaEnvelope, FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
 
 export const Contact: React.FC = () => {

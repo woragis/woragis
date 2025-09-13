@@ -80,7 +80,7 @@ export default function LanguagesAdminPage() {
     }
   };
 
-  const handleEdit = (language: any) => {
+  const handleEdit = (language: Language) => {
     setEditingLanguage(language.id);
     setFormData(language);
   };

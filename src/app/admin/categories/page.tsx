@@ -80,7 +80,7 @@ export default function CategoriesAdminPage() {
     }
   };
 
-  const handleEdit = (category: any) => {
+  const handleEdit = (category: Category) => {
     setEditingCategory(category.id);
     setFormData(category);
   };
