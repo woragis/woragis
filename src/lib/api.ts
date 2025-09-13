@@ -14,5 +14,8 @@ export {
   frameworkApi,
   settingsApi,
 } from "./api-service";
+export { blogApi } from "./api/blog";
+export { experienceApi } from "./api/experience";
+export { testimonialApi } from "./api/testimonials";
 export { authService } from "./auth-service";
 export { useAuthStore, useAuth, useAuthActions } from "../stores/auth-store";
