@@ -8,3 +8,4 @@ export * from "./languages";
 export * from "./frameworks";
 export * from "./testimonials";
 export * from "./blog";
+export * from "./experience";
