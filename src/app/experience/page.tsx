@@ -101,45 +101,52 @@ export default function ExperiencePage() {
                       {experience.description}
                     </p>
 
-                    {experience.achievements && experience.achievements.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                          {t("experience.keyAchievements")}:
-                        </h4>
-                        <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-300">
-                          {experience.achievements.map((achievement, achIndex) => (
-                            <li key={achIndex} className="text-sm">
-                              {achievement}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {experience.technologies && experience.technologies.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                          {t("experience.technologies")}:
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {experience.technologies.map((tech, techIndex) => (
-                            <span
-                              key={techIndex}
-                              className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full"
-                            >
-                              {tech}
-                            </span>
-                          ))}
+                    {experience.achievements &&
+                      experience.achievements.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                            {t("experience.keyAchievements")}:
+                          </h4>
+                          <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-300">
+                            {experience.achievements.map(
+                              (achievement, achIndex) => (
+                                <li key={achIndex} className="text-sm">
+                                  {achievement}
+                                </li>
+                              )
+                            )}
+                          </ul>
                         </div>
-                      </div>
-                    )}
+                      )}
+
+                    {experience.technologies &&
+                      experience.technologies.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                            {t("experience.technologies")}:
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {experience.technologies.map((tech, techIndex) => (
+                              <span
+                                key={techIndex}
+                                className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                   </div>
                 </div>
               </Card>
             ))
           ) : (
             <div className="text-center text-gray-500 dark:text-gray-400">
-              <p className="text-lg">{t("experience.noExperience") || "No experience entries available"}</p>
+              <p className="text-lg">
+                {t("experience.noExperience") ||
+                  "No experience entries available"}
+              </p>
             </div>
           )}
         </div>
