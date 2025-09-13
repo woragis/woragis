@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/api";
+import { testimonialApi } from "@/lib/api";
 import type {
   Testimonial,
   NewTestimonial,
@@ -23,23 +23,11 @@ export function useTestimonials(filters: TestimonialFilters = {}) {
   return useQuery({
     queryKey: testimonialKeys.list(filters),
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters.featured !== undefined)
-        params.append("featured", filters.featured.toString());
-      if (filters.visible !== undefined)
-        params.append("visible", filters.visible.toString());
-      if (filters.public !== undefined)
-        params.append("public", filters.public.toString());
-      if (filters.rating !== undefined)
-        params.append("rating", filters.rating.toString());
-      if (filters.search) params.append("search", filters.search);
-      if (filters.limit) params.append("limit", filters.limit.toString());
-      if (filters.offset) params.append("offset", filters.offset.toString());
-
-      const response = await api.get(
-        `/admin/testimonials?${params.toString()}`
-      );
-      return response.data.data as Testimonial[];
+      const response = await testimonialApi.getAllTestimonials(filters);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch testimonials");
+      }
+      return response.data;
     },
   });
 }
@@ -48,8 +36,11 @@ export function useTestimonial(id: string) {
   return useQuery({
     queryKey: testimonialKeys.detail(id),
     queryFn: async () => {
-      const response = await api.get(`/admin/testimonials/${id}`);
-      return response.data.data as Testimonial;
+      const response = await testimonialApi.getTestimonialById(id);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch testimonial");
+      }
+      return response.data;
     },
     enabled: !!id,
   });
@@ -77,8 +68,11 @@ export function useCreateTestimonial() {
 
   return useMutation({
     mutationFn: async (testimonial: NewTestimonial) => {
-      const response = await api.post("/admin/testimonials", testimonial);
-      return response.data.data as Testimonial;
+      const response = await testimonialApi.createTestimonial(testimonial);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to create testimonial");
+      }
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: testimonialKeys.all });
@@ -97,8 +91,11 @@ export function useUpdateTestimonial() {
       id: string;
       testimonial: Partial<NewTestimonial>;
     }) => {
-      const response = await api.put(`/admin/testimonials/${id}`, testimonial);
-      return response.data.data as Testimonial;
+      const response = await testimonialApi.updateTestimonial(id, testimonial);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to update testimonial");
+      }
+      return response.data;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: testimonialKeys.all });
@@ -112,7 +109,10 @@ export function useDeleteTestimonial() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/admin/testimonials/${id}`);
+      const response = await testimonialApi.deleteTestimonial(id);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to delete testimonial");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: testimonialKeys.all });
@@ -125,7 +125,12 @@ export function useUpdateTestimonialOrder() {
 
   return useMutation({
     mutationFn: async (testimonialOrders: TestimonialOrderUpdate[]) => {
-      await api.patch("/admin/testimonials/order", { testimonialOrders });
+      const response = await testimonialApi.updateTestimonialOrder(
+        testimonialOrders
+      );
+      if (!response.success) {
+        throw new Error(response.error || "Failed to update testimonial order");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: testimonialKeys.all });
@@ -138,10 +143,13 @@ export function useToggleTestimonialVisibility() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.patch(
-        `/admin/testimonials/${id}/toggle-visibility`
-      );
-      return response.data.data as Testimonial;
+      const response = await testimonialApi.toggleTestimonialVisibility(id);
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to toggle testimonial visibility"
+        );
+      }
+      return response.data;
     },
     onSuccess: (data, id) => {
       queryClient.invalidateQueries({ queryKey: testimonialKeys.all });
@@ -155,10 +163,13 @@ export function useToggleTestimonialFeatured() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.patch(
-        `/admin/testimonials/${id}/toggle-featured`
-      );
-      return response.data.data as Testimonial;
+      const response = await testimonialApi.toggleTestimonialFeatured(id);
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to toggle testimonial featured status"
+        );
+      }
+      return response.data;
     },
     onSuccess: (data, id) => {
       queryClient.invalidateQueries({ queryKey: testimonialKeys.all });

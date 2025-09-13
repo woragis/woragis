@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/api";
+import { tagApi } from "@/lib/api";
 import type { Tag, NewTag, TagFilters } from "@/types";
 
 // Query keys
@@ -17,15 +17,11 @@ export function useTags(filters: TagFilters = {}) {
   return useQuery({
     queryKey: tagKeys.list(filters),
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters.visible !== undefined)
-        params.append("visible", filters.visible.toString());
-      if (filters.search) params.append("search", filters.search);
-      if (filters.limit) params.append("limit", filters.limit.toString());
-      if (filters.offset) params.append("offset", filters.offset.toString());
-
-      const response = await api.get(`/admin/tags?${params.toString()}`);
-      return response.data.data as Tag[];
+      const response = await tagApi.searchTags(filters);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch tags");
+      }
+      return response.data;
     },
   });
 }
@@ -34,8 +30,11 @@ export function useTag(id: string) {
   return useQuery({
     queryKey: tagKeys.detail(id),
     queryFn: async () => {
-      const response = await api.get(`/admin/tags/${id}`);
-      return response.data.data as Tag;
+      const response = await tagApi.getTagById(id);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch tag");
+      }
+      return response.data;
     },
     enabled: !!id,
   });
@@ -45,8 +44,11 @@ export function usePopularTags(limit: number = 10) {
   return useQuery({
     queryKey: tagKeys.popular(limit),
     queryFn: async () => {
-      const response = await api.get(`/admin/tags/popular?limit=${limit}`);
-      return response.data.data as Array<{ tag: Tag; projectCount: number }>;
+      const response = await tagApi.getPopularTags(limit);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch popular tags");
+      }
+      return response.data;
     },
   });
 }
@@ -57,8 +59,11 @@ export function useCreateTag() {
 
   return useMutation({
     mutationFn: async (tag: NewTag) => {
-      const response = await api.post("/admin/tags", tag);
-      return response.data.data as Tag;
+      const response = await tagApi.createTag(tag);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to create tag");
+      }
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tagKeys.all });
@@ -71,8 +76,11 @@ export function useUpdateTag() {
 
   return useMutation({
     mutationFn: async ({ id, tag }: { id: string; tag: Partial<NewTag> }) => {
-      const response = await api.put(`/admin/tags/${id}`, tag);
-      return response.data.data as Tag;
+      const response = await tagApi.updateTag(id, tag);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to update tag");
+      }
+      return response.data;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: tagKeys.all });
@@ -86,7 +94,10 @@ export function useDeleteTag() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/admin/tags/${id}`);
+      const response = await tagApi.deleteTag(id);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to delete tag");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tagKeys.all });

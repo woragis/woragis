@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/api";
+import { languageApi } from "@/lib/api";
 import type { Language, NewLanguage, LanguageFilters } from "@/types";
 
 // Query keys
@@ -18,15 +18,11 @@ export function useLanguages(filters: LanguageFilters = {}) {
   return useQuery({
     queryKey: languageKeys.list(filters),
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters.visible !== undefined)
-        params.append("visible", filters.visible.toString());
-      if (filters.search) params.append("search", filters.search);
-      if (filters.limit) params.append("limit", filters.limit.toString());
-      if (filters.offset) params.append("offset", filters.offset.toString());
-
-      const response = await api.get(`/admin/languages?${params.toString()}`);
-      return response.data.data as Language[];
+      const response = await languageApi.searchLanguages(filters);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch languages");
+      }
+      return response.data;
     },
   });
 }
@@ -35,8 +31,11 @@ export function useLanguage(id: string) {
   return useQuery({
     queryKey: languageKeys.detail(id),
     queryFn: async () => {
-      const response = await api.get(`/admin/languages/${id}`);
-      return response.data.data as Language;
+      const response = await languageApi.getLanguageById(id);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch language");
+      }
+      return response.data;
     },
     enabled: !!id,
   });
@@ -46,11 +45,11 @@ export function usePopularLanguages(limit: number = 10) {
   return useQuery({
     queryKey: languageKeys.popular(limit),
     queryFn: async () => {
-      const response = await api.get(`/admin/languages/popular?limit=${limit}`);
-      return response.data.data as Array<{
-        language: Language;
-        projectCount: number;
-      }>;
+      const response = await languageApi.getPopularLanguages(limit);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch popular languages");
+      }
+      return response.data;
     },
   });
 }
@@ -61,8 +60,11 @@ export function useCreateLanguage() {
 
   return useMutation({
     mutationFn: async (language: NewLanguage) => {
-      const response = await api.post("/admin/languages", language);
-      return response.data.data as Language;
+      const response = await languageApi.createLanguage(language);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to create language");
+      }
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: languageKeys.all });
@@ -81,8 +83,11 @@ export function useUpdateLanguage() {
       id: string;
       language: Partial<NewLanguage>;
     }) => {
-      const response = await api.put(`/admin/languages/${id}`, language);
-      return response.data.data as Language;
+      const response = await languageApi.updateLanguage(id, language);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to update language");
+      }
+      return response.data;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: languageKeys.all });
@@ -96,7 +101,10 @@ export function useDeleteLanguage() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/admin/languages/${id}`);
+      const response = await languageApi.deleteLanguage(id);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to delete language");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: languageKeys.all });
@@ -109,7 +117,10 @@ export function useUpdateLanguageOrder() {
 
   return useMutation({
     mutationFn: async (languageOrders: { id: string; order: number }[]) => {
-      await api.patch("/admin/languages/order", { languageOrders });
+      const response = await languageApi.updateLanguageOrder(languageOrders);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to update language order");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: languageKeys.all });

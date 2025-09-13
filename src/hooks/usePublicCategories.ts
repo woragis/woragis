@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { categoryApi } from "@/lib/api";
 import type { Category } from "@/types";
 
 // Query keys for public categories
@@ -14,12 +15,12 @@ export const publicCategoryKeys = {
 export function usePublicCategories() {
   return useQuery({
     queryKey: publicCategoryKeys.lists(),
-    queryFn: async (): Promise<Category[]> => {
-      const response = await fetch("/api/categories");
-      if (!response.ok) {
-        throw new Error("Failed to fetch public categories");
+    queryFn: async () => {
+      const response = await categoryApi.getVisibleCategories();
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch public categories");
       }
-      return response.json();
+      return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
@@ -30,15 +31,18 @@ export function usePublicCategories() {
 export function usePublicCategory(id: string) {
   return useQuery({
     queryKey: publicCategoryKeys.detail(id),
-    queryFn: async (): Promise<Category | null> => {
-      const response = await fetch(`/api/categories/${id}`);
-      if (!response.ok) {
-        if (response.status === 404) {
+    queryFn: async () => {
+      const response = await categoryApi.getCategoryById(id);
+      if (!response.success) {
+        if (
+          response.error?.includes("404") ||
+          response.error?.includes("not found")
+        ) {
           return null;
         }
-        throw new Error("Failed to fetch public category");
+        throw new Error(response.error || "Failed to fetch public category");
       }
-      return response.json();
+      return response.data;
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -50,15 +54,20 @@ export function usePublicCategory(id: string) {
 export function usePublicCategoryBySlug(slug: string) {
   return useQuery({
     queryKey: publicCategoryKeys.bySlug(slug),
-    queryFn: async (): Promise<Category | null> => {
-      const response = await fetch(`/api/categories/${slug}`);
-      if (!response.ok) {
-        if (response.status === 404) {
+    queryFn: async () => {
+      const response = await categoryApi.getCategoryBySlug(slug);
+      if (!response.success) {
+        if (
+          response.error?.includes("404") ||
+          response.error?.includes("not found")
+        ) {
           return null;
         }
-        throw new Error("Failed to fetch public category by slug");
+        throw new Error(
+          response.error || "Failed to fetch public category by slug"
+        );
       }
-      return response.json();
+      return response.data;
     },
     enabled: !!slug,
     staleTime: 5 * 60 * 1000, // 5 minutes

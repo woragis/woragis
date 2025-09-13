@@ -1,18 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import { Experience, ApiResponse } from "@/types";
+import { experienceApi } from "@/lib/api";
+import { Experience } from "@/types";
 
 // Public experience hooks
 export const usePublicExperience = () => {
   return useQuery({
     queryKey: ["public-experience"],
-    queryFn: async () => {
-      const response = await apiClient.get("/api/experience");
-      const result = response.data as ApiResponse<Experience[]>;
-      if (!result.success) {
-        throw new Error(result.error || "Failed to fetch experiences");
+    queryFn: async (): Promise<Experience[]> => {
+      const response = await experienceApi.getPublicExperience();
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch experiences");
       }
-      return result.data || [];
+      return response.data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };

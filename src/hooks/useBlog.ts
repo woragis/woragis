@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/api";
+import { blogApi } from "@/lib/api";
 import type {
   BlogPost,
   NewBlogPost,
@@ -24,26 +24,11 @@ export function useBlogPosts(filters: BlogPostFilters = {}) {
   return useQuery({
     queryKey: blogKeys.list(filters),
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters.published !== undefined)
-        params.append("published", filters.published.toString());
-      if (filters.featured !== undefined)
-        params.append("featured", filters.featured.toString());
-      if (filters.visible !== undefined)
-        params.append("visible", filters.visible.toString());
-      if (filters.public !== undefined)
-        params.append("public", filters.public.toString());
-      if (filters.category) params.append("category", filters.category);
-      if (filters.tags && filters.tags.length > 0)
-        params.append("tags", filters.tags.join(","));
-      if (filters.search) params.append("search", filters.search);
-      if (filters.limit) params.append("limit", filters.limit.toString());
-      if (filters.offset) params.append("offset", filters.offset.toString());
-      if (filters.sortBy) params.append("sortBy", filters.sortBy);
-      if (filters.sortOrder) params.append("sortOrder", filters.sortOrder);
-
-      const response = await api.get(`/admin/blog?${params.toString()}`);
-      return response.data.data as BlogPost[];
+      const response = await blogApi.getAllBlogPosts(filters);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch blog posts");
+      }
+      return response.data;
     },
   });
 }
@@ -52,8 +37,11 @@ export function useBlogPost(id: string) {
   return useQuery({
     queryKey: blogKeys.detail(id),
     queryFn: async () => {
-      const response = await api.get(`/admin/blog/${id}`);
-      return response.data.data as BlogPost;
+      const response = await blogApi.getBlogPostById(id);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch blog post");
+      }
+      return response.data;
     },
     enabled: !!id,
   });
@@ -63,12 +51,11 @@ export function useBlogStats() {
   return useQuery({
     queryKey: blogKeys.stats(),
     queryFn: async () => {
-      const response = await api.get("/admin/blog/stats");
-      return response.data.data as {
-        total: number;
-        published: number;
-        totalViews: number;
-      };
+      const response = await blogApi.getBlogStats();
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch blog stats");
+      }
+      return response.data;
     },
   });
 }
@@ -77,8 +64,11 @@ export function useBlogCategories() {
   return useQuery({
     queryKey: blogKeys.categories(),
     queryFn: async () => {
-      const response = await api.get("/admin/blog/categories");
-      return response.data.data as { name: string; count: number }[];
+      const response = await blogApi.getBlogCategories();
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch blog categories");
+      }
+      return response.data;
     },
   });
 }
@@ -87,8 +77,11 @@ export function useBlogTags() {
   return useQuery({
     queryKey: blogKeys.tags(),
     queryFn: async () => {
-      const response = await api.get("/admin/blog/tags");
-      return response.data.data as { name: string; count: number }[];
+      const response = await blogApi.getBlogTags();
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch blog tags");
+      }
+      return response.data;
     },
   });
 }
@@ -99,8 +92,11 @@ export function useCreateBlogPost() {
 
   return useMutation({
     mutationFn: async (blogPost: NewBlogPost) => {
-      const response = await api.post("/admin/blog", blogPost);
-      return response.data.data as BlogPost;
+      const response = await blogApi.createBlogPost(blogPost);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to create blog post");
+      }
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: blogKeys.all });
@@ -119,8 +115,11 @@ export function useUpdateBlogPost() {
       id: string;
       blogPost: Partial<NewBlogPost>;
     }) => {
-      const response = await api.put(`/admin/blog/${id}`, blogPost);
-      return response.data.data as BlogPost;
+      const response = await blogApi.updateBlogPost(id, blogPost);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to update blog post");
+      }
+      return response.data;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.all });
@@ -134,7 +133,10 @@ export function useDeleteBlogPost() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/admin/blog/${id}`);
+      const response = await blogApi.deleteBlogPost(id);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to delete blog post");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: blogKeys.all });
@@ -147,7 +149,10 @@ export function useUpdateBlogPostOrder() {
 
   return useMutation({
     mutationFn: async (blogPostOrders: BlogPostOrderUpdate[]) => {
-      await api.patch("/admin/blog/order", { blogPostOrders });
+      const response = await blogApi.updateBlogPostOrder(blogPostOrders);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to update blog post order");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: blogKeys.all });
@@ -160,8 +165,13 @@ export function useToggleBlogPostVisibility() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.patch(`/admin/blog/${id}/toggle-visibility`);
-      return response.data.data as BlogPost;
+      const response = await blogApi.toggleBlogPostVisibility(id);
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to toggle blog post visibility"
+        );
+      }
+      return response.data;
     },
     onSuccess: (data, id) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.all });
@@ -175,8 +185,13 @@ export function useToggleBlogPostFeatured() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.patch(`/admin/blog/${id}/toggle-featured`);
-      return response.data.data as BlogPost;
+      const response = await blogApi.toggleBlogPostFeatured(id);
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to toggle blog post featured status"
+        );
+      }
+      return response.data;
     },
     onSuccess: (data, id) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.all });
@@ -190,8 +205,13 @@ export function useToggleBlogPostPublished() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.patch(`/admin/blog/${id}/toggle-published`);
-      return response.data.data as BlogPost;
+      const response = await blogApi.toggleBlogPostPublished(id);
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to toggle blog post published status"
+        );
+      }
+      return response.data;
     },
     onSuccess: (data, id) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.all });
@@ -205,7 +225,12 @@ export function useIncrementBlogPostViewCount() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.patch(`/admin/blog/${id}/increment-views`);
+      const response = await blogApi.incrementBlogPostViewCount(id);
+      if (!response.success) {
+        throw new Error(
+          response.error || "Failed to increment blog post view count"
+        );
+      }
     },
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.detail(id) });
@@ -218,7 +243,12 @@ export function useIncrementBlogPostLikeCount() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.patch(`/admin/blog/${id}/increment-likes`);
+      const response = await blogApi.incrementBlogPostLikeCount(id);
+      if (!response.success) {
+        throw new Error(
+          response.error || "Failed to increment blog post like count"
+        );
+      }
     },
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.detail(id) });

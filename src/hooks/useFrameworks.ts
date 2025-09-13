@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/api";
+import { frameworkApi } from "@/lib/api";
 import type { Framework, NewFramework, FrameworkFilters } from "@/types";
 
 // Query keys
@@ -18,15 +18,11 @@ export function useFrameworks(filters: FrameworkFilters = {}) {
   return useQuery({
     queryKey: frameworkKeys.list(filters),
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters.visible !== undefined)
-        params.append("visible", filters.visible.toString());
-      if (filters.search) params.append("search", filters.search);
-      if (filters.limit) params.append("limit", filters.limit.toString());
-      if (filters.offset) params.append("offset", filters.offset.toString());
-
-      const response = await api.get(`/admin/frameworks?${params.toString()}`);
-      return response.data.data as Framework[];
+      const response = await frameworkApi.searchFrameworks(filters);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch frameworks");
+      }
+      return response.data;
     },
   });
 }
@@ -35,8 +31,11 @@ export function useFramework(id: string) {
   return useQuery({
     queryKey: frameworkKeys.detail(id),
     queryFn: async () => {
-      const response = await api.get(`/admin/frameworks/${id}`);
-      return response.data.data as Framework;
+      const response = await frameworkApi.getFrameworkById(id);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch framework");
+      }
+      return response.data;
     },
     enabled: !!id,
   });
@@ -46,13 +45,11 @@ export function usePopularFrameworks(limit: number = 10) {
   return useQuery({
     queryKey: frameworkKeys.popular(limit),
     queryFn: async () => {
-      const response = await api.get(
-        `/admin/frameworks/popular?limit=${limit}`
-      );
-      return response.data.data as Array<{
-        framework: Framework;
-        projectCount: number;
-      }>;
+      const response = await frameworkApi.getPopularFrameworks(limit);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch popular frameworks");
+      }
+      return response.data;
     },
   });
 }
@@ -63,8 +60,11 @@ export function useCreateFramework() {
 
   return useMutation({
     mutationFn: async (framework: NewFramework) => {
-      const response = await api.post("/admin/frameworks", framework);
-      return response.data.data as Framework;
+      const response = await frameworkApi.createFramework(framework);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to create framework");
+      }
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: frameworkKeys.all });
@@ -83,8 +83,11 @@ export function useUpdateFramework() {
       id: string;
       framework: Partial<NewFramework>;
     }) => {
-      const response = await api.put(`/admin/frameworks/${id}`, framework);
-      return response.data.data as Framework;
+      const response = await frameworkApi.updateFramework(id, framework);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to update framework");
+      }
+      return response.data;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: frameworkKeys.all });
@@ -98,7 +101,10 @@ export function useDeleteFramework() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/admin/frameworks/${id}`);
+      const response = await frameworkApi.deleteFramework(id);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to delete framework");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: frameworkKeys.all });
@@ -111,7 +117,10 @@ export function useUpdateFrameworkOrder() {
 
   return useMutation({
     mutationFn: async (frameworkOrders: { id: string; order: number }[]) => {
-      await api.patch("/admin/frameworks/order", { frameworkOrders });
+      const response = await frameworkApi.updateFrameworkOrder(frameworkOrders);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to update framework order");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: frameworkKeys.all });

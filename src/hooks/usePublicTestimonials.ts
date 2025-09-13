@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Testimonial } from "@/types";
+import { testimonialApi } from "@/lib/api";
+import type { Testimonial, TestimonialFilters } from "@/types";
 
 // Query keys for public testimonials
 export const publicTestimonialKeys = {
   all: ["public-testimonials"] as const,
   lists: () => [...publicTestimonialKeys.all, "list"] as const,
+  list: (filters: TestimonialFilters) =>
+    [...publicTestimonialKeys.lists(), filters] as const,
   featured: (limit?: number) =>
     [...publicTestimonialKeys.lists(), "featured", limit] as const,
   details: () => [...publicTestimonialKeys.all, "detail"] as const,
@@ -12,15 +15,17 @@ export const publicTestimonialKeys = {
 };
 
 // Hook for fetching all public testimonials
-export function usePublicTestimonials() {
+export function usePublicTestimonials(filters: TestimonialFilters = {}) {
   return useQuery({
-    queryKey: publicTestimonialKeys.lists(),
-    queryFn: async (): Promise<Testimonial[]> => {
-      const response = await fetch("/api/testimonials");
-      if (!response.ok) {
-        throw new Error("Failed to fetch public testimonials");
+    queryKey: publicTestimonialKeys.list(filters),
+    queryFn: async () => {
+      const response = await testimonialApi.getPublicTestimonials(filters);
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to fetch public testimonials"
+        );
       }
-      return response.json();
+      return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
@@ -31,18 +36,17 @@ export function usePublicTestimonials() {
 export function usePublicFeaturedTestimonials(limit?: number) {
   return useQuery({
     queryKey: publicTestimonialKeys.featured(limit),
-    queryFn: async (): Promise<Testimonial[]> => {
-      const params = new URLSearchParams();
-      params.append("featured", "true");
-      if (limit) {
-        params.append("limit", limit.toString());
+    queryFn: async () => {
+      const response = await testimonialApi.getPublicTestimonials({
+        featured: true,
+        limit,
+      });
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to fetch featured public testimonials"
+        );
       }
-
-      const response = await fetch(`/api/testimonials?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch featured public testimonials");
-      }
-      return response.json();
+      return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
@@ -53,15 +57,18 @@ export function usePublicFeaturedTestimonials(limit?: number) {
 export function usePublicTestimonial(id: string) {
   return useQuery({
     queryKey: publicTestimonialKeys.detail(id),
-    queryFn: async (): Promise<Testimonial | null> => {
-      const response = await fetch(`/api/testimonials/${id}`);
-      if (!response.ok) {
-        if (response.status === 404) {
+    queryFn: async () => {
+      const response = await testimonialApi.getTestimonialById(id);
+      if (!response.success) {
+        if (
+          response.error?.includes("404") ||
+          response.error?.includes("not found")
+        ) {
           return null;
         }
-        throw new Error("Failed to fetch public testimonial");
+        throw new Error(response.error || "Failed to fetch public testimonial");
       }
-      return response.json();
+      return response.data;
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000, // 5 minutes

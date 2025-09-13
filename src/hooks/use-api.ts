@@ -6,7 +6,7 @@ import {
   languageApi,
   frameworkApi,
   settingsApi,
-} from "@/lib/api-service";
+} from "@/lib/api";
 import type {
   Project,
   NewProject,

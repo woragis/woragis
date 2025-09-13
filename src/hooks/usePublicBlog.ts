@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import type { BlogPost } from "@/types";
+import { blogApi } from "@/lib/api";
+import type { BlogPost, BlogPostFilters } from "@/types";
 
 // Query keys for public blog posts
 export const publicBlogKeys = {
   all: ["public-blog"] as const,
   lists: () => [...publicBlogKeys.all, "list"] as const,
+  list: (filters: BlogPostFilters) =>
+    [...publicBlogKeys.lists(), filters] as const,
   featured: (limit?: number) =>
     [...publicBlogKeys.lists(), "featured", limit] as const,
   recent: (limit?: number) =>
@@ -14,15 +17,15 @@ export const publicBlogKeys = {
 };
 
 // Hook for fetching all public blog posts
-export function usePublicBlogPosts() {
+export function usePublicBlogPosts(filters: BlogPostFilters = {}) {
   return useQuery({
-    queryKey: publicBlogKeys.lists(),
-    queryFn: async (): Promise<BlogPost[]> => {
-      const response = await fetch("/api/blog");
-      if (!response.ok) {
-        throw new Error("Failed to fetch public blog posts");
+    queryKey: publicBlogKeys.list(filters),
+    queryFn: async () => {
+      const response = await blogApi.getPublicBlogPosts(filters);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch public blog posts");
       }
-      return response.json();
+      return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
@@ -33,18 +36,17 @@ export function usePublicBlogPosts() {
 export function usePublicFeaturedBlogPosts(limit?: number) {
   return useQuery({
     queryKey: publicBlogKeys.featured(limit),
-    queryFn: async (): Promise<BlogPost[]> => {
-      const params = new URLSearchParams();
-      params.append("featured", "true");
-      if (limit) {
-        params.append("limit", limit.toString());
+    queryFn: async () => {
+      const response = await blogApi.getPublicBlogPosts({
+        featured: true,
+        limit,
+      });
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to fetch featured public blog posts"
+        );
       }
-
-      const response = await fetch(`/api/blog?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch featured public blog posts");
-      }
-      return response.json();
+      return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
@@ -55,18 +57,18 @@ export function usePublicFeaturedBlogPosts(limit?: number) {
 export function usePublicRecentBlogPosts(limit?: number) {
   return useQuery({
     queryKey: publicBlogKeys.recent(limit),
-    queryFn: async (): Promise<BlogPost[]> => {
-      const params = new URLSearchParams();
-      params.append("recent", "true");
-      if (limit) {
-        params.append("limit", limit.toString());
+    queryFn: async () => {
+      const response = await blogApi.getPublicBlogPosts({
+        sortBy: "createdAt",
+        sortOrder: "desc",
+        limit,
+      });
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to fetch recent public blog posts"
+        );
       }
-
-      const response = await fetch(`/api/blog?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch recent public blog posts");
-      }
-      return response.json();
+      return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
@@ -74,23 +76,21 @@ export function usePublicRecentBlogPosts(limit?: number) {
 }
 
 // Hook for fetching a single public blog post by slug
-export function usePublicBlogPost(slug: string, incrementViews?: boolean) {
+export function usePublicBlogPost(slug: string) {
   return useQuery({
     queryKey: publicBlogKeys.detail(slug),
-    queryFn: async (): Promise<BlogPost | null> => {
-      const params = new URLSearchParams();
-      if (incrementViews) {
-        params.append("increment_views", "true");
-      }
-
-      const response = await fetch(`/api/blog/${slug}?${params.toString()}`);
-      if (!response.ok) {
-        if (response.status === 404) {
+    queryFn: async () => {
+      const response = await blogApi.getPublicBlogPostBySlug(slug);
+      if (!response.success) {
+        if (
+          response.error?.includes("404") ||
+          response.error?.includes("not found")
+        ) {
           return null;
         }
-        throw new Error("Failed to fetch public blog post");
+        throw new Error(response.error || "Failed to fetch public blog post");
       }
-      return response.json();
+      return response.data;
     },
     enabled: !!slug,
     staleTime: 5 * 60 * 1000, // 5 minutes

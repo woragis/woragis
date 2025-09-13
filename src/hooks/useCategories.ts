@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/api";
+import { categoryApi } from "@/lib/api";
 import type { Category, NewCategory, CategoryFilters } from "@/types";
 
 // Query keys
@@ -18,15 +18,11 @@ export function useCategories(filters: CategoryFilters = {}) {
   return useQuery({
     queryKey: categoryKeys.list(filters),
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters.visible !== undefined)
-        params.append("visible", filters.visible.toString());
-      if (filters.search) params.append("search", filters.search);
-      if (filters.limit) params.append("limit", filters.limit.toString());
-      if (filters.offset) params.append("offset", filters.offset.toString());
-
-      const response = await api.get(`/admin/categories?${params.toString()}`);
-      return response.data.data as Category[];
+      const response = await categoryApi.searchCategories(filters);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch categories");
+      }
+      return response.data;
     },
   });
 }
@@ -35,8 +31,11 @@ export function useCategory(id: string) {
   return useQuery({
     queryKey: categoryKeys.detail(id),
     queryFn: async () => {
-      const response = await api.get(`/admin/categories/${id}`);
-      return response.data.data as Category;
+      const response = await categoryApi.getCategoryById(id);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch category");
+      }
+      return response.data;
     },
     enabled: !!id,
   });
@@ -46,13 +45,11 @@ export function usePopularCategories(limit: number = 10) {
   return useQuery({
     queryKey: categoryKeys.popular(limit),
     queryFn: async () => {
-      const response = await api.get(
-        `/admin/categories/popular?limit=${limit}`
-      );
-      return response.data.data as Array<{
-        category: Category;
-        projectCount: number;
-      }>;
+      const response = await categoryApi.getPopularCategories(limit);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch popular categories");
+      }
+      return response.data;
     },
   });
 }
@@ -63,8 +60,11 @@ export function useCreateCategory() {
 
   return useMutation({
     mutationFn: async (category: NewCategory) => {
-      const response = await api.post("/admin/categories", category);
-      return response.data.data as Category;
+      const response = await categoryApi.createCategory(category);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to create category");
+      }
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all });
@@ -83,8 +83,11 @@ export function useUpdateCategory() {
       id: string;
       category: Partial<NewCategory>;
     }) => {
-      const response = await api.put(`/admin/categories/${id}`, category);
-      return response.data.data as Category;
+      const response = await categoryApi.updateCategory(id, category);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to update category");
+      }
+      return response.data;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all });
@@ -98,7 +101,10 @@ export function useDeleteCategory() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/admin/categories/${id}`);
+      const response = await categoryApi.deleteCategory(id);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to delete category");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all });
@@ -111,7 +117,10 @@ export function useUpdateCategoryOrder() {
 
   return useMutation({
     mutationFn: async (categoryOrders: { id: string; order: number }[]) => {
-      await api.patch("/admin/categories/order", { categoryOrders });
+      const response = await categoryApi.updateCategoryOrder(categoryOrders);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to update category order");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all });

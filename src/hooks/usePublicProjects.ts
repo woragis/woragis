@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { projectApi } from "@/lib/api";
 import type { Project, ProjectWithRelations } from "@/types";
 
 // Query keys for public projects
@@ -17,12 +18,12 @@ export const publicProjectKeys = {
 export function usePublicProjects() {
   return useQuery({
     queryKey: publicProjectKeys.lists(),
-    queryFn: async (): Promise<Project[]> => {
-      const response = await fetch("/api/projects");
-      if (!response.ok) {
-        throw new Error("Failed to fetch public projects");
+    queryFn: async () => {
+      const response = await projectApi.getVisibleProjects();
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch public projects");
       }
-      return response.json();
+      return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
@@ -33,18 +34,14 @@ export function usePublicProjects() {
 export function usePublicFeaturedProjects(limit?: number) {
   return useQuery({
     queryKey: publicProjectKeys.featured(limit),
-    queryFn: async (): Promise<Project[]> => {
-      const params = new URLSearchParams();
-      params.append("featured", "true");
-      if (limit) {
-        params.append("limit", limit.toString());
+    queryFn: async () => {
+      const response = await projectApi.getFeaturedProjects(limit);
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.error || "Failed to fetch featured public projects"
+        );
       }
-
-      const response = await fetch(`/api/projects?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch featured public projects");
-      }
-      return response.json();
+      return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
@@ -55,15 +52,18 @@ export function usePublicFeaturedProjects(limit?: number) {
 export function usePublicProject(id: string) {
   return useQuery({
     queryKey: publicProjectKeys.detail(id),
-    queryFn: async (): Promise<Project | null> => {
-      const response = await fetch(`/api/projects/${id}`);
-      if (!response.ok) {
-        if (response.status === 404) {
+    queryFn: async () => {
+      const response = await projectApi.getProjectById(id);
+      if (!response.success) {
+        if (
+          response.error?.includes("404") ||
+          response.error?.includes("not found")
+        ) {
           return null;
         }
-        throw new Error("Failed to fetch public project");
+        throw new Error(response.error || "Failed to fetch public project");
       }
-      return response.json();
+      return response.data;
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -75,15 +75,20 @@ export function usePublicProject(id: string) {
 export function usePublicProjectWithRelations(id: string) {
   return useQuery({
     queryKey: publicProjectKeys.withRelations(id),
-    queryFn: async (): Promise<ProjectWithRelations | null> => {
-      const response = await fetch(`/api/projects/${id}?relations=true`);
-      if (!response.ok) {
-        if (response.status === 404) {
+    queryFn: async () => {
+      const response = await projectApi.getProjectWithRelations(id);
+      if (!response.success) {
+        if (
+          response.error?.includes("404") ||
+          response.error?.includes("not found")
+        ) {
           return null;
         }
-        throw new Error("Failed to fetch public project with relations");
+        throw new Error(
+          response.error || "Failed to fetch public project with relations"
+        );
       }
-      return response.json();
+      return response.data;
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000, // 5 minutes

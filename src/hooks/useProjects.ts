@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { projectApi } from "@/lib/api-service";
+import { projectApi } from "@/lib/api";
 import type {
   Project,
   NewProject,
