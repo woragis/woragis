@@ -18,6 +18,8 @@ export interface TestimonialFilters {
   search?: string;
   limit?: number;
   offset?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 export interface TestimonialOrderUpdate {

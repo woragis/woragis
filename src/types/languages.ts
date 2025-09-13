@@ -2,6 +2,7 @@ import type {
   languages,
   projectLanguages,
 } from "@/server/db/schemas/languages";
+import type { ProficiencyLevel } from "./index";
 
 // Base types from schema
 export type Language = typeof languages.$inferSelect;
@@ -24,13 +25,6 @@ export interface LanguageFilters {
   limit?: number;
   offset?: number;
 }
-
-// Proficiency levels
-export type ProficiencyLevel =
-  | "beginner"
-  | "intermediate"
-  | "advanced"
-  | "expert";
 
 // Form types for admin
 export interface LanguageFormData {

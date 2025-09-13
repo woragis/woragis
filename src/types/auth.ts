@@ -64,7 +64,7 @@ export const UpdateProfileRequestSchema = z.object({
 
 // Auth response schemas
 export const AuthResponseSchema = z.object({
-  user: UserSchema.omit({ passwordHash: true }),
+  user: UserSchema,
   token: z.string(),
   expiresAt: z.date(),
 });
@@ -77,10 +77,17 @@ export const RefreshTokenRequestSchema = z.object({
 export type User = z.infer<typeof UserSchema>;
 export type UserSession = z.infer<typeof UserSessionSchema>;
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
+export type LoginCredentials = LoginRequest; // Alias for consistency
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
+export type RegisterData = RegisterRequest; // Alias for consistency
 export type ChangePasswordRequest = z.infer<typeof ChangePasswordRequestSchema>;
 export type UpdateProfileRequest = z.infer<typeof UpdateProfileRequestSchema>;
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+export type AuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: Date;
+};
 export type RefreshTokenRequest = z.infer<typeof RefreshTokenRequestSchema>;
 
 // Database insert types (without generated fields)

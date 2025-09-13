@@ -2,6 +2,7 @@ import type {
   frameworks,
   projectFrameworks,
 } from "@/server/db/schemas/frameworks";
+import type { ProficiencyLevel } from "./index";
 
 // Base types from schema
 export type Framework = typeof frameworks.$inferSelect;
@@ -14,9 +15,9 @@ export interface FrameworkWithCount extends Framework {
   projectCount: number;
 }
 
-export interface FrameworkWithProficiency extends Framework {
+export interface FrameworkWithProficiency extends Omit<Framework, "version"> {
   proficiency?: string;
-  version?: string;
+  version?: string | null;
 }
 
 export interface FrameworkFilters {
@@ -25,13 +26,6 @@ export interface FrameworkFilters {
   limit?: number;
   offset?: number;
 }
-
-// Proficiency levels
-export type ProficiencyLevel =
-  | "beginner"
-  | "intermediate"
-  | "advanced"
-  | "expert";
 
 // Form types for admin
 export interface FrameworkFormData {

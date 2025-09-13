@@ -16,6 +16,7 @@ export interface ApiResponse<T = any> {
   data?: T;
   error?: string;
   message?: string;
+  details?: any;
 }
 
 export interface PaginationParams {
@@ -31,3 +32,10 @@ export interface PaginatedResponse<T> {
   limit: number;
   hasMore: boolean;
 }
+
+// Common proficiency levels
+export type ProficiencyLevel =
+  | "beginner"
+  | "intermediate"
+  | "advanced"
+  | "expert";
