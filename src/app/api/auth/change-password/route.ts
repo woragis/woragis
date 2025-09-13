@@ -1,30 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { authService } from "../../../../server/services";
 import { ChangePasswordRequestSchema } from "../../../../types";
-import { ApiResponse } from "../../../../types";
+import {
+  successResponse,
+  unauthorizedResponse,
+  badRequestResponse,
+  validationErrorResponse,
+  withErrorHandling,
+} from "@/utils/response-helpers";
+import { z } from "zod";
 
-export async function PUT(request: NextRequest) {
+export const PUT = withErrorHandling(async (request: NextRequest) => {
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return unauthorizedResponse("No authorization token provided");
+  }
+
+  const token = authHeader.substring(7);
+  const tokenData = await authService.verifyToken(token);
+
+  if (!tokenData) {
+    return unauthorizedResponse("Invalid or expired token");
+  }
+
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      const response: ApiResponse = {
-        success: false,
-        error: "No authorization token provided",
-      };
-      return NextResponse.json(response, { status: 401 });
-    }
-
-    const token = authHeader.substring(7);
-    const tokenData = await authService.verifyToken(token);
-
-    if (!tokenData) {
-      const response: ApiResponse = {
-        success: false,
-        error: "Invalid or expired token",
-      };
-      return NextResponse.json(response, { status: 401 });
-    }
-
     const body = await request.json();
     const validatedData = ChangePasswordRequestSchema.parse(body);
 
@@ -33,23 +32,20 @@ export async function PUT(request: NextRequest) {
       validatedData
     );
 
-    const response: ApiResponse = {
-      success,
-      message: success
-        ? "Password changed successfully"
-        : "Failed to change password",
-    };
-
-    return NextResponse.json(response, { status: success ? 200 : 400 });
+    if (success) {
+      return successResponse(null, "Password changed successfully");
+    } else {
+      return badRequestResponse("Failed to change password");
+    }
   } catch (error) {
-    console.error("Change password error:", error);
+    if (error instanceof z.ZodError) {
+      return validationErrorResponse(
+        error.flatten().fieldErrors,
+        "Invalid password data"
+      );
+    }
 
-    const response: ApiResponse = {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to change password",
-    };
-
-    return NextResponse.json(response, { status: 400 });
+    // Re-throw to be handled by withErrorHandling
+    throw error;
   }
-}
+});

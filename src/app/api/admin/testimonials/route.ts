@@ -1,12 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { testimonialService } from "@/server/services";
 import { authMiddleware } from "@/lib/auth-middleware";
+import {
+  handleServiceResult,
+  withErrorHandling,
+  handleAuthError,
+  badRequestResponse,
+} from "@/utils/response-helpers";
 
 // GET /api/admin/testimonials - Get all testimonials for admin
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling(async (request: NextRequest) => {
   const authResult = await authMiddleware(request);
   if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: 401 });
+    return handleAuthError(authResult.error);
   }
 
   const { searchParams } = new URL(request.url);
@@ -33,40 +39,21 @@ export async function GET(request: NextRequest) {
     authResult.userId
   );
 
-  if (!result.success) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
-  }
-
-  return NextResponse.json({
-    success: true,
-    data: result.data,
-  });
-}
+  return handleServiceResult(result, "Testimonials fetched successfully");
+});
 
 // POST /api/admin/testimonials - Create new testimonial
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling(async (request: NextRequest) => {
   const authResult = await authMiddleware(request);
   if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: 401 });
+    return handleAuthError(authResult.error);
   }
 
-  try {
-    const testimonialData = await request.json();
-    const result = await testimonialService.createTestimonial(
-      testimonialData,
-      authResult.userId
-    );
+  const testimonialData = await request.json();
+  const result = await testimonialService.createTestimonial(
+    testimonialData,
+    authResult.userId
+  );
 
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: result.data,
-      message: result.message,
-    });
-  } catch (error) {
-    return NextResponse.json({ error: "Invalid JSON data" }, { status: 400 });
-  }
-}
+  return handleServiceResult(result, "Testimonial created successfully", 201);
+});

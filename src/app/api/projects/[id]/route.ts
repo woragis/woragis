@@ -1,38 +1,37 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { projectService } from "@/server/services";
+import {
+  handleServiceResult,
+  withErrorHandling,
+  notFoundResponse,
+} from "@/utils/response-helpers";
 
 // GET /api/projects/[id] - Get public project by ID
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
-  const { searchParams } = new URL(request.url);
-  const relations = searchParams.get("relations");
+export const GET = withErrorHandling(
+  async (request: NextRequest, { params }: { params: { id: string } }) => {
+    const { id } = params;
+    const { searchParams } = new URL(request.url);
+    const relations = searchParams.get("relations");
 
-  if (relations === "true") {
-    const result = await projectService.getPublicProjectWithRelations(id);
+    if (relations === "true") {
+      const result = await projectService.getPublicProjectWithRelations(id);
+
+      if (!result.success) {
+        return notFoundResponse(result.error || "Project not found");
+      }
+
+      return handleServiceResult(
+        result,
+        "Project with relations fetched successfully"
+      );
+    }
+
+    const result = await projectService.getPublicProjectById(id);
 
     if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 500 });
+      return notFoundResponse(result.error || "Project not found");
     }
 
-    if (!result.data) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(result.data);
+    return handleServiceResult(result, "Project fetched successfully");
   }
-
-  const result = await projectService.getPublicProjectById(id);
-
-  if (!result.success) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
-  }
-
-  if (!result.data) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
-  }
-
-  return NextResponse.json(result.data);
-}
+);

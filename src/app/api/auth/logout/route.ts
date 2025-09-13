@@ -1,29 +1,36 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { authService } from "../../../../server/services";
 import { RefreshTokenRequestSchema } from "../../../../types";
-import { ApiResponse } from "../../../../types";
+import {
+  successResponse,
+  badRequestResponse,
+  validationErrorResponse,
+  withErrorHandling,
+} from "@/utils/response-helpers";
+import { z } from "zod";
 
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling(async (request: NextRequest) => {
+  const body = await request.json();
+
   try {
-    const body = await request.json();
     const validatedData = RefreshTokenRequestSchema.parse(body);
 
     const success = await authService.logout(validatedData.refreshToken);
 
-    const response: ApiResponse = {
-      success,
-      message: success ? "Logout successful" : "Logout failed",
-    };
-
-    return NextResponse.json(response, { status: success ? 200 : 400 });
+    if (success) {
+      return successResponse(null, "Logout successful");
+    } else {
+      return badRequestResponse("Logout failed");
+    }
   } catch (error) {
-    console.error("Logout error:", error);
+    if (error instanceof z.ZodError) {
+      return validationErrorResponse(
+        error.flatten().fieldErrors,
+        "Invalid refresh token"
+      );
+    }
 
-    const response: ApiResponse = {
-      success: false,
-      error: error instanceof Error ? error.message : "Logout failed",
-    };
-
-    return NextResponse.json(response, { status: 400 });
+    // Re-throw to be handled by withErrorHandling
+    throw error;
   }
-}
+});

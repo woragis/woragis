@@ -1,8 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { testimonialService } from "@/server/services";
+import {
+  handleServiceResult,
+  withErrorHandling,
+} from "@/utils/response-helpers";
 
 // GET /api/testimonials - Get public testimonials for frontend
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const featured = searchParams.get("featured");
   const limit = searchParams.get("limit");
@@ -13,19 +17,12 @@ export async function GET(request: NextRequest) {
     const result = await testimonialService.getPublicFeaturedTestimonials(
       limitValue
     );
-
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 500 });
-    }
-
-    return NextResponse.json(result.data);
+    return handleServiceResult(
+      result,
+      "Featured testimonials fetched successfully"
+    );
   }
 
   const result = await testimonialService.getPublicTestimonials();
-
-  if (!result.success) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
-  }
-
-  return NextResponse.json(result.data);
-}
+  return handleServiceResult(result, "Testimonials fetched successfully");
+});

@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { projectService } from "@/server/services";
 import { requireAuth, type AuthenticatedUser } from "@/lib/auth-middleware";
+import { handleServiceResult } from "@/utils/response-helpers";
 import type { NewProject, ProjectFilters } from "@/types";
 
 // GET /api/admin/projects - Get all projects with optional filtering
@@ -31,12 +32,7 @@ export const GET = requireAuth(
     };
 
     const result = await projectService.searchProjects(filters, user.userId);
-
-    if (!result.success) {
-      return NextResponse.json(result, { status: 500 });
-    }
-
-    return NextResponse.json(result);
+    return handleServiceResult(result, "Projects fetched successfully");
   }
 );
 
@@ -47,11 +43,6 @@ export const POST = requireAuth(
     const projectData: NewProject = body;
 
     const result = await projectService.createProject(projectData, user.userId);
-
-    if (!result.success) {
-      return NextResponse.json(result, { status: 500 });
-    }
-
-    return NextResponse.json(result, { status: 201 });
+    return handleServiceResult(result, "Project created successfully", 201);
   }
 );

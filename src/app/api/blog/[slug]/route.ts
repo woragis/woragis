@@ -1,29 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { blogService } from "@/server/services";
+import {
+  handleServiceResult,
+  withErrorHandling,
+  notFoundResponse,
+} from "@/utils/response-helpers";
 
 // GET /api/blog/[slug] - Get public blog post by slug
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { slug: string } }
-) {
-  const { slug } = params;
-  const { searchParams } = new URL(request.url);
-  const incrementViews = searchParams.get("increment_views") === "true";
+export const GET = withErrorHandling(
+  async (request: NextRequest, { params }: { params: { slug: string } }) => {
+    const { slug } = params;
+    const { searchParams } = new URL(request.url);
+    const incrementViews = searchParams.get("increment_views") === "true";
 
-  const result = await blogService.getPublicBlogPostBySlug(slug);
+    const result = await blogService.getPublicBlogPostBySlug(slug);
 
-  if (!result.success) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
+    if (!result.success) {
+      return notFoundResponse(result.error || "Blog post not found");
+    }
+
+    // Increment view count if requested
+    if (incrementViews && result.data) {
+      await blogService.incrementBlogPostViewCount(result.data.id);
+    }
+
+    return handleServiceResult(result, "Blog post fetched successfully");
   }
-
-  if (!result.data) {
-    return NextResponse.json({ error: "Blog post not found" }, { status: 404 });
-  }
-
-  // Increment view count if requested
-  if (incrementViews) {
-    await blogService.incrementBlogPostViewCount(result.data.id);
-  }
-
-  return NextResponse.json(result.data);
-}
+);

@@ -1,6 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { projectService } from "@/server/services";
 import { requireAuth, type AuthenticatedUser } from "@/lib/auth-middleware";
+import {
+  handleServiceResult,
+  notFoundResponse,
+  deletedResponse,
+} from "@/utils/response-helpers";
 import type { NewProject } from "@/types";
 
 // GET /api/admin/projects/[id] - Get project by ID
@@ -16,10 +21,10 @@ export const GET = requireAuth(
     );
 
     if (!result.success) {
-      return NextResponse.json(result, { status: 404 });
+      return notFoundResponse(result.error || "Project not found");
     }
 
-    return NextResponse.json(result);
+    return handleServiceResult(result, "Project fetched successfully");
   }
 );
 
@@ -40,10 +45,10 @@ export const PUT = requireAuth(
     );
 
     if (!result.success) {
-      return NextResponse.json(result, { status: 404 });
+      return notFoundResponse(result.error || "Project not found");
     }
 
-    return NextResponse.json(result);
+    return handleServiceResult(result, "Project updated successfully");
   }
 );
 
@@ -60,9 +65,9 @@ export const DELETE = requireAuth(
     );
 
     if (!result.success) {
-      return NextResponse.json(result, { status: 500 });
+      return notFoundResponse(result.error || "Project not found");
     }
 
-    return NextResponse.json(result);
+    return deletedResponse("Project deleted successfully");
   }
 );

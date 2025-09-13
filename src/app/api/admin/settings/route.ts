@@ -1,34 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { settingsService } from "@/server/services";
+import {
+  handleServiceResult,
+  withErrorHandling,
+  badRequestResponse,
+} from "@/utils/response-helpers";
 
 // GET /api/admin/settings - Get all settings
-export async function GET() {
+export const GET = withErrorHandling(async () => {
   const result = await settingsService.getAllSettings();
-
-  if (!result.success) {
-    return NextResponse.json(result, { status: 500 });
-  }
-
-  return NextResponse.json(result);
-}
+  return handleServiceResult(result, "Settings fetched successfully");
+});
 
 // POST /api/admin/settings - Create or update setting
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling(async (request: NextRequest) => {
   const body = await request.json();
   const { key, value } = body;
 
   if (!key || value === undefined) {
-    return NextResponse.json(
-      { success: false, error: "Key and value are required" },
-      { status: 400 }
-    );
+    return badRequestResponse("Key and value are required");
   }
 
   const result = await settingsService.updateSetting(key, value);
-
-  if (!result.success) {
-    return NextResponse.json(result, { status: 500 });
-  }
-
-  return NextResponse.json(result);
-}
+  return handleServiceResult(result, "Setting updated successfully");
+});

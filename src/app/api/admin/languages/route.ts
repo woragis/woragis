@@ -1,9 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { languageService } from "@/server/services";
+import {
+  handleServiceResult,
+  withErrorHandling,
+} from "@/utils/response-helpers";
 import type { NewLanguage, LanguageFilters } from "@/types";
 
 // GET /api/admin/languages - Get all languages with optional filtering
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const filters: LanguageFilters = {
     visible:
@@ -22,24 +26,14 @@ export async function GET(request: NextRequest) {
   };
 
   const result = await languageService.searchLanguages(filters);
-
-  if (!result.success) {
-    return NextResponse.json(result, { status: 500 });
-  }
-
-  return NextResponse.json(result);
-}
+  return handleServiceResult(result, "Languages fetched successfully");
+});
 
 // POST /api/admin/languages - Create new language
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling(async (request: NextRequest) => {
   const body = await request.json();
   const languageData: NewLanguage = body;
 
   const result = await languageService.createLanguage(languageData);
-
-  if (!result.success) {
-    return NextResponse.json(result, { status: 500 });
-  }
-
-  return NextResponse.json(result, { status: 201 });
-}
+  return handleServiceResult(result, "Language created successfully", 201);
+});

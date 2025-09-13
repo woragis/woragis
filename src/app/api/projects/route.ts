@@ -1,8 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { projectService } from "@/server/services";
+import {
+  handleServiceResult,
+  withErrorHandling,
+} from "@/utils/response-helpers";
 
 // GET /api/projects - Get public projects for frontend
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const featured = searchParams.get("featured");
   const limit = searchParams.get("limit");
@@ -11,19 +15,12 @@ export async function GET(request: NextRequest) {
     // Use default limit of 3 for featured projects if not specified
     const limitValue = parseInt(limit || "3");
     const result = await projectService.getPublicFeaturedProjects(limitValue);
-
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 500 });
-    }
-
-    return NextResponse.json(result.data);
+    return handleServiceResult(
+      result,
+      "Featured projects fetched successfully"
+    );
   }
 
   const result = await projectService.getPublicProjects();
-
-  if (!result.success) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
-  }
-
-  return NextResponse.json(result.data);
-}
+  return handleServiceResult(result, "Projects fetched successfully");
+});

@@ -1,30 +1,31 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { authService } from "../../../../server/services";
 import { RefreshTokenRequestSchema } from "../../../../types";
-import { ApiResponse } from "../../../../types";
+import {
+  successResponse,
+  unauthorizedResponse,
+  validationErrorResponse,
+  withErrorHandling,
+} from "@/utils/response-helpers";
+import { z } from "zod";
 
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling(async (request: NextRequest) => {
   try {
     const body = await request.json();
     const validatedData = RefreshTokenRequestSchema.parse(body);
 
     const result = await authService.refreshToken(validatedData.refreshToken);
 
-    const response: ApiResponse = {
-      success: true,
-      data: result,
-      message: "Token refreshed successfully",
-    };
-
-    return NextResponse.json(response, { status: 200 });
+    return successResponse(result, "Token refreshed successfully");
   } catch (error) {
-    console.error("Token refresh error:", error);
+    if (error instanceof z.ZodError) {
+      return validationErrorResponse(
+        error.flatten().fieldErrors,
+        "Invalid refresh token data"
+      );
+    }
 
-    const response: ApiResponse = {
-      success: false,
-      error: error instanceof Error ? error.message : "Token refresh failed",
-    };
-
-    return NextResponse.json(response, { status: 401 });
+    // Re-throw to be handled by withErrorHandling
+    throw error;
   }
-}
+});

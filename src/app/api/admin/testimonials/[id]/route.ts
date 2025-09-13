@@ -1,51 +1,45 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { testimonialService } from "@/server/services";
 import { authMiddleware } from "@/lib/auth-middleware";
+import {
+  handleServiceResult,
+  withErrorHandling,
+  handleAuthError,
+  notFoundResponse,
+  badRequestResponse,
+  deletedResponse,
+} from "@/utils/response-helpers";
 
 // GET /api/admin/testimonials/[id] - Get testimonial by ID for admin
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const authResult = await authMiddleware(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: 401 });
-  }
+export const GET = withErrorHandling(
+  async (request: NextRequest, { params }: { params: { id: string } }) => {
+    const authResult = await authMiddleware(request);
+    if (!authResult.success) {
+      return handleAuthError(authResult.error);
+    }
 
-  const { id } = params;
-  const result = await testimonialService.getTestimonialById(
-    id,
-    authResult.userId
-  );
-
-  if (!result.success) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
-  }
-
-  if (!result.data) {
-    return NextResponse.json(
-      { error: "Testimonial not found" },
-      { status: 404 }
+    const { id } = params;
+    const result = await testimonialService.getTestimonialById(
+      id,
+      authResult.userId
     );
-  }
 
-  return NextResponse.json({
-    success: true,
-    data: result.data,
-  });
-}
+    if (!result.success) {
+      return notFoundResponse(result.error || "Testimonial not found");
+    }
+
+    return handleServiceResult(result, "Testimonial fetched successfully");
+  }
+);
 
 // PUT /api/admin/testimonials/[id] - Update testimonial
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const authResult = await authMiddleware(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: 401 });
-  }
+export const PUT = withErrorHandling(
+  async (request: NextRequest, { params }: { params: { id: string } }) => {
+    const authResult = await authMiddleware(request);
+    if (!authResult.success) {
+      return handleAuthError(authResult.error);
+    }
 
-  try {
     const { id } = params;
     const testimonialData = await request.json();
     const result = await testimonialService.updateTestimonial(
@@ -54,42 +48,28 @@ export async function PUT(
       authResult.userId
     );
 
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: result.data,
-      message: result.message,
-    });
-  } catch (error) {
-    return NextResponse.json({ error: "Invalid JSON data" }, { status: 400 });
+    return handleServiceResult(result, "Testimonial updated successfully");
   }
-}
+);
 
 // DELETE /api/admin/testimonials/[id] - Delete testimonial
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const authResult = await authMiddleware(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: 401 });
+export const DELETE = withErrorHandling(
+  async (request: NextRequest, { params }: { params: { id: string } }) => {
+    const authResult = await authMiddleware(request);
+    if (!authResult.success) {
+      return handleAuthError(authResult.error);
+    }
+
+    const { id } = params;
+    const result = await testimonialService.deleteTestimonial(
+      id,
+      authResult.userId
+    );
+
+    if (!result.success) {
+      return notFoundResponse(result.error || "Testimonial not found");
+    }
+
+    return deletedResponse("Testimonial deleted successfully");
   }
-
-  const { id } = params;
-  const result = await testimonialService.deleteTestimonial(
-    id,
-    authResult.userId
-  );
-
-  if (!result.success) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
-  }
-
-  return NextResponse.json({
-    success: true,
-    message: result.message,
-  });
-}
+);

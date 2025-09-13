@@ -1,12 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { blogService } from "@/server/services";
 import { authMiddleware } from "@/lib/auth-middleware";
+import {
+  handleServiceResult,
+  withErrorHandling,
+  handleAuthError,
+  badRequestResponse,
+} from "@/utils/response-helpers";
 
 // GET /api/admin/blog - Get all blog posts for admin
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling(async (request: NextRequest) => {
   const authResult = await authMiddleware(request);
   if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: 401 });
+    return handleAuthError(authResult.error);
   }
 
   const { searchParams } = new URL(request.url);
@@ -37,41 +43,21 @@ export async function GET(request: NextRequest) {
   };
 
   const result = await blogService.searchBlogPosts(filters, authResult.userId);
-
-  if (!result.success) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
-  }
-
-  return NextResponse.json({
-    success: true,
-    data: result.data,
-  });
-}
+  return handleServiceResult(result, "Blog posts fetched successfully");
+});
 
 // POST /api/admin/blog - Create new blog post
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling(async (request: NextRequest) => {
   const authResult = await authMiddleware(request);
   if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: 401 });
+    return handleAuthError(authResult.error);
   }
 
-  try {
-    const blogPostData = await request.json();
-    const result = await blogService.createBlogPost(
-      blogPostData,
-      authResult.userId
-    );
+  const blogPostData = await request.json();
+  const result = await blogService.createBlogPost(
+    blogPostData,
+    authResult.userId
+  );
 
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: result.data,
-      message: result.message,
-    });
-  } catch (error) {
-    return NextResponse.json({ error: "Invalid JSON data" }, { status: 400 });
-  }
-}
+  return handleServiceResult(result, "Blog post created successfully", 201);
+});

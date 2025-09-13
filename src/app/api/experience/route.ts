@@ -1,22 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { experienceService } from "@/server/services";
+import {
+  handleServiceResult,
+  withErrorHandling,
+} from "@/utils/response-helpers";
 
-export async function GET() {
-  try {
-    const experiences = await experienceService.getAllExperiences();
+export const GET = withErrorHandling(async () => {
+  console.log("Fetching experiences...");
+  const result = await experienceService.getVisibleExperiences();
+  console.log("Service result:", result);
 
-    return NextResponse.json({
-      success: true,
-      data: experiences,
-    });
-  } catch (error) {
-    console.error("Error fetching experiences:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch experiences",
-      },
-      { status: 500 }
-    );
-  }
-}
+  return handleServiceResult(result, "Experiences fetched successfully");
+});

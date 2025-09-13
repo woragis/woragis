@@ -1,22 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { categoryService } from "@/server/services";
+import {
+  handleServiceResult,
+  withErrorHandling,
+  notFoundResponse,
+} from "@/utils/response-helpers";
 
 // GET /api/categories/[slug] - Get public category by slug
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { slug: string } }
-) {
-  const { slug } = params;
+export const GET = withErrorHandling(
+  async (request: NextRequest, { params }: { params: { slug: string } }) => {
+    const { slug } = params;
 
-  const result = await categoryService.getPublicCategoryBySlug(slug);
+    const result = await categoryService.getPublicCategoryBySlug(slug);
 
-  if (!result.success) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
+    if (!result.success) {
+      return notFoundResponse(result.error || "Category not found");
+    }
+
+    return handleServiceResult(result, "Category fetched successfully");
   }
-
-  if (!result.data) {
-    return NextResponse.json({ error: "Category not found" }, { status: 404 });
-  }
-
-  return NextResponse.json(result.data);
-}
+);

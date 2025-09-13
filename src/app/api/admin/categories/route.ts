@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { categoryService } from "@/server/services";
 import { requireAuth, type AuthenticatedUser } from "@/lib/auth-middleware";
+import { handleServiceResult } from "@/utils/response-helpers";
 import type { NewCategory, CategoryFilters } from "@/types";
 
 // GET /api/admin/categories - Get all categories with optional filtering
@@ -24,12 +25,7 @@ export const GET = requireAuth(
     };
 
     const result = await categoryService.searchCategories(filters, user.userId);
-
-    if (!result.success) {
-      return NextResponse.json(result, { status: 500 });
-    }
-
-    return NextResponse.json(result);
+    return handleServiceResult(result, "Categories fetched successfully");
   }
 );
 
@@ -44,10 +40,6 @@ export const POST = requireAuth(
       user.userId
     );
 
-    if (!result.success) {
-      return NextResponse.json(result, { status: 500 });
-    }
-
-    return NextResponse.json(result, { status: 201 });
+    return handleServiceResult(result, "Category created successfully", 201);
   }
 );

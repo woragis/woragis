@@ -1,9 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { tagService } from "@/server/services";
+import {
+  handleServiceResult,
+  withErrorHandling,
+} from "@/utils/response-helpers";
 import type { NewTag, TagFilters } from "@/types";
 
 // GET /api/admin/tags - Get all tags with optional filtering
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const filters: TagFilters = {
     visible:
@@ -22,24 +26,14 @@ export async function GET(request: NextRequest) {
   };
 
   const result = await tagService.searchTags(filters);
-
-  if (!result.success) {
-    return NextResponse.json(result, { status: 500 });
-  }
-
-  return NextResponse.json(result);
-}
+  return handleServiceResult(result, "Tags fetched successfully");
+});
 
 // POST /api/admin/tags - Create new tag
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling(async (request: NextRequest) => {
   const body = await request.json();
   const tagData: NewTag = body;
 
   const result = await tagService.createTag(tagData);
-
-  if (!result.success) {
-    return NextResponse.json(result, { status: 500 });
-  }
-
-  return NextResponse.json(result, { status: 201 });
-}
+  return handleServiceResult(result, "Tag created successfully", 201);
+});

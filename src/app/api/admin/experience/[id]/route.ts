@@ -1,57 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { experienceService } from "@/server/services";
 import { authMiddleware } from "@/lib/auth-middleware";
+import {
+  handleServiceResult,
+  withErrorHandling,
+  handleAuthError,
+  notFoundResponse,
+  deletedResponse,
+} from "@/utils/response-helpers";
 import { UpdateExperience } from "@/types";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
+export const GET = withErrorHandling(
+  async (request: NextRequest, { params }: { params: { id: string } }) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+      return handleAuthError(authResult.error);
     }
 
     const experience = await experienceService.getExperienceById(params.id);
 
     if (!experience) {
-      return NextResponse.json(
-        { success: false, error: "Experience not found" },
-        { status: 404 }
-      );
+      return notFoundResponse("Experience not found");
     }
 
-    return NextResponse.json({
-      success: true,
-      data: experience,
-    });
-  } catch (error) {
-    console.error("Error fetching experience:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch experience",
-      },
-      { status: 500 }
+    return handleServiceResult(
+      { success: true, data: experience },
+      "Experience fetched successfully"
     );
   }
-}
+);
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
+export const PUT = withErrorHandling(
+  async (request: NextRequest, { params }: { params: { id: string } }) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+      return handleAuthError(authResult.error);
     }
 
     const body = await request.json();
@@ -74,68 +57,29 @@ export async function PUT(
     );
 
     if (!experience) {
-      return NextResponse.json(
-        { success: false, error: "Experience not found" },
-        { status: 404 }
-      );
+      return notFoundResponse("Experience not found");
     }
 
-    return NextResponse.json({
-      success: true,
-      data: experience,
-    });
-  } catch (error) {
-    console.error("Error updating experience:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to update experience",
-      },
-      { status: 500 }
+    return handleServiceResult(
+      { success: true, data: experience },
+      "Experience updated successfully"
     );
   }
-}
+);
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
+export const DELETE = withErrorHandling(
+  async (request: NextRequest, { params }: { params: { id: string } }) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+      return handleAuthError(authResult.error);
     }
 
     const success = await experienceService.deleteExperience(params.id);
 
     if (!success) {
-      return NextResponse.json(
-        { success: false, error: "Experience not found" },
-        { status: 404 }
-      );
+      return notFoundResponse("Experience not found");
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Experience deleted successfully",
-    });
-  } catch (error) {
-    console.error("Error deleting experience:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to delete experience",
-      },
-      { status: 500 }
-    );
+    return deletedResponse("Experience deleted successfully");
   }
-}
+);
