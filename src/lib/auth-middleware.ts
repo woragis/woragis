@@ -100,3 +100,17 @@ export function requireSuperAdmin(
 ) {
   return requireRole("super_admin")(handler);
 }
+
+export async function authMiddleware(request: NextRequest): Promise<{
+  success: boolean;
+  userId?: string;
+  error?: string;
+}> {
+  const { user, error } = await authenticateUser(request);
+  
+  if (!user) {
+    return { success: false, error: error || "Authentication required" };
+  }
+  
+  return { success: true, userId: user.userId };
+}
