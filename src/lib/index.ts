@@ -1,11 +1,5 @@
-// API Client
-export { apiClient, ApiClient } from "./api-client";
-export type {
-  ApiClientConfig,
-  RequestInterceptor,
-  ResponseInterceptor,
-  ErrorInterceptor,
-} from "./api-client";
+// API Client and Services
+export * from "./api";
 
 // Authentication
 export { authService, AuthService } from "./auth-service";
@@ -17,22 +11,6 @@ export type {
   RegisterData,
   AuthState,
 } from "../stores/auth-store";
-
-// API Services
-export {
-  projectApi,
-  categoryApi,
-  tagApi,
-  languageApi,
-  frameworkApi,
-  settingsApi,
-  ProjectApiService,
-  CategoryApiService,
-  TagApiService,
-  LanguageApiService,
-  FrameworkApiService,
-  SettingsApiService,
-} from "./api-service";
 
 // Interceptors
 export {

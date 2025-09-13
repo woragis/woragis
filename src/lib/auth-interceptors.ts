@@ -51,7 +51,14 @@ export const authErrorInterceptor = async (error: any): Promise<any> => {
     if (authService.isTokenExpired(tokens.expiresAt)) {
       try {
         // Try to refresh the token
-        const newTokens = await refreshToken();
+        await refreshToken();
+
+        // Get the updated tokens from store
+        const newTokens = useAuthStore.getState().tokens;
+        if (!newTokens) {
+          logout();
+          return Promise.reject(error);
+        }
 
         // Retry the original request with new token
         originalRequest._retry = true;
@@ -106,10 +113,13 @@ export const tokenRefreshInterceptor = async (
   ) {
     try {
       // Refresh the token
-      const newTokens = await refreshToken();
+      await refreshToken();
 
-      // Update the request with new token
-      config.headers.Authorization = `Bearer ${newTokens.accessToken}`;
+      // Get the updated tokens from store
+      const newTokens = useAuthStore.getState().tokens;
+      if (newTokens) {
+        config.headers.Authorization = `Bearer ${newTokens.accessToken}`;
+      }
     } catch (error) {
       // Refresh failed, but don't block the request
       // The error interceptor will handle it
