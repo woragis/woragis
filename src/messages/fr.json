@@ -123,5 +123,51 @@
     "japanese": "日本語",
     "chinese": "中文",
     "korean": "한국어"
+  },
+  "experience": {
+    "title": "Expérience Professionnelle",
+    "subtitle": "Mon parcours professionnel et jalons de carrière",
+    "keyAchievements": "Réalisations Clés",
+    "technologies": "Technologies Utilisées",
+    "errorLoading": "Échec du chargement des données d'expérience",
+    "noExperience": "Aucune entrée d'expérience disponible",
+    "items": {
+      "seniorDeveloper": {
+        "title": "Développeur Full-Stack Senior",
+        "company": "TechCorp Solutions",
+        "period": "2022 - Présent",
+        "location": "San Francisco, CA",
+        "description": "Diriger le développement d'applications à l'échelle de l'entreprise et encadrer les développeurs juniors. Responsable des décisions architecturales et de la stratégie technique.",
+        "achievements": [
+          "Dirigé une équipe de 5 développeurs dans la construction d'une architecture de microservices",
+          "Amélioré les performances de l'application de 40% grâce à l'optimisation",
+          "Encadré 3 développeurs juniors et effectué des revues de code"
+        ]
+      },
+      "fullStackDeveloper": {
+        "title": "Développeur Full-Stack",
+        "company": "StartupXYZ",
+        "period": "2020 - 2022",
+        "location": "Distant",
+        "description": "Développé des applications web full-stack utilisant des technologies modernes. Collaboré avec des équipes multifonctionnelles pour livrer des produits de haute qualité.",
+        "achievements": [
+          "Construit 3 fonctionnalités majeures qui ont augmenté l'engagement utilisateur de 25%",
+          "Implémenté un pipeline CI/CD réduisant le temps de déploiement de 60%",
+          "Collaboré avec l'équipe de design pour améliorer l'expérience utilisateur"
+        ]
+      },
+      "frontendDeveloper": {
+        "title": "Développeur Frontend",
+        "company": "WebAgency Inc",
+        "period": "2019 - 2020",
+        "location": "New York, NY",
+        "description": "Concentré sur la création d'interfaces utilisateur responsives et interactives. Travaillé étroitement avec les designers pour implémenter des designs parfaits.",
+        "achievements": [
+          "Développé 15+ sites web responsives pour divers clients",
+          "Réduit le temps de chargement des pages de 30% grâce à l'optimisation",
+          "Implémenté des fonctionnalités d'accessibilité améliorant la conformité WCAG"
+        ]
+      }
+    }
   }
 }

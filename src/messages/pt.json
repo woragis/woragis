@@ -123,5 +123,51 @@
     "japanese": "日本語",
     "chinese": "中文",
     "korean": "한국어"
+  },
+  "experience": {
+    "title": "Experiência Profissional",
+    "subtitle": "Minha jornada profissional e marcos de carreira",
+    "keyAchievements": "Conquistas Principais",
+    "technologies": "Tecnologias Utilizadas",
+    "errorLoading": "Falha ao carregar dados de experiência",
+    "noExperience": "Nenhuma entrada de experiência disponível",
+    "items": {
+      "seniorDeveloper": {
+        "title": "Desenvolvedor Full-Stack Sênior",
+        "company": "TechCorp Solutions",
+        "period": "2022 - Presente",
+        "location": "San Francisco, CA",
+        "description": "Liderando o desenvolvimento de aplicações em escala empresarial e mentorando desenvolvedores júnior. Responsável por decisões arquiteturais e estratégia técnica.",
+        "achievements": [
+          "Liderei uma equipe de 5 desenvolvedores na construção de uma arquitetura de microserviços",
+          "Melhorei o desempenho da aplicação em 40% através de otimização",
+          "Mentorei 3 desenvolvedores júnior e realizei revisões de código"
+        ]
+      },
+      "fullStackDeveloper": {
+        "title": "Desenvolvedor Full-Stack",
+        "company": "StartupXYZ",
+        "period": "2020 - 2022",
+        "location": "Remoto",
+        "description": "Desenvolvi aplicações web full-stack usando tecnologias modernas. Colaborei com equipes multifuncionais para entregar produtos de alta qualidade.",
+        "achievements": [
+          "Construí 3 recursos principais que aumentaram o engajamento do usuário em 25%",
+          "Implementei pipeline CI/CD reduzindo o tempo de deploy em 60%",
+          "Colaborei com a equipe de design para melhorar a experiência do usuário"
+        ]
+      },
+      "frontendDeveloper": {
+        "title": "Desenvolvedor Frontend",
+        "company": "WebAgency Inc",
+        "period": "2019 - 2020",
+        "location": "Nova York, NY",
+        "description": "Focado em criar interfaces de usuário responsivas e interativas. Trabalhei de perto com designers para implementar designs perfeitos.",
+        "achievements": [
+          "Desenvolvi 15+ sites responsivos para vários clientes",
+          "Reduzi o tempo de carregamento da página em 30% através de otimização",
+          "Implementei recursos de acessibilidade melhorando a conformidade WCAG"
+        ]
+      }
+    }
   }
 }

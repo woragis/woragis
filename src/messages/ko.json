@@ -123,5 +123,51 @@
     "japanese": "日本語",
     "chinese": "中文",
     "korean": "한국어"
+  },
+  "experience": {
+    "title": "경력",
+    "subtitle": "제 전문적인 여정과 커리어 마일스톤",
+    "keyAchievements": "주요 성과",
+    "technologies": "사용 기술",
+    "errorLoading": "경력 데이터 로드 실패",
+    "noExperience": "사용 가능한 경력 항목이 없습니다",
+    "items": {
+      "seniorDeveloper": {
+        "title": "시니어 풀스택 개발자",
+        "company": "TechCorp Solutions",
+        "period": "2022 - 현재",
+        "location": "샌프란시스코, CA",
+        "description": "엔터프라이즈 규모의 애플리케이션 개발을 이끌고 주니어 개발자들을 멘토링합니다. 아키텍처 결정과 기술 전략을 담당합니다.",
+        "achievements": [
+          "5명의 개발자 팀을 이끌어 마이크로서비스 아키텍처 구축",
+          "최적화를 통해 애플리케이션 성능을 40% 향상",
+          "3명의 주니어 개발자를 멘토링하고 코드 리뷰 수행"
+        ]
+      },
+      "fullStackDeveloper": {
+        "title": "풀스택 개발자",
+        "company": "StartupXYZ",
+        "period": "2020 - 2022",
+        "location": "원격",
+        "description": "현대적인 기술을 사용하여 풀스택 웹 애플리케이션을 개발했습니다. 고품질 제품을 제공하기 위해 크로스 기능 팀과 협력했습니다.",
+        "achievements": [
+          "사용자 참여도를 25% 증가시킨 3개의 주요 기능 구축",
+          "배포 시간을 60% 단축하는 CI/CD 파이프라인 구현",
+          "디자인 팀과 협력하여 사용자 경험 개선"
+        ]
+      },
+      "frontendDeveloper": {
+        "title": "프론트엔드 개발자",
+        "company": "WebAgency Inc",
+        "period": "2019 - 2020",
+        "location": "뉴욕, NY",
+        "description": "반응형이고 인터랙티브한 사용자 인터페이스 생성에 집중했습니다. 픽셀 퍼펙트한 디자인을 구현하기 위해 디자이너들과 밀접하게 협력했습니다.",
+        "achievements": [
+          "다양한 클라이언트를 위한 15+개의 반응형 웹사이트 개발",
+          "최적화를 통해 페이지 로딩 시간을 30% 단축",
+          "WCAG 준수를 개선하는 접근성 기능 구현"
+        ]
+      }
+    }
   }
 }

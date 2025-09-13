@@ -123,5 +123,51 @@
     "japanese": "日本語",
     "chinese": "中文",
     "korean": "한국어"
+  },
+  "experience": {
+    "title": "工作经验",
+    "subtitle": "我的专业旅程和职业里程碑",
+    "keyAchievements": "主要成就",
+    "technologies": "使用技术",
+    "errorLoading": "加载经验数据失败",
+    "noExperience": "没有可用的经验条目",
+    "items": {
+      "seniorDeveloper": {
+        "title": "高级全栈开发者",
+        "company": "TechCorp Solutions",
+        "period": "2022 - 至今",
+        "location": "旧金山，CA",
+        "description": "领导企业级应用程序开发并指导初级开发者。负责架构决策和技术策略。",
+        "achievements": [
+          "领导5人开发团队构建微服务架构",
+          "通过优化将应用程序性能提升40%",
+          "指导3名初级开发者并进行代码审查"
+        ]
+      },
+      "fullStackDeveloper": {
+        "title": "全栈开发者",
+        "company": "StartupXYZ",
+        "period": "2020 - 2022",
+        "location": "远程",
+        "description": "使用现代技术开发全栈Web应用程序。与跨职能团队合作交付高质量产品。",
+        "achievements": [
+          "构建了3个主要功能，将用户参与度提升25%",
+          "实施CI/CD管道，将部署时间减少60%",
+          "与设计团队合作改善用户体验"
+        ]
+      },
+      "frontendDeveloper": {
+        "title": "前端开发者",
+        "company": "WebAgency Inc",
+        "period": "2019 - 2020",
+        "location": "纽约，NY",
+        "description": "专注于创建响应式和交互式用户界面。与设计师密切合作实现像素级完美的设计。",
+        "achievements": [
+          "为各种客户开发了15+个响应式网站",
+          "通过优化将页面加载时间减少30%",
+          "实施可访问性功能，改善WCAG合规性"
+        ]
+      }
+    }
   }
 }
