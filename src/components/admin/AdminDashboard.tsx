@@ -50,7 +50,7 @@ export const AdminDashboard: React.FC = () => {
           project: projectData,
         });
       } else {
-        await createProjectMutation.mutateAsync(projectData as any);
+        await createProjectMutation.mutateAsync(projectData);
       }
       setShowForm(false);
       setEditingProject(null);
