@@ -8,6 +8,7 @@ import { FrameworkService } from "./framework.service";
 import { SettingsService } from "./settings.service";
 import { TestimonialService } from "./testimonial.service";
 import { BlogService } from "./blog.service";
+import { ExperienceService } from "./experience.service";
 
 // Export all services
 export {
@@ -20,6 +21,7 @@ export {
   SettingsService,
   TestimonialService,
   BlogService,
+  ExperienceService,
 };
 
 // Create singleton instances
@@ -32,3 +34,4 @@ export const frameworkService = new FrameworkService();
 export const settingsService = new SettingsService();
 export const testimonialService = new TestimonialService();
 export const blogService = new BlogService();
+export const experienceService = new ExperienceService();
