@@ -22,6 +22,7 @@ export default function CategoriesAdminPage() {
     color: "#3B82F6",
     order: 0,
     visible: true,
+    public: true,
   });
 
   const { data: categories, isLoading, error } = useCategories(filters);
@@ -48,6 +49,7 @@ export default function CategoriesAdminPage() {
       color: "#3B82F6",
       order: 0,
       visible: true,
+      public: true,
     });
   };
 
@@ -68,6 +70,7 @@ export default function CategoriesAdminPage() {
       color: "#3B82F6",
       order: 0,
       visible: true,
+      public: true,
     });
   };
 
@@ -243,7 +246,7 @@ export default function CategoriesAdminPage() {
                 />
               </div>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center space-x-6">
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -254,6 +257,17 @@ export default function CategoriesAdminPage() {
                   className="mr-2"
                 />
                 Visible
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.public ?? true}
+                  onChange={(e) =>
+                    setFormData({ ...formData, public: e.target.checked })
+                  }
+                  className="mr-2"
+                />
+                Public
               </label>
             </div>
             <div className="flex justify-end space-x-3">
@@ -329,6 +343,15 @@ export default function CategoriesAdminPage() {
                     }`}
                   >
                     {category.visible ? "Visible" : "Hidden"}
+                  </span>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      category.public
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {category.public ? "Public" : "Private"}
                   </span>
                   <button
                     onClick={() => handleEdit(category)}
