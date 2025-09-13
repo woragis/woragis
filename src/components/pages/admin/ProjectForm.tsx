@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "../ui/Button";
-import { Card } from "../ui/Card";
+import { Button, Card } from "@/components/ui";
 import { Project } from "@/server/db/schema";
 
 interface ProjectFormProps {

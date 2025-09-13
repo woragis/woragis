@@ -8,10 +8,14 @@ import {
   Card,
   Button,
   EmptyState,
-  GamingBackground,
-  StarIcon,
-  TrophyIcon,
-  PowerUpIcon,
+  ValorantBackground,
+  AbstractShapes,
+  CodeIcon,
+  RocketIcon,
+  SparklesIcon,
+  ShieldIcon,
+  ZapIcon,
+  TargetIcon,
 } from "../../ui";
 import { Project } from "@/server/db/schema";
 import { ExternalLink, Github } from "lucide-react";
@@ -25,9 +29,18 @@ export const Projects: React.FC = () => {
     error,
   } = usePublicFeaturedProjects(3);
 
+  const projectIcons = [
+    CodeIcon,
+    RocketIcon,
+    SparklesIcon,
+    ShieldIcon,
+    ZapIcon,
+    TargetIcon,
+  ];
+
   if (isLoading) {
     return (
-      <GamingBackground variant="retro" className="py-20">
+      <ValorantBackground variant="geometric" className="py-20">
         <Section
           id="projects"
           title={t("projects.title")}
@@ -36,30 +49,29 @@ export const Projects: React.FC = () => {
           <Container>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(3)].map((_, index) => (
-                <Card key={index} variant="gaming" className="animate-pulse">
-                  <div className="h-48 gaming-card rounded-t-lg"></div>
-                  <div className="p-6">
-                    <div className="h-6 gaming-card rounded mb-3"></div>
-                    <div className="h-4 gaming-card rounded mb-2"></div>
-                    <div className="h-4 gaming-card rounded w-3/4 mb-4"></div>
-                    <div className="flex space-x-2 mb-4">
-                      <div className="h-6 gaming-card rounded w-16"></div>
-                      <div className="h-6 gaming-card rounded w-20"></div>
-                    </div>
-                    <div className="h-10 gaming-card rounded"></div>
+                <Card key={index} variant="modern" className="animate-pulse">
+                  <div className="h-48 glass-morphism rounded-lg mb-4"></div>
+                  <div className="h-6 glass-morphism rounded mb-3"></div>
+                  <div className="h-4 glass-morphism rounded mb-2"></div>
+                  <div className="h-4 glass-morphism rounded mb-2"></div>
+                  <div className="h-4 glass-morphism rounded w-3/4 mb-4"></div>
+                  <div className="flex space-x-2 mb-4">
+                    <div className="h-6 glass-morphism rounded w-16"></div>
+                    <div className="h-6 glass-morphism rounded w-20"></div>
                   </div>
+                  <div className="h-10 glass-morphism rounded"></div>
                 </Card>
               ))}
             </div>
           </Container>
         </Section>
-      </GamingBackground>
+      </ValorantBackground>
     );
   }
 
   if (error) {
     return (
-      <GamingBackground variant="retro" className="py-20">
+      <ValorantBackground variant="geometric" className="py-20">
         <Section
           id="projects"
           title={t("projects.title")}
@@ -72,13 +84,13 @@ export const Projects: React.FC = () => {
             />
           </Container>
         </Section>
-      </GamingBackground>
+      </ValorantBackground>
     );
   }
 
   if (projects.length === 0) {
     return (
-      <GamingBackground variant="retro" className="py-20">
+      <ValorantBackground variant="geometric" className="py-20">
         <Section
           id="projects"
           title={t("projects.title")}
@@ -91,14 +103,12 @@ export const Projects: React.FC = () => {
             />
           </Container>
         </Section>
-      </GamingBackground>
+      </ValorantBackground>
     );
   }
 
-  const projectIcons = [StarIcon, TrophyIcon, PowerUpIcon];
-
   return (
-    <GamingBackground variant="retro" className="py-20">
+    <ValorantBackground variant="geometric" className="py-20">
       <Section
         id="projects"
         title={t("projects.title")}
@@ -113,33 +123,33 @@ export const Projects: React.FC = () => {
               return (
                 <Card
                   key={project.id}
-                  variant="gaming"
-                  className="flex flex-col overflow-hidden gaming-hover pixel-hover"
+                  variant="modern"
+                  className="flex flex-col overflow-hidden hover-lift hover-glow"
                 >
-                  <div className="aspect-video gaming-card flex items-center justify-center text-6xl relative overflow-hidden">
+                  <div className="aspect-video glass-morphism flex items-center justify-center text-6xl relative overflow-hidden">
                     {project.image.startsWith("http") ? (
                       <img
                         src={project.image}
                         alt={project.title}
-                        className="w-full h-full object-cover filter contrast-110 brightness-110"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-green-400 font-pixel">
+                      <span className="text-indigo-600 dark:text-indigo-400 font-bold">
                         {project.image}
                       </span>
                     )}
-                    <div className="absolute inset-0 pixel-grid opacity-20"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-indigo-600/20 to-transparent"></div>
                     <div className="absolute top-2 right-2">
-                      <IconComponent className="w-6 h-6 text-cyan-400 animate-neon-pulse" />
+                      <IconComponent className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                     </div>
                   </div>
 
                   <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-pixel font-bold text-green-400 neon-text mb-3">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
                       {project.title}
                     </h3>
 
-                    <p className="text-gray-300 mb-4 flex-grow font-sans leading-relaxed">
+                    <p className="text-slate-600 dark:text-slate-300 mb-4 flex-grow leading-relaxed">
                       {project.description}
                     </p>
 
@@ -150,13 +160,13 @@ export const Projects: React.FC = () => {
                           .map((tech: string, techIndex: number) => (
                             <span
                               key={techIndex}
-                              className="px-2 py-1 gaming-card text-cyan-400 text-xs font-pixel font-bold border border-cyan-400/30"
+                              className="px-2 py-1 glass-morphism text-indigo-600 dark:text-indigo-400 text-xs font-medium rounded-full border border-indigo-200/50 dark:border-indigo-700/50"
                             >
                               {tech}
                             </span>
                           ))}
                         {technologies.length > 3 && (
-                          <span className="px-2 py-1 gaming-card text-pink-400 text-xs font-pixel font-bold border border-pink-400/30">
+                          <span className="px-2 py-1 glass-morphism text-purple-600 dark:text-purple-400 text-xs font-medium rounded-full border border-purple-200/50 dark:border-purple-700/50">
                             +{technologies.length - 3} more
                           </span>
                         )}
@@ -166,7 +176,7 @@ export const Projects: React.FC = () => {
                     <div className="flex gap-2">
                       {project.githubUrl && (
                         <Button
-                          variant="cyber"
+                          variant="outline"
                           size="sm"
                           className="flex-1"
                           onClick={() =>
@@ -179,7 +189,7 @@ export const Projects: React.FC = () => {
                       )}
                       {project.liveUrl && (
                         <Button
-                          variant="neon"
+                          variant="modern"
                           size="sm"
                           className="flex-1"
                           onClick={() =>
@@ -199,16 +209,16 @@ export const Projects: React.FC = () => {
 
           <div className="text-center mt-12">
             <Button
-              variant="retro"
+              variant="gradient"
               size="lg"
               onClick={() => (window.location.href = "/projects")}
-              className="gaming-hover pixel-hover"
+              className="hover-lift"
             >
               {t("projects.viewAllProjects")}
             </Button>
           </div>
         </Container>
       </Section>
-    </GamingBackground>
+    </ValorantBackground>
   );
 };

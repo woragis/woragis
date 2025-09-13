@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Orbitron, Press_Start_2P, Rajdhani } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -7,22 +7,16 @@ import { Navigation, Footer } from "@/components/pages/home";
 import { ClientOnly } from "@/components/ClientOnly";
 import { QueryClientProviderWrapper } from "@/components/QueryClientProvider";
 
-const orbitron = Orbitron({
-  variable: "--font-orbitron",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "700", "900"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
-const pressStart2P = Press_Start_2P({
-  variable: "--font-press-start-2p",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-  weight: ["400"],
-});
-
-const rajdhani = Rajdhani({
-  variable: "--font-rajdhani",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -101,7 +95,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${orbitron.variable} ${pressStart2P.variable} ${rajdhani.variable} antialiased`}
+        className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <QueryClientProviderWrapper>
           <LanguageProvider>

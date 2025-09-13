@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import { Project } from "@/server/db/schema";
-import { Button } from "../ui/Button";
-import { Card } from "../ui/Card";
+import { Button, Card } from "@/components/ui";
 import {
   Edit,
   Trash2,

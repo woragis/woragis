@@ -3,7 +3,7 @@
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePublicExperience } from "@/hooks/usePublicExperience";
-import { Section, Container, Card, GamingBackground } from "../../ui";
+import { Section, Container, Card, ValorantBackground } from "../../ui";
 import { ExperienceList } from "../experience";
 
 export const Experience: React.FC = () => {
@@ -11,7 +11,7 @@ export const Experience: React.FC = () => {
   const { data: experiences, isLoading, error } = usePublicExperience();
 
   return (
-    <GamingBackground variant="neon" className="py-20">
+    <ValorantBackground variant="gradient" className="py-20">
       <Section
         id="experience"
         title={t("experience.title")}
@@ -25,6 +25,6 @@ export const Experience: React.FC = () => {
           />
         </Container>
       </Section>
-    </GamingBackground>
+    </ValorantBackground>
   );
 };

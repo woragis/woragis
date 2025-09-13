@@ -7,11 +7,14 @@ import {
   Container,
   Card,
   Button,
-  GamingBackground,
-  StarIcon,
-  TrophyIcon,
-  PowerUpIcon,
-  ControllerIcon,
+  ValorantBackground,
+  AbstractShapes,
+  CodeIcon,
+  RocketIcon,
+  SparklesIcon,
+  ShieldIcon,
+  ZapIcon,
+  TargetIcon,
 } from "../../ui";
 import { FaEnvelope, FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
 
@@ -63,6 +66,7 @@ export const Contact: React.FC = () => {
       description: t("contact.methods.email.description"),
       value: t("contact.methods.email.value"),
       action: "mailto:hello@example.com",
+      color: "text-indigo-600 dark:text-indigo-400",
     },
     {
       icon: FaLinkedin,
@@ -70,6 +74,7 @@ export const Contact: React.FC = () => {
       description: t("contact.methods.linkedin.description"),
       value: t("contact.methods.linkedin.value"),
       action: "https://linkedin.com/in/yourprofile",
+      color: "text-blue-600 dark:text-blue-400",
     },
     {
       icon: FaGithub,
@@ -77,6 +82,7 @@ export const Contact: React.FC = () => {
       description: t("contact.methods.github.description"),
       value: t("contact.methods.github.value"),
       action: "https://github.com/yourusername",
+      color: "text-slate-600 dark:text-slate-400",
     },
     {
       icon: FaTwitter,
@@ -84,51 +90,60 @@ export const Contact: React.FC = () => {
       description: t("contact.methods.twitter.description"),
       value: t("contact.methods.twitter.value"),
       action: "https://twitter.com/yourusername",
+      color: "text-cyan-600 dark:text-cyan-400",
     },
   ];
 
-  const contactIcons = [StarIcon, TrophyIcon, PowerUpIcon, ControllerIcon];
+  const contactIcons = [
+    CodeIcon,
+    RocketIcon,
+    SparklesIcon,
+    ShieldIcon,
+    ZapIcon,
+    TargetIcon,
+  ];
 
   return (
-    <GamingBackground variant="matrix" className="py-20">
+    <ValorantBackground variant="minimal" className="py-20">
       <Section
         id="contact"
         title={t("contact.title")}
         subtitle={t("contact.subtitle")}
       >
         <Container>
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-16">
             <div>
-              <h3 className="text-2xl font-display font-black text-white mb-6 neon-text">
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">
                 {t("contact.conversationTitle")}
               </h3>
-              <p className="text-gray-300 mb-8 font-sans leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 mb-8 text-lg leading-relaxed">
                 {t("contact.conversationDescription")}
               </p>
 
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-6">
                 {contactMethods.map((method, index) => {
                   const IconComponent = method.icon;
-                  const GamingIcon = contactIcons[index % contactIcons.length];
+                  const AbstractIcon =
+                    contactIcons[index % contactIcons.length];
                   return (
                     <Card
                       key={index}
-                      variant="gaming"
-                      className="text-center gaming-hover pixel-hover"
+                      variant="glass"
+                      className="text-center hover-lift hover-glow"
                     >
                       <div className="flex flex-col items-center">
-                        <div className="text-3xl mb-3 text-cyan-400">
+                        <div className={`text-3xl mb-3 ${method.color}`}>
                           <IconComponent />
                         </div>
-                        <GamingIcon className="w-6 h-6 text-green-400 mb-2 animate-neon-pulse" />
-                        <h4 className="font-pixel font-bold text-green-400 neon-text mb-2">
+                        <AbstractIcon className="w-6 h-6 text-purple-600 dark:text-purple-400 mb-2" />
+                        <h4 className="font-semibold text-slate-900 dark:text-white mb-2">
                           {method.title}
                         </h4>
-                        <p className="text-sm text-gray-300 mb-3 font-sans">
+                        <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
                           {method.description}
                         </p>
                         <Button
-                          variant="cyber"
+                          variant="outline"
                           size="sm"
                           className="w-full"
                           onClick={() => window.open(method.action, "_blank")}
@@ -143,34 +158,34 @@ export const Contact: React.FC = () => {
             </div>
 
             <div>
-              <Card variant="gaming" className="gaming-hover">
-                <h3 className="text-xl font-pixel font-bold text-green-400 neon-text mb-6">
+              <Card variant="modern" className="hover-lift">
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
                   {t("contact.sendMessageTitle")}
                 </h3>
 
                 {submitStatus === "success" && (
-                  <div className="mb-4 p-4 gaming-card text-green-400 border border-green-400 rounded-lg">
+                  <div className="mb-4 p-4 glass-morphism text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800 rounded-lg">
                     <div className="flex items-center">
-                      <StarIcon className="w-5 h-5 mr-2" />
+                      <ShieldIcon className="w-5 h-5 mr-2" />
                       {t("contact.form.successMessage")}
                     </div>
                   </div>
                 )}
 
                 {submitStatus === "error" && (
-                  <div className="mb-4 p-4 gaming-card text-red-400 border border-red-400 rounded-lg">
+                  <div className="mb-4 p-4 glass-morphism text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg">
                     <div className="flex items-center">
-                      <PowerUpIcon className="w-5 h-5 mr-2" />
+                      <ZapIcon className="w-5 h-5 mr-2" />
                       {t("contact.form.errorMessage")}
                     </div>
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <label
                       htmlFor="name"
-                      className="block text-sm font-pixel font-bold text-cyan-400 mb-2"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
                     >
                       {t("contact.form.name")}
                     </label>
@@ -181,14 +196,14 @@ export const Contact: React.FC = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 gaming-card border border-cyan-400/30 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-white placeholder-gray-400 font-sans"
+                      className="modern-input w-full"
                       placeholder={t("contact.form.namePlaceholder")}
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-pixel font-bold text-cyan-400 mb-2"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
                     >
                       {t("contact.form.email")}
                     </label>
@@ -199,14 +214,14 @@ export const Contact: React.FC = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 gaming-card border border-cyan-400/30 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-white placeholder-gray-400 font-sans"
+                      className="modern-input w-full"
                       placeholder={t("contact.form.emailPlaceholder")}
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="message"
-                      className="block text-sm font-pixel font-bold text-cyan-400 mb-2"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
                     >
                       {t("contact.form.message")}
                     </label>
@@ -217,15 +232,15 @@ export const Contact: React.FC = () => {
                       value={formData.message}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 gaming-card border border-cyan-400/30 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-white placeholder-gray-400 font-sans"
+                      className="modern-input w-full resize-none"
                       placeholder={t("contact.form.messagePlaceholder")}
                     />
                   </div>
                   <Button
                     type="submit"
-                    variant="retro"
+                    variant="gradient"
                     size="lg"
-                    className="w-full gaming-hover pixel-hover"
+                    className="w-full hover-lift"
                     disabled={isSubmitting}
                   >
                     {isSubmitting
@@ -238,6 +253,6 @@ export const Contact: React.FC = () => {
           </div>
         </Container>
       </Section>
-    </GamingBackground>
+    </ValorantBackground>
   );
 };

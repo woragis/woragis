@@ -49,10 +49,9 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-rajdhani)", "system-ui", "sans-serif"],
-        mono: ["var(--font-press-start-2p)", "monospace"],
-        display: ["var(--font-orbitron)", "system-ui", "sans-serif"],
-        pixel: ["var(--font-press-start-2p)", "monospace"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        mono: ["var(--font-jetbrains-mono)", "monospace"],
+        display: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
     },
   },

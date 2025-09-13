@@ -6,10 +6,13 @@ import {
   Section,
   Container,
   Card,
-  GamingBackground,
-  StarIcon,
-  PowerUpIcon,
-  ControllerIcon,
+  ValorantBackground,
+  CodeIcon,
+  RocketIcon,
+  SparklesIcon,
+  ShieldIcon,
+  ZapIcon,
+  TargetIcon,
 } from "../../ui";
 
 export const Skills: React.FC = () => {
@@ -25,6 +28,7 @@ export const Skills: React.FC = () => {
         { name: "Tailwind CSS", level: 90 },
         { name: "Vue.js", level: 75 },
       ],
+      icon: CodeIcon,
     },
     {
       title: t("skills.categories.backend"),
@@ -35,6 +39,7 @@ export const Skills: React.FC = () => {
         { name: "MongoDB", level: 75 },
         { name: "Redis", level: 70 },
       ],
+      icon: RocketIcon,
     },
     {
       title: t("skills.categories.tools"),
@@ -45,13 +50,12 @@ export const Skills: React.FC = () => {
         { name: "Linux", level: 85 },
         { name: "Figma", level: 70 },
       ],
+      icon: SparklesIcon,
     },
   ];
 
-  const categoryIcons = [ControllerIcon, PowerUpIcon, StarIcon];
-
   return (
-    <GamingBackground variant="pixel" className="py-20">
+    <ValorantBackground variant="minimal" className="py-20">
       <Section
         id="skills"
         title={t("skills.title")}
@@ -60,34 +64,35 @@ export const Skills: React.FC = () => {
         <Container>
           <div className="grid md:grid-cols-3 gap-8">
             {skillCategories.map((category, categoryIndex) => {
-              const IconComponent =
-                categoryIcons[categoryIndex % categoryIcons.length];
+              const IconComponent = category.icon;
               return (
                 <Card
                   key={categoryIndex}
-                  variant="gaming"
-                  className="h-fit gaming-hover pixel-hover"
+                  variant="modern"
+                  className="hover-lift hover-glow"
                 >
                   <div className="text-center mb-6">
-                    <IconComponent className="w-8 h-8 text-cyan-400 mx-auto mb-3 animate-neon-pulse" />
-                    <h3 className="text-xl font-pixel font-bold text-green-400 neon-text">
+                    <div className="w-16 h-16 glass-morphism rounded-full flex items-center justify-center mx-auto mb-4">
+                      <IconComponent className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                       {category.title}
                     </h3>
                   </div>
                   <div className="space-y-4">
                     {category.skills.map((skill, skillIndex) => (
-                      <div key={skillIndex} className="cyber-glow">
+                      <div key={skillIndex}>
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-300 font-pixel font-bold text-sm">
+                          <span className="text-slate-700 dark:text-slate-300 font-medium">
                             {skill.name}
                           </span>
-                          <span className="text-sm text-cyan-400 font-pixel font-bold">
+                          <span className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
                             {skill.level}%
                           </span>
                         </div>
-                        <div className="w-full bg-gray-800 rounded-full h-3 border border-gray-600">
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
                           <div
-                            className="bg-gradient-to-r from-green-400 via-cyan-400 to-pink-400 h-3 rounded-full transition-all duration-1000 ease-out gaming-pulse"
+                            className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-1000 ease-out"
                             style={{ width: `${skill.level}%` }}
                           />
                         </div>
@@ -100,6 +105,6 @@ export const Skills: React.FC = () => {
           </div>
         </Container>
       </Section>
-    </GamingBackground>
+    </ValorantBackground>
   );
 };

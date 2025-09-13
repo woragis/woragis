@@ -7,10 +7,14 @@ import {
   Container,
   Card,
   EmptyState,
-  GamingBackground,
-  StarIcon,
-  TrophyIcon,
-  PowerUpIcon,
+  ValorantBackground,
+  AbstractShapes,
+  CodeIcon,
+  RocketIcon,
+  SparklesIcon,
+  ShieldIcon,
+  ZapIcon,
+  TargetIcon,
 } from "../../ui";
 import { usePublicFeaturedTestimonials } from "@/hooks/usePublicTestimonials";
 import { Star, Quote } from "lucide-react";
@@ -23,9 +27,18 @@ export const Testimonials: React.FC = () => {
     error,
   } = usePublicFeaturedTestimonials(3);
 
+  const testimonialIcons = [
+    CodeIcon,
+    RocketIcon,
+    SparklesIcon,
+    ShieldIcon,
+    ZapIcon,
+    TargetIcon,
+  ];
+
   if (isLoading) {
     return (
-      <GamingBackground variant="cyber" className="py-20">
+      <ValorantBackground variant="abstract" className="py-20">
         <Section
           id="testimonials"
           title={t("testimonials.title")}
@@ -34,31 +47,31 @@ export const Testimonials: React.FC = () => {
           <Container>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(3)].map((_, index) => (
-                <Card key={index} variant="gaming" className="animate-pulse">
+                <Card key={index} variant="glass" className="animate-pulse">
                   <div className="p-6">
                     <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 gaming-card rounded-full mr-4"></div>
+                      <div className="w-12 h-12 glass-morphism rounded-full mr-4"></div>
                       <div className="flex-1">
-                        <div className="h-4 gaming-card rounded mb-2"></div>
-                        <div className="h-3 gaming-card rounded w-2/3"></div>
+                        <div className="h-4 glass-morphism rounded mb-2"></div>
+                        <div className="h-3 glass-morphism rounded w-2/3"></div>
                       </div>
                     </div>
-                    <div className="h-4 gaming-card rounded mb-2"></div>
-                    <div className="h-4 gaming-card rounded mb-2"></div>
-                    <div className="h-4 gaming-card rounded w-3/4"></div>
+                    <div className="h-4 glass-morphism rounded mb-2"></div>
+                    <div className="h-4 glass-morphism rounded mb-2"></div>
+                    <div className="h-4 glass-morphism rounded w-3/4"></div>
                   </div>
                 </Card>
               ))}
             </div>
           </Container>
         </Section>
-      </GamingBackground>
+      </ValorantBackground>
     );
   }
 
   if (error) {
     return (
-      <GamingBackground variant="cyber" className="py-20">
+      <ValorantBackground variant="abstract" className="py-20">
         <Section
           id="testimonials"
           title={t("testimonials.title")}
@@ -71,13 +84,13 @@ export const Testimonials: React.FC = () => {
             />
           </Container>
         </Section>
-      </GamingBackground>
+      </ValorantBackground>
     );
   }
 
   if (testimonials.length === 0) {
     return (
-      <GamingBackground variant="cyber" className="py-20">
+      <ValorantBackground variant="abstract" className="py-20">
         <Section
           id="testimonials"
           title={t("testimonials.title")}
@@ -90,14 +103,12 @@ export const Testimonials: React.FC = () => {
             />
           </Container>
         </Section>
-      </GamingBackground>
+      </ValorantBackground>
     );
   }
 
-  const testimonialIcons = [StarIcon, TrophyIcon, PowerUpIcon];
-
   return (
-    <GamingBackground variant="cyber" className="py-20">
+    <ValorantBackground variant="abstract" className="py-20">
       <Section
         id="testimonials"
         title={t("testimonials.title")}
@@ -111,18 +122,18 @@ export const Testimonials: React.FC = () => {
               return (
                 <Card
                   key={testimonial.id}
-                  variant="gaming"
-                  className="flex flex-col h-full gaming-hover pixel-hover"
+                  variant="glass"
+                  className="flex flex-col h-full hover-lift hover-glow"
                 >
                   <div className="p-6 flex flex-col h-full">
                     {/* Quote icon */}
                     <div className="mb-4 flex items-center justify-between">
-                      <Quote className="w-8 h-8 text-cyan-400" />
-                      <IconComponent className="w-6 h-6 text-green-400 animate-neon-pulse" />
+                      <Quote className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                      <IconComponent className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                     </div>
 
                     {/* Testimonial content */}
-                    <blockquote className="text-gray-300 mb-6 flex-grow font-sans leading-relaxed">
+                    <blockquote className="text-slate-600 dark:text-slate-300 mb-6 flex-grow leading-relaxed">
                       &ldquo;{testimonial.content}&rdquo;
                     </blockquote>
 
@@ -134,7 +145,7 @@ export const Testimonials: React.FC = () => {
                           className={`w-4 h-4 ${
                             i < testimonial.rating
                               ? "text-yellow-400 fill-current"
-                              : "text-gray-600"
+                              : "text-slate-300 dark:text-slate-600"
                           }`}
                         />
                       ))}
@@ -142,22 +153,22 @@ export const Testimonials: React.FC = () => {
 
                     {/* Author info */}
                     <div className="flex items-center">
-                      <div className="w-12 h-12 gaming-card rounded-full flex items-center justify-center text-green-400 font-pixel font-bold text-lg mr-4 gaming-pulse">
+                      <div className="w-12 h-12 glass-morphism rounded-full flex items-center justify-center text-slate-900 dark:text-white font-bold text-lg mr-4">
                         {testimonial.avatar ? (
                           <img
                             src={testimonial.avatar}
                             alt={testimonial.name}
-                            className="w-full h-full rounded-full object-cover filter contrast-110 brightness-110"
+                            className="w-full h-full rounded-full object-cover"
                           />
                         ) : (
                           testimonial.name.charAt(0).toUpperCase()
                         )}
                       </div>
                       <div>
-                        <h4 className="font-pixel font-bold text-green-400 neon-text">
+                        <h4 className="font-semibold text-slate-900 dark:text-white">
                           {testimonial.name}
                         </h4>
-                        <p className="text-sm text-cyan-400 font-pixel">
+                        <p className="text-sm text-indigo-600 dark:text-indigo-400">
                           {testimonial.position} at {testimonial.company}
                         </p>
                       </div>
@@ -169,6 +180,6 @@ export const Testimonials: React.FC = () => {
           </div>
         </Container>
       </Section>
-    </GamingBackground>
+    </ValorantBackground>
   );
 };
