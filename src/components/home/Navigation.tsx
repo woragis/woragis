@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button, ThemeToggle, LanguageSwitcher } from "../ui";
 import { ClientOnly } from "../ClientOnly";
+import { useAuthStore } from "@/stores/auth-store";
+import { usePathname } from "next/navigation";
 
 export const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -36,6 +38,17 @@ export const Navigation: React.FC = () => {
     }
     setIsMobileMenuOpen(false);
   };
+
+  const isAdmin = useAuthStore((state) => state.user?.role === "admin");
+
+  if (isAdmin) {
+    navItems.push({ name: t("navigation.admin"), href: "/admin" });
+  }
+
+  const pathname = usePathname();
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <nav
