@@ -8,6 +8,7 @@ import { FrameworkRepository } from "./framework.repository";
 import { SettingsRepository } from "./settings.repository";
 import { TestimonialRepository } from "./testimonial.repository";
 import { BlogRepository } from "./blog.repository";
+import { ExperienceRepository } from "./experience.repository";
 
 // Export all repositories
 export {
@@ -20,6 +21,7 @@ export {
   SettingsRepository,
   TestimonialRepository,
   BlogRepository,
+  ExperienceRepository,
 };
 
 // Create singleton instances
@@ -32,3 +34,4 @@ export const frameworkRepository = new FrameworkRepository();
 export const settingsRepository = new SettingsRepository();
 export const testimonialRepository = new TestimonialRepository();
 export const blogRepository = new BlogRepository();
+export const experienceRepository = new ExperienceRepository();
