@@ -5,4 +5,5 @@ export { Container } from "./Container";
 export { ThemeToggle } from "./ThemeToggle";
 export { LanguageSwitcher } from "./LanguageSwitcher";
 export { EmptyState } from "./EmptyState";
+export { Breadcrumb } from "./Breadcrumb";
 export { ClientOnly } from "../ClientOnly";
