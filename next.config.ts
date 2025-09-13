@@ -4,11 +4,8 @@ const nextConfig: NextConfig = {
   // Enable standalone output for Docker
   output: "standalone",
 
-  // Experimental features
-  experimental: {
-    // Enable server components
-    serverComponentsExternalPackages: ["postgres"],
-  },
+  // External packages for server components
+  serverExternalPackages: ["postgres"],
 
   // Image optimization
   images: {
