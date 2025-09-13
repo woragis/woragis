@@ -7,3 +7,5 @@ export { LanguageSwitcher } from "./LanguageSwitcher";
 export { EmptyState } from "./EmptyState";
 export { Breadcrumb } from "./Breadcrumb";
 export { ClientOnly } from "../ClientOnly";
+export * from "./GamingIcons";
+export * from "./GamingBackground";

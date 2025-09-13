@@ -2,7 +2,15 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Section, Container, Card } from "../../ui";
+import {
+  Section,
+  Container,
+  Card,
+  GamingBackground,
+  StarIcon,
+  PowerUpIcon,
+  ControllerIcon,
+} from "../../ui";
 
 export const Skills: React.FC = () => {
   const { t } = useLanguage();
@@ -40,43 +48,58 @@ export const Skills: React.FC = () => {
     },
   ];
 
+  const categoryIcons = [ControllerIcon, PowerUpIcon, StarIcon];
+
   return (
-    <Section
-      id="skills"
-      title={t("skills.title")}
-      subtitle={t("skills.subtitle")}
-    >
-      <Container>
-        <div className="grid md:grid-cols-3 gap-8">
-          {skillCategories.map((category, categoryIndex) => (
-            <Card key={categoryIndex} hover className="h-fit">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 text-center">
-                {category.title}
-              </h3>
-              <div className="space-y-4">
-                {category.skills.map((skill, skillIndex) => (
-                  <div key={skillIndex}>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-gray-700 dark:text-gray-300 font-medium">
-                        {skill.name}
-                      </span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {skill.level}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-1000 ease-out"
-                        style={{ width: `${skill.level}%` }}
-                      />
-                    </div>
+    <GamingBackground variant="pixel" className="py-20">
+      <Section
+        id="skills"
+        title={t("skills.title")}
+        subtitle={t("skills.subtitle")}
+      >
+        <Container>
+          <div className="grid md:grid-cols-3 gap-8">
+            {skillCategories.map((category, categoryIndex) => {
+              const IconComponent =
+                categoryIcons[categoryIndex % categoryIcons.length];
+              return (
+                <Card
+                  key={categoryIndex}
+                  variant="gaming"
+                  className="h-fit gaming-hover pixel-hover"
+                >
+                  <div className="text-center mb-6">
+                    <IconComponent className="w-8 h-8 text-cyan-400 mx-auto mb-3 animate-neon-pulse" />
+                    <h3 className="text-xl font-pixel font-bold text-green-400 neon-text">
+                      {category.title}
+                    </h3>
                   </div>
-                ))}
-              </div>
-            </Card>
-          ))}
-        </div>
-      </Container>
-    </Section>
+                  <div className="space-y-4">
+                    {category.skills.map((skill, skillIndex) => (
+                      <div key={skillIndex} className="cyber-glow">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-300 font-pixel font-bold text-sm">
+                            {skill.name}
+                          </span>
+                          <span className="text-sm text-cyan-400 font-pixel font-bold">
+                            {skill.level}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-800 rounded-full h-3 border border-gray-600">
+                          <div
+                            className="bg-gradient-to-r from-green-400 via-cyan-400 to-pink-400 h-3 rounded-full transition-all duration-1000 ease-out gaming-pulse"
+                            style={{ width: `${skill.level}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </Container>
+      </Section>
+    </GamingBackground>
   );
 };

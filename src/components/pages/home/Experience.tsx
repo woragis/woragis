@@ -3,7 +3,7 @@
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePublicExperience } from "@/hooks/usePublicExperience";
-import { Section, Container, Card } from "../../ui";
+import { Section, Container, Card, GamingBackground } from "../../ui";
 import { ExperienceList } from "../experience";
 
 export const Experience: React.FC = () => {
@@ -11,18 +11,20 @@ export const Experience: React.FC = () => {
   const { data: experiences, isLoading, error } = usePublicExperience();
 
   return (
-    <Section
-      id="experience"
-      title={t("experience.title")}
-      subtitle={t("experience.subtitle")}
-    >
-      <Container>
-        <ExperienceList
-          experiences={experiences || []}
-          isLoading={isLoading}
-          error={error}
-        />
-      </Container>
-    </Section>
+    <GamingBackground variant="neon" className="py-20">
+      <Section
+        id="experience"
+        title={t("experience.title")}
+        subtitle={t("experience.subtitle")}
+      >
+        <Container>
+          <ExperienceList
+            experiences={experiences || []}
+            isLoading={isLoading}
+            error={error}
+          />
+        </Container>
+      </Section>
+    </GamingBackground>
   );
 };

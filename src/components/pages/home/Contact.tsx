@@ -2,7 +2,17 @@
 
 import React, { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Section, Container, Card, Button } from "../../ui";
+import {
+  Section,
+  Container,
+  Card,
+  Button,
+  GamingBackground,
+  StarIcon,
+  TrophyIcon,
+  PowerUpIcon,
+  ControllerIcon,
+} from "../../ui";
 import { FaEnvelope, FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
 
 export const Contact: React.FC = () => {
@@ -77,138 +87,157 @@ export const Contact: React.FC = () => {
     },
   ];
 
-  return (
-    <Section
-      id="contact"
-      title={t("contact.title")}
-      subtitle={t("contact.subtitle")}
-    >
-      <Container>
-        <div className="grid lg:grid-cols-2 gap-12">
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              {t("contact.conversationTitle")}
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-8">
-              {t("contact.conversationDescription")}
-            </p>
+  const contactIcons = [StarIcon, TrophyIcon, PowerUpIcon, ControllerIcon];
 
-            <div className="grid sm:grid-cols-2 gap-4">
-              {contactMethods.map((method, index) => {
-                const IconComponent = method.icon;
-                return (
-                  <Card key={index} hover className="text-center">
-                    <div className="text-3xl mb-3 text-blue-600 dark:text-blue-400">
-                      <IconComponent />
-                    </div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                      {method.title}
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                      {method.description}
-                    </p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => window.open(method.action, "_blank")}
+  return (
+    <GamingBackground variant="matrix" className="py-20">
+      <Section
+        id="contact"
+        title={t("contact.title")}
+        subtitle={t("contact.subtitle")}
+      >
+        <Container>
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-2xl font-display font-black text-white mb-6 neon-text">
+                {t("contact.conversationTitle")}
+              </h3>
+              <p className="text-gray-300 mb-8 font-sans leading-relaxed">
+                {t("contact.conversationDescription")}
+              </p>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                {contactMethods.map((method, index) => {
+                  const IconComponent = method.icon;
+                  const GamingIcon = contactIcons[index % contactIcons.length];
+                  return (
+                    <Card
+                      key={index}
+                      variant="gaming"
+                      className="text-center gaming-hover pixel-hover"
                     >
-                      {method.value}
-                    </Button>
-                  </Card>
-                );
-              })}
+                      <div className="flex flex-col items-center">
+                        <div className="text-3xl mb-3 text-cyan-400">
+                          <IconComponent />
+                        </div>
+                        <GamingIcon className="w-6 h-6 text-green-400 mb-2 animate-neon-pulse" />
+                        <h4 className="font-pixel font-bold text-green-400 neon-text mb-2">
+                          {method.title}
+                        </h4>
+                        <p className="text-sm text-gray-300 mb-3 font-sans">
+                          {method.description}
+                        </p>
+                        <Button
+                          variant="cyber"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => window.open(method.action, "_blank")}
+                        >
+                          {method.value}
+                        </Button>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <Card variant="gaming" className="gaming-hover">
+                <h3 className="text-xl font-pixel font-bold text-green-400 neon-text mb-6">
+                  {t("contact.sendMessageTitle")}
+                </h3>
+
+                {submitStatus === "success" && (
+                  <div className="mb-4 p-4 gaming-card text-green-400 border border-green-400 rounded-lg">
+                    <div className="flex items-center">
+                      <StarIcon className="w-5 h-5 mr-2" />
+                      {t("contact.form.successMessage")}
+                    </div>
+                  </div>
+                )}
+
+                {submitStatus === "error" && (
+                  <div className="mb-4 p-4 gaming-card text-red-400 border border-red-400 rounded-lg">
+                    <div className="flex items-center">
+                      <PowerUpIcon className="w-5 h-5 mr-2" />
+                      {t("contact.form.errorMessage")}
+                    </div>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-pixel font-bold text-cyan-400 mb-2"
+                    >
+                      {t("contact.form.name")}
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 gaming-card border border-cyan-400/30 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-white placeholder-gray-400 font-sans"
+                      placeholder={t("contact.form.namePlaceholder")}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-pixel font-bold text-cyan-400 mb-2"
+                    >
+                      {t("contact.form.email")}
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 gaming-card border border-cyan-400/30 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-white placeholder-gray-400 font-sans"
+                      placeholder={t("contact.form.emailPlaceholder")}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-pixel font-bold text-cyan-400 mb-2"
+                    >
+                      {t("contact.form.message")}
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows={4}
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 gaming-card border border-cyan-400/30 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-white placeholder-gray-400 font-sans"
+                      placeholder={t("contact.form.messagePlaceholder")}
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    variant="retro"
+                    size="lg"
+                    className="w-full gaming-hover pixel-hover"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting
+                      ? t("contact.form.sending")
+                      : t("contact.form.sendMessage")}
+                  </Button>
+                </form>
+              </Card>
             </div>
           </div>
-
-          <div>
-            <Card>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                {t("contact.sendMessageTitle")}
-              </h3>
-
-              {submitStatus === "success" && (
-                <div className="mb-4 p-4 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg">
-                  {t("contact.form.successMessage")}
-                </div>
-              )}
-
-              {submitStatus === "error" && (
-                <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-lg">
-                  {t("contact.form.errorMessage")}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    {t("contact.form.name")}
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder={t("contact.form.namePlaceholder")}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    {t("contact.form.email")}
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder={t("contact.form.emailPlaceholder")}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    {t("contact.form.message")}
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={4}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder={t("contact.form.messagePlaceholder")}
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting
-                    ? t("contact.form.sending")
-                    : t("contact.form.sendMessage")}
-                </Button>
-              </form>
-            </Card>
-          </div>
-        </div>
-      </Container>
-    </Section>
+        </Container>
+      </Section>
+    </GamingBackground>
   );
 };
