@@ -1,0 +1,22 @@
+// Export all API modules
+export { apiClient, ApiClient } from "./client";
+export type {
+  ApiClientConfig,
+  RequestInterceptor,
+  ResponseInterceptor,
+  ErrorInterceptor,
+} from "./client";
+
+export { projectApi } from "./projects";
+export { categoryApi } from "./categories";
+export { tagApi } from "./tags";
+export { languageApi } from "./languages";
+export { frameworkApi } from "./frameworks";
+export { settingsApi } from "./settings";
+export { blogApi } from "./blog";
+export { experienceApi } from "./experience";
+export { testimonialApi } from "./testimonials";
+export { authApi } from "./auth";
+
+// Re-export the main client as default for backward compatibility
+export { apiClient as default } from "./client";
