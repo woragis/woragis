@@ -38,7 +38,7 @@ export const blogApi = {
   },
 
   async createBlogPost(
-    blogPostData: NewBlogPost
+    blogPostData: Omit<NewBlogPost, "userId">
   ): Promise<ApiResponse<BlogPost>> {
     return apiClient.post("/admin/blog", blogPostData);
   },
