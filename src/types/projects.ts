@@ -1,5 +1,5 @@
 import type { projects } from "@/server/db/schemas/projects";
-import type { Tag, Category, Language, Framework } from "@/types";
+import type { Framework } from "@/types";
 
 // Base types from schema
 export type Project = typeof projects.$inferSelect;
@@ -13,10 +13,8 @@ export interface ProjectWithStats extends Project {
 }
 
 export interface ProjectWithRelations extends Project {
-  tags?: Tag[];
-  categories?: Category[];
-  languages?: Language[];
   frameworks?: Framework[];
+  tags?: import("./project-tags").ProjectTag[];
 }
 
 export interface ProjectFilters {
