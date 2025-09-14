@@ -19,8 +19,6 @@ export const blogPosts = pgTable("blog_posts", {
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   featuredImage: text("featured_image"), // URL to featured image
-  tags: text("tags"), // JSON string array
-  category: text("category"),
   readingTime: integer("reading_time"), // estimated reading time in minutes
   featured: boolean("featured").default(false),
   published: boolean("published").default(false),
