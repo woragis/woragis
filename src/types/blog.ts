@@ -11,13 +11,15 @@ export interface BlogPostWithStats extends BlogPost {
   readingTime: number | null;
 }
 
+export interface BlogPostWithTags extends BlogPost {
+  tags?: import("./blog-tags").BlogTag[];
+}
+
 export interface BlogPostFilters {
   published?: boolean;
   featured?: boolean;
   visible?: boolean;
   public?: boolean;
-  category?: string;
-  tags?: string[];
   search?: string;
   limit?: number;
   offset?: number;
@@ -37,8 +39,6 @@ export interface BlogPostFormData {
   excerpt: string;
   content: string;
   featuredImage?: string;
-  tags: string[];
-  category?: string;
   readingTime?: number;
   featured: boolean;
   published: boolean;
@@ -58,7 +58,7 @@ export interface BlogPostListResponse {
 }
 
 export interface BlogPostCreateRequest {
-  blogPost: NewBlogPost;
+  blogPost: Omit<NewBlogPost, "userId">;
 }
 
 export interface BlogPostUpdateRequest {
@@ -78,8 +78,6 @@ export interface PublicBlogPost {
   excerpt: string;
   content: string;
   featuredImage?: string;
-  tags?: string[];
-  category?: string;
   readingTime?: number;
   featured: boolean;
   publishedAt?: Date;
@@ -87,16 +85,4 @@ export interface PublicBlogPost {
   likeCount: number;
   createdAt: Date;
   updatedAt: Date;
-}
-
-// Blog categories and tags
-export interface BlogCategory {
-  name: string;
-  slug: string;
-  count: number;
-}
-
-export interface BlogTag {
-  name: string;
-  count: number;
 }
