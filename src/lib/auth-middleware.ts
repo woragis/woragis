@@ -1,116 +1,155 @@
-import { NextRequest } from "next/server";
-import { authService } from "../server/services";
-import { UserRole } from "../types";
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: "admin" | "user";
+  avatar?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface AuthenticatedUser {
   userId: string;
+  id: string;
   email: string;
-  username: string;
-  role: UserRole;
+  name: string;
+  role: "admin" | "user";
+  avatar?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export async function authenticateUser(request: NextRequest): Promise<{
-  user: AuthenticatedUser | null;
-  error?: string;
-}> {
+export async function getServerAuth(): Promise<AuthUser | null> {
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return { user: null, error: "No authorization token provided" };
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth-token")?.value;
+
+    if (!token) {
+      return null;
     }
 
-    const token = authHeader.substring(7);
-    const tokenData = await authService.verifyToken(token);
+    // Verify token with the API
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/auth/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-    if (!tokenData) {
-      return { user: null, error: "Invalid or expired token" };
+    if (!response.ok) {
+      return null;
     }
 
-    return {
-      user: {
-        userId: tokenData.userId,
-        email: tokenData.email,
-        username: tokenData.username,
-        role: tokenData.role,
-      },
+    const data = await response.json();
+    if (!data.success || !data.data) {
+      return null;
+    }
+
+    const userData = data.data;
+
+    // Map API response to AuthUser interface
+    const authUser: AuthUser = {
+      id: userData.id,
+      email: userData.email,
+      name:
+        userData.firstName && userData.lastName
+          ? `${userData.firstName} ${userData.lastName}`.trim()
+          : userData.username || userData.email,
+      role: userData.role,
+      avatar: userData.avatar,
+      createdAt: userData.createdAt,
+      updatedAt: userData.updatedAt,
     };
+
+    return authUser;
   } catch (error) {
-    return { user: null, error: "Authentication failed" };
+    console.error("Auth verification failed:", error);
+    return null;
   }
 }
 
 export function requireAuth(
   handler: (
     request: NextRequest,
-    user: AuthenticatedUser,
-    context?: any
-  ) => Promise<Response>
+    user: AuthenticatedUser
+  ) => Promise<NextResponse> | NextResponse
 ) {
-  return async (request: NextRequest, context?: any): Promise<Response> => {
-    const { user, error } = await authenticateUser(request);
+  return async (request: NextRequest) => {
+    const authUser = await getServerAuth();
 
-    if (!user) {
-      return Response.json(
-        { success: false, error: error || "Authentication required" },
-        { status: 401 }
-      );
+    if (!authUser) {
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    return handler(request, user, context);
-  };
-}
-
-export function requireRole(role: UserRole) {
-  return function (
-    handler: (
-      request: NextRequest,
-      user: AuthenticatedUser
-    ) => Promise<Response>
-  ) {
-    return async (request: NextRequest): Promise<Response> => {
-      const { user, error } = await authenticateUser(request);
-
-      if (!user) {
-        return Response.json(
-          { success: false, error: error || "Authentication required" },
-          { status: 401 }
-        );
-      }
-
-      if (user.role !== role && user.role !== "super_admin") {
-        return Response.json(
-          { success: false, error: "Insufficient permissions" },
-          { status: 403 }
-        );
-      }
-
-      return handler(request, user);
+    // Convert AuthUser to AuthenticatedUser format
+    const authenticatedUser: AuthenticatedUser = {
+      ...authUser,
+      userId: authUser.id,
     };
+
+    return handler(request, authenticatedUser);
   };
 }
 
 export function requireAdmin(
-  handler: (request: NextRequest, user: AuthenticatedUser) => Promise<Response>
+  handler: (
+    request: NextRequest,
+    user: AuthenticatedUser
+  ) => Promise<NextResponse> | NextResponse
 ) {
-  return requireRole("admin")(handler);
+  return async (request: NextRequest) => {
+    const authUser = await getServerAuth();
+
+    if (!authUser) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    if (authUser.role !== "admin") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    // Convert AuthUser to AuthenticatedUser format
+    const authenticatedUser: AuthenticatedUser = {
+      ...authUser,
+      userId: authUser.id,
+    };
+
+    return handler(request, authenticatedUser);
+  };
 }
 
-export function requireSuperAdmin(
-  handler: (request: NextRequest, user: AuthenticatedUser) => Promise<Response>
-) {
-  return requireRole("super_admin")(handler);
-}
-
+// Auth middleware that returns a result object instead of redirecting
 export async function authMiddleware(request: NextRequest): Promise<{
   success: boolean;
   userId?: string;
   error?: string;
 }> {
-  const { user, error } = await authenticateUser(request);
-  
-  if (!user) {
-    return { success: false, error: error || "Authentication required" };
+  try {
+    const authUser = await getServerAuth();
+
+    if (!authUser) {
+      return {
+        success: false,
+        error: "Authentication required",
+      };
+    }
+
+    return {
+      success: true,
+      userId: authUser.id,
+    };
+  } catch (error) {
+    console.error("Auth middleware error:", error);
+    return {
+      success: false,
+      error: "Authentication failed",
+    };
   }
-  
-  return { success: true, userId: user.userId };
 }
