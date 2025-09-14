@@ -14,7 +14,7 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     return handleAuthError("Unauthorized");
   }
 
-  const result = await experienceService.getAllExperiencesForAdmin();
+  const result = await experienceService.getAllExperiences();
   return handleServiceResult(result, "Admin experiences fetched successfully");
 });
 

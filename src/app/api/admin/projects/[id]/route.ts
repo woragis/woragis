@@ -1,24 +1,28 @@
 import { NextRequest } from "next/server";
 import { projectService } from "@/server/services";
-import { requireAuth, type AuthenticatedUser } from "@/lib/auth-middleware";
+import { authMiddleware } from "@/lib/auth-middleware";
 import {
   handleServiceResult,
+  withErrorHandling,
+  handleAuthError,
   notFoundResponse,
   deletedResponse,
 } from "@/utils/response-helpers";
 import type { NewProject } from "@/types";
 
 // GET /api/admin/projects/[id] - Get project by ID
-export const GET = requireAuth(
+export const GET = withErrorHandling(
   async (
     request: NextRequest,
-    user: AuthenticatedUser,
-    context: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
   ) => {
-    const result = await projectService.getProjectById(
-      context.params.id,
-      user.userId
-    );
+    const authResult = await authMiddleware(request);
+    if (!authResult.success) {
+      return handleAuthError(authResult.error);
+    }
+
+    const { id } = await params;
+    const result = await projectService.getProjectById(id, authResult.userId!);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Project not found");
@@ -29,19 +33,24 @@ export const GET = requireAuth(
 );
 
 // PUT /api/admin/projects/[id] - Update project
-export const PUT = requireAuth(
+export const PUT = withErrorHandling(
   async (
     request: NextRequest,
-    user: AuthenticatedUser,
-    context: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
   ) => {
+    const authResult = await authMiddleware(request);
+    if (!authResult.success) {
+      return handleAuthError(authResult.error);
+    }
+
+    const { id } = await params;
     const body = await request.json();
     const projectData: Partial<NewProject> = body;
 
     const result = await projectService.updateProject(
-      context.params.id,
+      id,
       projectData,
-      user.userId
+      authResult.userId!
     );
 
     if (!result.success) {
@@ -53,16 +62,18 @@ export const PUT = requireAuth(
 );
 
 // DELETE /api/admin/projects/[id] - Delete project
-export const DELETE = requireAuth(
+export const DELETE = withErrorHandling(
   async (
     request: NextRequest,
-    user: AuthenticatedUser,
-    context: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
   ) => {
-    const result = await projectService.deleteProject(
-      context.params.id,
-      user.userId
-    );
+    const authResult = await authMiddleware(request);
+    if (!authResult.success) {
+      return handleAuthError(authResult.error);
+    }
+
+    const { id } = await params;
+    const result = await projectService.deleteProject(id, authResult.userId!);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Project not found");

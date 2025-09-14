@@ -10,8 +10,12 @@ import type { NewTag } from "@/types";
 
 // GET /api/admin/tags/[id] - Get tag by ID
 export const GET = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
-    const result = await tagService.getTagById(params.id);
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    const { id } = await params;
+    const result = await tagService.getTagById(id);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Tag not found");
@@ -23,11 +27,15 @@ export const GET = withErrorHandling(
 
 // PUT /api/admin/tags/[id] - Update tag
 export const PUT = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    const { id } = await params;
     const body = await request.json();
     const tagData: Partial<NewTag> = body;
 
-    const result = await tagService.updateTag(params.id, tagData);
+    const result = await tagService.updateTag(id, tagData);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Tag not found");
@@ -39,8 +47,12 @@ export const PUT = withErrorHandling(
 
 // DELETE /api/admin/tags/[id] - Delete tag
 export const DELETE = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
-    const result = await tagService.deleteTag(params.id);
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    const { id } = await params;
+    const result = await tagService.deleteTag(id);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Tag not found");

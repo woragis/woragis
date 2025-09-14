@@ -10,8 +10,12 @@ import type { NewFramework } from "@/types";
 
 // GET /api/admin/frameworks/[id] - Get framework by ID
 export const GET = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
-    const result = await frameworkService.getFrameworkById(params.id);
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    const { id } = await params;
+    const result = await frameworkService.getFrameworkById(id);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Framework not found");
@@ -23,14 +27,15 @@ export const GET = withErrorHandling(
 
 // PUT /api/admin/frameworks/[id] - Update framework
 export const PUT = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    const { id } = await params;
     const body = await request.json();
     const frameworkData: Partial<NewFramework> = body;
 
-    const result = await frameworkService.updateFramework(
-      params.id,
-      frameworkData
-    );
+    const result = await frameworkService.updateFramework(id, frameworkData);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Framework not found");
@@ -42,8 +47,12 @@ export const PUT = withErrorHandling(
 
 // DELETE /api/admin/frameworks/[id] - Delete framework
 export const DELETE = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
-    const result = await frameworkService.deleteFramework(params.id);
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    const { id } = await params;
+    const result = await frameworkService.deleteFramework(id);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Framework not found");

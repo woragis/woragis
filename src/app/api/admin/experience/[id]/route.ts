@@ -11,13 +11,17 @@ import {
 import { UpdateExperience } from "@/types";
 
 export const GET = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return handleAuthError(authResult.error);
     }
 
-    const experience = await experienceService.getExperienceById(params.id);
+    const { id } = await params;
+    const experience = await experienceService.getExperienceById(id);
 
     if (!experience) {
       return notFoundResponse("Experience not found");
@@ -31,12 +35,16 @@ export const GET = withErrorHandling(
 );
 
 export const PUT = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return handleAuthError(authResult.error);
     }
 
+    const { id } = await params;
     const body = await request.json();
     const updateData: UpdateExperience = {
       title: body.title,
@@ -51,10 +59,7 @@ export const PUT = withErrorHandling(
       isActive: body.isActive ? "true" : "false",
     };
 
-    const experience = await experienceService.updateExperience(
-      params.id,
-      updateData
-    );
+    const experience = await experienceService.updateExperience(id, updateData);
 
     if (!experience) {
       return notFoundResponse("Experience not found");
@@ -68,13 +73,17 @@ export const PUT = withErrorHandling(
 );
 
 export const DELETE = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return handleAuthError(authResult.error);
     }
 
-    const success = await experienceService.deleteExperience(params.id);
+    const { id } = await params;
+    const success = await experienceService.deleteExperience(id);
 
     if (!success) {
       return notFoundResponse("Experience not found");
