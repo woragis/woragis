@@ -13,6 +13,7 @@
     "db:seed": "tsx scripts/seed.ts",
     "db:studio": "drizzle-kit studio",
     "setup": "tsx scripts/setup.ts",
+    "admin:promote-first": "tsx scripts/promote-first-admin.ts",
     "docker:up": "docker-compose up -d",
     "docker:build": "docker-compose build",
     "docker:down": "docker-compose down",
