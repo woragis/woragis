@@ -5,9 +5,15 @@ import { persist, createJSONStorage } from "zustand/middleware";
 export interface User {
   id: string;
   email: string;
-  name: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string; // Computed field for compatibility
   role: "admin" | "user";
   avatar?: string;
+  isActive: boolean;
+  emailVerified: boolean;
+  lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -52,8 +58,9 @@ export interface AuthState {
 }
 
 // Token utilities
-const isTokenExpired = (expiresAt: number): boolean => {
-  return Date.now() >= expiresAt;
+const isTokenExpired = (expiresAt: number | Date): boolean => {
+  const timestamp = expiresAt instanceof Date ? expiresAt.getTime() : expiresAt;
+  return Date.now() >= timestamp;
 };
 
 const getStoredTokens = (): AuthTokens | null => {
@@ -74,7 +81,13 @@ const storeTokens = (tokens: AuthTokens): void => {
   if (typeof window === "undefined") return;
 
   try {
+    // Store in localStorage for client-side access
     localStorage.setItem("auth-tokens", JSON.stringify(tokens));
+
+    // Store access token in cookie for server-side access
+    const expiresAt = tokens.expiresAt;
+    const maxAge = Math.floor((expiresAt - Date.now()) / 1000);
+    document.cookie = `auth-token=${tokens.accessToken}; path=/; max-age=${maxAge}; samesite=strict`;
   } catch (error) {
     console.error("Failed to store tokens:", error);
   }
@@ -85,6 +98,9 @@ const clearStoredTokens = (): void => {
 
   try {
     localStorage.removeItem("auth-tokens");
+    // Clear the auth cookie
+    document.cookie =
+      "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
   } catch (error) {
     console.error("Failed to clear tokens:", error);
   }
@@ -125,8 +141,20 @@ export const useAuthStore = create<AuthState>()(
           if (data.success && data.data) {
             const { user, tokens } = data.data;
 
+            // Compute name field for compatibility
+            const userWithName = {
+              ...user,
+              name:
+                user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.username,
+            };
+
+            console.log("Login successful - User with name:", userWithName);
+            console.log("Login successful - Tokens:", tokens);
+
             set({
-              user,
+              user: userWithName,
               tokens,
               isAuthenticated: true,
               isLoading: false,
@@ -156,12 +184,21 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
 
         try {
+          // Convert RegisterData to match API schema
+          const apiData = {
+            email: data.email,
+            username: data.name, // Convert name to username for API
+            password: data.password,
+            firstName: data.name.split(" ")[0] || data.name,
+            lastName: data.name.split(" ").slice(1).join(" ") || "",
+          };
+
           const response = await fetch("/api/auth/register", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(apiData),
           });
 
           if (!response.ok) {
@@ -174,8 +211,17 @@ export const useAuthStore = create<AuthState>()(
           if (result.success && result.data) {
             const { user, tokens } = result.data;
 
+            // Compute name field for compatibility
+            const userWithName = {
+              ...user,
+              name:
+                user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.username,
+            };
+
             set({
-              user,
+              user: userWithName,
               tokens,
               isAuthenticated: true,
               isLoading: false,
@@ -304,8 +350,17 @@ export const useAuthStore = create<AuthState>()(
           const data = await response.json();
 
           if (data.success && data.data) {
+            // Compute name field for compatibility
+            const userWithName = {
+              ...data.data,
+              name:
+                data.data.firstName && data.data.lastName
+                  ? `${data.data.firstName} ${data.data.lastName}`
+                  : data.data.username,
+            };
+
             set({
-              user: data.data,
+              user: userWithName,
               tokens: storedTokens,
               isAuthenticated: true,
               isLoading: false,
