@@ -9,9 +9,10 @@ import {
   useToggleProjectVisibility,
   useToggleProjectFeatured,
 } from "@/hooks/useProjects";
-import { Modal } from "@/components/ui";
+import { Modal, Button } from "@/components/ui";
 import { ProjectForm } from "@/components/pages/admin/ProjectForm";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
+import { Tag } from "lucide-react";
 import type { ProjectFilters, Project, NewProject } from "@/types";
 
 export default function ProjectsAdminPage() {
@@ -102,12 +103,22 @@ export default function ProjectsAdminPage() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Projects
         </h1>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          Add Project
-        </button>
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => window.open("/admin/projects/tags", "_blank")}
+            className="flex items-center gap-2"
+          >
+            <Tag className="w-4 h-4" />
+            Manage Tags
+          </Button>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          >
+            Add Project
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}
