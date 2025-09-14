@@ -430,28 +430,6 @@ export class BlogService extends BaseService {
     }
   }
 
-  async getBlogCategories(
-    userId?: string
-  ): Promise<ApiResponse<{ name: string; count: number }[]>> {
-    try {
-      const categories = await blogRepository.getCategories(userId);
-      return this.success(categories);
-    } catch (error) {
-      return this.handleError(error, "getBlogCategories");
-    }
-  }
-
-  async getBlogTags(
-    userId?: string
-  ): Promise<ApiResponse<{ name: string; count: number }[]>> {
-    try {
-      const tags = await blogRepository.getTags(userId);
-      return this.success(tags);
-    } catch (error) {
-      return this.handleError(error, "getBlogTags");
-    }
-  }
-
   async getPublicBlogStats(): Promise<
     ApiResponse<{
       totalPublished: number;
