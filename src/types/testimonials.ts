@@ -10,6 +10,10 @@ export interface TestimonialWithStats extends Testimonial {
   likeCount?: number;
 }
 
+export interface TestimonialWithTags extends Testimonial {
+  tags?: import("./testimonial-tags").TestimonialTag[];
+}
+
 export interface TestimonialFilters {
   featured?: boolean;
   visible?: boolean;
@@ -51,7 +55,7 @@ export interface TestimonialListResponse {
 }
 
 export interface TestimonialCreateRequest {
-  testimonial: NewTestimonial;
+  testimonial: Omit<NewTestimonial, "userId">;
 }
 
 export interface TestimonialUpdateRequest {
