@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { blogService } from "@/server/services";
+import { blogTagService } from "@/server/services";
 import { authMiddleware } from "@/lib/auth-middleware";
 import {
   handleServiceResult,
@@ -8,7 +8,7 @@ import {
   badRequestResponse,
 } from "@/utils/response-helpers";
 
-// GET /api/admin/blog - Get all blog posts for admin
+// GET /api/admin/blog-tags - Get all blog tags for admin
 export const GET = withErrorHandling(async (request: NextRequest) => {
   const authResult = await authMiddleware(request);
   if (!authResult.success) {
@@ -16,42 +16,27 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   }
 
   const { searchParams } = new URL(request.url);
-  const published = searchParams.get("published");
-  const featured = searchParams.get("featured");
   const visible = searchParams.get("visible");
-  const publicOnly = searchParams.get("public");
   const search = searchParams.get("search");
   const limit = searchParams.get("limit");
   const offset = searchParams.get("offset");
-  const sortBy = searchParams.get("sortBy");
-  const sortOrder = searchParams.get("sortOrder");
 
   const filters = {
-    published: published ? published === "true" : undefined,
-    featured: featured ? featured === "true" : undefined,
     visible: visible ? visible === "true" : undefined,
-    public: publicOnly ? publicOnly === "true" : undefined,
     search: search || undefined,
     limit: limit ? parseInt(limit) : undefined,
     offset: offset ? parseInt(offset) : undefined,
-    sortBy:
-      (sortBy as
-        | "title"
-        | "createdAt"
-        | "updatedAt"
-        | "publishedAt"
-        | "viewCount") || "createdAt",
-    sortOrder: (sortOrder as "asc" | "desc") || "desc",
   };
 
-  const result = await blogService.searchBlogPosts(
+  const result = await blogTagService.searchBlogTags(
     filters,
     authResult.userId || undefined
   );
-  return handleServiceResult(result, "Blog posts fetched successfully");
+
+  return handleServiceResult(result, "Blog tags fetched successfully");
 });
 
-// POST /api/admin/blog - Create new blog post
+// POST /api/admin/blog-tags - Create new blog tag
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const authResult = await authMiddleware(request);
   if (!authResult.success) {
@@ -64,16 +49,11 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   const body = await request.json();
 
-  // Handle date conversion for publishedAt
-  const blogPostData = {
-    ...body,
-    publishedAt: body.publishedAt ? new Date(body.publishedAt) : undefined,
-  };
+  if (!body.name || !body.slug) {
+    return badRequestResponse("Name and slug are required");
+  }
 
-  const result = await blogService.createBlogPost(
-    blogPostData,
-    authResult.userId
-  );
+  const result = await blogTagService.createBlogTag(body, authResult.userId);
 
-  return handleServiceResult(result, "Blog post created successfully", 201);
+  return handleServiceResult(result, "Blog tag created successfully", 201);
 });

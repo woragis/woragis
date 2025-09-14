@@ -38,7 +38,14 @@ export const PUT = withErrorHandling(
     }
 
     const { id } = params;
-    const blogPostData = await request.json();
+    const body = await request.json();
+
+    // Handle date conversion for publishedAt
+    const blogPostData = {
+      ...body,
+      publishedAt: body.publishedAt ? new Date(body.publishedAt) : undefined,
+    };
+
     const result = await blogService.updateBlogPost(
       id,
       blogPostData,
