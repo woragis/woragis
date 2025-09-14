@@ -3,6 +3,7 @@ import type {
   Testimonial,
   NewTestimonial,
   TestimonialFilters,
+  TestimonialCreateRequest,
 } from "@/types/testimonials";
 import type { ApiResponse } from "@/types";
 
@@ -32,7 +33,7 @@ export const testimonialApi = {
   },
 
   async createTestimonial(
-    testimonialData: NewTestimonial
+    testimonialData: TestimonialCreateRequest["testimonial"]
   ): Promise<ApiResponse<Testimonial>> {
     return apiClient.post("/admin/testimonials", testimonialData);
   },
