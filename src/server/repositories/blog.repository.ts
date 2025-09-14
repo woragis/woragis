@@ -245,18 +245,6 @@ export class BlogRepository {
       conditions.push(eq(blogPosts.public, filters.public));
     }
 
-    if (filters.category) {
-      conditions.push(eq(blogPosts.category, filters.category));
-    }
-
-    if (filters.tags && filters.tags.length > 0) {
-      // For JSON array search, we'll use a simple LIKE search for now
-      const tagConditions = filters.tags.map((tag) =>
-        like(blogPosts.tags, `%${tag}%`)
-      );
-      conditions.push(sql`${blogPosts.tags} ?| ${filters.tags}`);
-    }
-
     if (filters.search) {
       conditions.push(
         and(
@@ -361,73 +349,6 @@ export class BlogRepository {
       .where(conditions.length > 0 ? and(...conditions) : undefined);
 
     return result[0]?.total || 0;
-  }
-
-  // Get categories and tags
-  async getCategories(
-    userId?: string
-  ): Promise<{ name: string; count: number }[]> {
-    const conditions = [];
-    if (userId) {
-      conditions.push(eq(blogPosts.userId, userId));
-    }
-
-    const result = await db
-      .select({
-        name: blogPosts.category,
-        count: sql<number>`count(*)`,
-      })
-      .from(blogPosts)
-      .where(
-        and(
-          conditions.length > 0 ? and(...conditions) : undefined,
-          sql`${blogPosts.category} IS NOT NULL`
-        )
-      )
-      .groupBy(blogPosts.category);
-
-    return result.map((row) => ({
-      name: row.name || "Uncategorized",
-      count: row.count,
-    }));
-  }
-
-  async getTags(userId?: string): Promise<{ name: string; count: number }[]> {
-    // This is a simplified implementation
-    // In a real app, you might want to normalize tags into a separate table
-    const conditions = [];
-    if (userId) {
-      conditions.push(eq(blogPosts.userId, userId));
-    }
-
-    const result = await db
-      .select({ tags: blogPosts.tags })
-      .from(blogPosts)
-      .where(
-        and(
-          conditions.length > 0 ? and(...conditions) : undefined,
-          sql`${blogPosts.tags} IS NOT NULL`
-        )
-      );
-
-    const tagCounts: { [key: string]: number } = {};
-    result.forEach((row) => {
-      if (row.tags) {
-        try {
-          const tags = JSON.parse(row.tags);
-          tags.forEach((tag: string) => {
-            tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-          });
-        } catch (error) {
-          // Handle invalid JSON
-        }
-      }
-    });
-
-    return Object.entries(tagCounts).map(([name, count]) => ({
-      name,
-      count,
-    }));
   }
 
   async getTotalLikes(userId?: string): Promise<number> {
