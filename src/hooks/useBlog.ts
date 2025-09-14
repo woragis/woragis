@@ -91,7 +91,7 @@ export function useCreateBlogPost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (blogPost: NewBlogPost) => {
+    mutationFn: async (blogPost: Omit<NewBlogPost, "userId">) => {
       const response = await blogApi.createBlogPost(blogPost);
       if (!response.success || !response.data) {
         throw new Error(response.error || "Failed to create blog post");
