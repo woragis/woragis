@@ -3,10 +3,22 @@
     "logo": "</> 开发者",
     "about": "关于我",
     "skills": "技能",
+    "experience": "经验",
     "projects": "项目",
+    "testimonials": "推荐",
+    "blog": "博客",
     "contact": "联系",
     "getInTouch": "联系我"
   },
+  "nav": {
+    "about": "关于我",
+    "skills": "技能",
+    "experience": "经验",
+    "projects": "项目",
+    "contact": "联系"
+  },
+  "logo": "</> 开发者",
+  "getInTouch": "联系我",
   "hero": {
     "greeting": "👋 你好，我是一名程序员",
     "title": "构建数字",
@@ -14,6 +26,8 @@
     "subtitle": "充满激情的全栈开发者，使用现代技术创造创新解决方案。我通过干净的代码和创造性的问题解决将想法变为现实。",
     "viewWork": "查看我的作品",
     "getInTouch": "联系我",
+    "contact": "联系我",
+    "experienceYears": "5+",
     "scrollToExplore": "滚动探索"
   },
   "about": {
@@ -167,6 +181,147 @@
           "通过优化将页面加载时间减少30%",
           "实施可访问性功能，改善WCAG合规性"
         ]
+      }
+    }
+  },
+  "testimonials": {
+    "title": "客户评价",
+    "subtitle": "来自满意客户和同事的推荐",
+    "items": {
+      "client1": {
+        "name": "Sarah Johnson",
+        "role": "产品经理",
+        "company": "TechStart Inc",
+        "content": "与这位开发者合作绝对是一种享受。代码质量非常出色，整个项目过程中的沟通也很优秀。强烈推荐！"
+      },
+      "client2": {
+        "name": "Michael Chen",
+        "role": "首席技术官",
+        "company": "InnovateLab",
+        "content": "技术专长和解决问题的能力都是一流的。提前交付了我们的项目，没有任何bug。我们一定会再次合作。"
+      },
+      "client3": {
+        "name": "Emily Rodriguez",
+        "role": "设计总监",
+        "company": "CreativeStudio",
+        "content": "对细节的关注令人难以置信，能够将复杂的设计转化为美观且功能强大的代码。合作非常顺利，结果超出了预期。"
+      }
+    }
+  },
+  "blog": {
+    "title": "最新文章",
+    "subtitle": "关于Web开发和技术的思想和见解",
+    "viewAllArticles": "查看所有文章",
+    "readMore": "阅读更多",
+    "searchPlaceholder": "搜索文章...",
+    "allCategories": "所有分类",
+    "allTags": "所有标签",
+    "newestFirst": "最新优先",
+    "oldestFirst": "最旧优先",
+    "mostPopular": "最受欢迎",
+    "clearFilters": "清除筛选",
+    "showingResults": "显示 {count} 篇文章",
+    "noArticlesFound": "未找到文章",
+    "noArticlesDescription": "没有文章符合您当前的筛选条件。请尝试调整您的搜索条件。",
+    "backToBlog": "返回博客",
+    "shareArticle": "分享此文章：",
+    "copyLink": "复制链接",
+    "copied": "已复制！",
+    "readTime": "{minutes} 分钟阅读",
+    "views": "{count} 次浏览",
+    "likes": "{count} 个赞",
+    "articleNotFound": "文章未找到",
+    "articleNotFoundDescription": "您要查找的文章不存在或已被删除。",
+    "author": "作者",
+    "publishedOn": "发布于",
+    "updatedOn": "更新于",
+    "items": {
+      "reactBestPractices": {
+        "title": "2024年React最佳实践",
+        "excerpt": "每个React开发者都应该了解的编写可维护和高性能代码的基本模式和实践。",
+        "date": "2024年12月15日",
+        "readTime": "5分钟阅读",
+        "category": "React"
+      },
+      "typescriptTips": {
+        "title": "高级TypeScript技巧",
+        "excerpt": "强大的TypeScript功能，可以帮助您编写更健壮和类型安全的应用程序。",
+        "date": "2024年12月10日",
+        "readTime": "7分钟阅读",
+        "category": "TypeScript"
+      },
+      "nextjsOptimization": {
+        "title": "Next.js性能优化",
+        "excerpt": "学习如何优化您的Next.js应用程序以获得更好的性能和用户体验。",
+        "date": "2024年12月5日",
+        "readTime": "6分钟阅读",
+        "category": "Next.js"
+      }
+    }
+  },
+  "certifications": {
+    "title": "教育与认证",
+    "subtitle": "持续学习和专业发展",
+    "certificationsTitle": "认证",
+    "items": {
+      "aws": {
+        "title": "AWS解决方案架构师",
+        "issuer": "Amazon Web Services",
+        "date": "2023",
+        "credential": "AWS-SAA-2023"
+      },
+      "react": {
+        "title": "React开发者认证",
+        "issuer": "Meta",
+        "date": "2023",
+        "credential": "META-REACT-2023"
+      },
+      "typescript": {
+        "title": "TypeScript基础",
+        "issuer": "Microsoft",
+        "date": "2022",
+        "credential": "MS-TS-2022"
+      },
+      "docker": {
+        "title": "Docker认证助理",
+        "issuer": "Docker Inc",
+        "date": "2022",
+        "credential": "DCA-2022"
+      }
+    }
+  },
+  "education": {
+    "title": "教育",
+    "items": {
+      "computerScience": {
+        "degree": "计算机科学学士",
+        "school": "科技大学",
+        "year": "2015 - 2019",
+        "description": "以优异成绩毕业，专注于软件工程和Web技术"
+      }
+    }
+  },
+  "githubStats": {
+    "title": "GitHub活动",
+    "subtitle": "我的编程之旅和开源贡献",
+    "commits": "提交",
+    "repositories": "仓库",
+    "stars": "获得星标",
+    "contributions": "贡献",
+    "languageDistribution": "语言分布",
+    "recentRepositories": "最近仓库",
+    "contributionGraph": "贡献活动",
+    "graphPlaceholder": "GitHub贡献图将在此处显示",
+    "graphDescription": "这显示了我过去一年的编程活动",
+    "repos": {
+      "portfolio": {
+        "description": "使用Next.js和TypeScript构建的个人作品集网站"
+      },
+      "componentLibrary": {
+        "description": "带有TypeScript支持的可重用React组件库"
+      },
+      "apiBoilerplate": {
+        "description": "带有身份验证的生产就绪Node.js API模板"
       }
     }
   }

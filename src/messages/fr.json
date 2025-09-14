@@ -3,10 +3,22 @@
     "logo": "</> Développeur",
     "about": "À Propos",
     "skills": "Compétences",
+    "experience": "Expérience",
     "projects": "Projets",
+    "testimonials": "Témoignages",
+    "blog": "Blog",
     "contact": "Contact",
     "getInTouch": "Entrer en Contact"
   },
+  "nav": {
+    "about": "À Propos",
+    "skills": "Compétences",
+    "experience": "Expérience",
+    "projects": "Projets",
+    "contact": "Contact"
+  },
+  "logo": "</> Développeur",
+  "getInTouch": "Entrer en Contact",
   "hero": {
     "greeting": "👋 Bonjour, je suis un Programmeur",
     "title": "Créer des Expériences",
@@ -14,6 +26,8 @@
     "subtitle": "Développeur full-stack passionné créant des solutions innovantes avec des technologies modernes. Je transforme les idées en réalité grâce à un code propre et une résolution créative de problèmes.",
     "viewWork": "Voir Mon Travail",
     "getInTouch": "Entrer en Contact",
+    "contact": "Entrer en Contact",
+    "experienceYears": "5+",
     "scrollToExplore": "Faites défiler pour explorer"
   },
   "about": {
@@ -167,6 +181,147 @@
           "Réduit le temps de chargement des pages de 30% grâce à l'optimisation",
           "Implémenté des fonctionnalités d'accessibilité améliorant la conformité WCAG"
         ]
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Ce Que Disent les Clients",
+    "subtitle": "Témoignages de clients satisfaits et collègues",
+    "items": {
+      "client1": {
+        "name": "Sarah Johnson",
+        "role": "Chef de Produit",
+        "company": "TechStart Inc",
+        "content": "Travailler avec ce développeur a été un plaisir absolu. La qualité du code était exceptionnelle et la communication tout au long du projet était remarquable. Hautement recommandé !"
+      },
+      "client2": {
+        "name": "Michael Chen",
+        "role": "CTO",
+        "company": "InnovateLab",
+        "content": "L'expertise technique et les compétences de résolution de problèmes sont de premier plan. A livré notre projet en avance sans aucun bug. Nous travaillerons définitivement ensemble à nouveau."
+      },
+      "client3": {
+        "name": "Emily Rodriguez",
+        "role": "Directrice de Design",
+        "company": "CreativeStudio",
+        "content": "Attention incroyable aux détails et capacité à traduire des designs complexes en code beau et fonctionnel. La collaboration était parfaite et les résultats ont dépassé les attentes."
+      }
+    }
+  },
+  "blog": {
+    "title": "Derniers Articles",
+    "subtitle": "Pensées et idées sur le développement web et la technologie",
+    "viewAllArticles": "Voir Tous les Articles",
+    "readMore": "Lire Plus",
+    "searchPlaceholder": "Rechercher des articles...",
+    "allCategories": "Toutes les Catégories",
+    "allTags": "Tous les Tags",
+    "newestFirst": "Plus Récents en Premier",
+    "oldestFirst": "Plus Anciens en Premier",
+    "mostPopular": "Plus Populaires",
+    "clearFilters": "Effacer les Filtres",
+    "showingResults": "Affichage de {count} article{plural}",
+    "noArticlesFound": "Aucun Article Trouvé",
+    "noArticlesDescription": "Aucun article ne correspond à vos filtres actuels. Essayez d'ajuster vos critères de recherche.",
+    "backToBlog": "Retour au Blog",
+    "shareArticle": "Partager cet article :",
+    "copyLink": "Copier le lien",
+    "copied": "Copié !",
+    "readTime": "{minutes} min de lecture",
+    "views": "{count} vues",
+    "likes": "{count} j'aime",
+    "articleNotFound": "Article Non Trouvé",
+    "articleNotFoundDescription": "L'article que vous recherchez n'existe pas ou a été supprimé.",
+    "author": "Auteur",
+    "publishedOn": "Publié le",
+    "updatedOn": "Mis à jour le",
+    "items": {
+      "reactBestPractices": {
+        "title": "Meilleures Pratiques React pour 2024",
+        "excerpt": "Modèles et pratiques essentielles que tout développeur React doit connaître pour écrire du code maintenable et performant.",
+        "date": "15 Déc, 2024",
+        "readTime": "5 min de lecture",
+        "category": "React"
+      },
+      "typescriptTips": {
+        "title": "Conseils TypeScript Avancés",
+        "excerpt": "Fonctionnalités puissantes de TypeScript qui peuvent vous aider à écrire des applications plus robustes et sûres en types.",
+        "date": "10 Déc, 2024",
+        "readTime": "7 min de lecture",
+        "category": "TypeScript"
+      },
+      "nextjsOptimization": {
+        "title": "Optimisation des Performances Next.js",
+        "excerpt": "Apprenez comment optimiser vos applications Next.js pour de meilleures performances et expérience utilisateur.",
+        "date": "5 Déc, 2024",
+        "readTime": "6 min de lecture",
+        "category": "Next.js"
+      }
+    }
+  },
+  "certifications": {
+    "title": "Éducation et Certifications",
+    "subtitle": "Apprentissage continu et développement professionnel",
+    "certificationsTitle": "Certifications",
+    "items": {
+      "aws": {
+        "title": "Architecte de Solutions AWS",
+        "issuer": "Amazon Web Services",
+        "date": "2023",
+        "credential": "AWS-SAA-2023"
+      },
+      "react": {
+        "title": "Certification Développeur React",
+        "issuer": "Meta",
+        "date": "2023",
+        "credential": "META-REACT-2023"
+      },
+      "typescript": {
+        "title": "Fondamentaux TypeScript",
+        "issuer": "Microsoft",
+        "date": "2022",
+        "credential": "MS-TS-2022"
+      },
+      "docker": {
+        "title": "Associé Certifié Docker",
+        "issuer": "Docker Inc",
+        "date": "2022",
+        "credential": "DCA-2022"
+      }
+    }
+  },
+  "education": {
+    "title": "Éducation",
+    "items": {
+      "computerScience": {
+        "degree": "Licence en Sciences Informatiques",
+        "school": "Université de Technologie",
+        "year": "2015 - 2019",
+        "description": "Diplômé avec mention, se concentrant sur l'ingénierie logicielle et les technologies web"
+      }
+    }
+  },
+  "githubStats": {
+    "title": "Activité GitHub",
+    "subtitle": "Mon parcours de programmation et contributions open source",
+    "commits": "Commits",
+    "repositories": "Dépôts",
+    "stars": "Étoiles Gagnées",
+    "contributions": "Contributions",
+    "languageDistribution": "Distribution des Langages",
+    "recentRepositories": "Dépôts Récents",
+    "contributionGraph": "Activité de Contribution",
+    "graphPlaceholder": "Le graphique de contributions GitHub serait affiché ici",
+    "graphDescription": "Cela montre mon activité de programmation au cours de l'année dernière",
+    "repos": {
+      "portfolio": {
+        "description": "Mon site web de portfolio personnel construit avec Next.js et TypeScript"
+      },
+      "componentLibrary": {
+        "description": "Une bibliothèque de composants React réutilisable avec support TypeScript"
+      },
+      "apiBoilerplate": {
+        "description": "Template d'API Node.js prêt pour la production avec authentification"
       }
     }
   }

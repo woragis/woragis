@@ -3,10 +3,22 @@
     "logo": "</> 開発者",
     "about": "私について",
     "skills": "スキル",
+    "experience": "経験",
     "projects": "プロジェクト",
+    "testimonials": "推薦文",
+    "blog": "ブログ",
     "contact": "お問い合わせ",
     "getInTouch": "お問い合わせ"
   },
+  "nav": {
+    "about": "私について",
+    "skills": "スキル",
+    "experience": "経験",
+    "projects": "プロジェクト",
+    "contact": "お問い合わせ"
+  },
+  "logo": "</> 開発者",
+  "getInTouch": "お問い合わせ",
   "hero": {
     "greeting": "👋 こんにちは、プログラマーです",
     "title": "デジタル体験を",
@@ -14,6 +26,8 @@
     "subtitle": "モダンなテクノロジーで革新的なソリューションを創造する情熱的なフルスタック開発者。クリーンなコードと創造的な問題解決を通じて、アイデアを現実に変えます。",
     "viewWork": "作品を見る",
     "getInTouch": "お問い合わせ",
+    "contact": "お問い合わせ",
+    "experienceYears": "5+",
     "scrollToExplore": "スクロールして探索"
   },
   "about": {
@@ -167,6 +181,147 @@
           "最適化によりページ読み込み時間を30%短縮",
           "WCAG準拠を改善するアクセシビリティ機能を実装"
         ]
+      }
+    }
+  },
+  "testimonials": {
+    "title": "クライアントの声",
+    "subtitle": "満足したクライアントと同僚からの推薦文",
+    "items": {
+      "client1": {
+        "name": "Sarah Johnson",
+        "role": "プロダクトマネージャー",
+        "company": "TechStart Inc",
+        "content": "この開発者と一緒に仕事をするのは本当に楽しかったです。コードの品質は素晴らしく、プロジェクト全体を通じてのコミュニケーションも優秀でした。強くお勧めします！"
+      },
+      "client2": {
+        "name": "Michael Chen",
+        "role": "CTO",
+        "company": "InnovateLab",
+        "content": "技術的な専門知識と問題解決能力は一流です。プロジェクトを予定より早く、バグなしで納品しました。また必ず一緒に仕事をしたいと思います。"
+      },
+      "client3": {
+        "name": "Emily Rodriguez",
+        "role": "デザインディレクター",
+        "company": "CreativeStudio",
+        "content": "細部への信じられないほどの注意と、複雑なデザインを美しく機能的なコードに変換する能力。コラボレーションは完璧で、結果は期待を上回りました。"
+      }
+    }
+  },
+  "blog": {
+    "title": "最新記事",
+    "subtitle": "ウェブ開発とテクノロジーに関する思考と洞察",
+    "viewAllArticles": "すべての記事を見る",
+    "readMore": "続きを読む",
+    "searchPlaceholder": "記事を検索...",
+    "allCategories": "すべてのカテゴリ",
+    "allTags": "すべてのタグ",
+    "newestFirst": "最新順",
+    "oldestFirst": "古い順",
+    "mostPopular": "人気順",
+    "clearFilters": "フィルターをクリア",
+    "showingResults": "{count}件の記事を表示",
+    "noArticlesFound": "記事が見つかりません",
+    "noArticlesDescription": "現在のフィルターに一致する記事がありません。検索条件を調整してみてください。",
+    "backToBlog": "ブログに戻る",
+    "shareArticle": "この記事を共有：",
+    "copyLink": "リンクをコピー",
+    "copied": "コピーしました！",
+    "readTime": "{minutes}分で読める",
+    "views": "{count}回閲覧",
+    "likes": "{count}いいね",
+    "articleNotFound": "記事が見つかりません",
+    "articleNotFoundDescription": "お探しの記事は存在しないか、削除されています。",
+    "author": "著者",
+    "publishedOn": "公開日",
+    "updatedOn": "更新日",
+    "items": {
+      "reactBestPractices": {
+        "title": "2024年のReactベストプラクティス",
+        "excerpt": "保守性とパフォーマンスの高いコードを書くために、すべてのReact開発者が知っておくべき重要なパターンとプラクティス。",
+        "date": "2024年12月15日",
+        "readTime": "5分で読める",
+        "category": "React"
+      },
+      "typescriptTips": {
+        "title": "高度なTypeScriptのヒント",
+        "excerpt": "より堅牢で型安全なアプリケーションを書くのに役立つ強力なTypeScript機能。",
+        "date": "2024年12月10日",
+        "readTime": "7分で読める",
+        "category": "TypeScript"
+      },
+      "nextjsOptimization": {
+        "title": "Next.jsパフォーマンス最適化",
+        "excerpt": "より良いパフォーマンスとユーザー体験のためにNext.jsアプリケーションを最適化する方法を学ぶ。",
+        "date": "2024年12月5日",
+        "readTime": "6分で読める",
+        "category": "Next.js"
+      }
+    }
+  },
+  "certifications": {
+    "title": "教育と認定",
+    "subtitle": "継続的な学習と専門的な発展",
+    "certificationsTitle": "認定",
+    "items": {
+      "aws": {
+        "title": "AWSソリューションアーキテクト",
+        "issuer": "Amazon Web Services",
+        "date": "2023",
+        "credential": "AWS-SAA-2023"
+      },
+      "react": {
+        "title": "React開発者認定",
+        "issuer": "Meta",
+        "date": "2023",
+        "credential": "META-REACT-2023"
+      },
+      "typescript": {
+        "title": "TypeScript基礎",
+        "issuer": "Microsoft",
+        "date": "2022",
+        "credential": "MS-TS-2022"
+      },
+      "docker": {
+        "title": "Docker認定アソシエイト",
+        "issuer": "Docker Inc",
+        "date": "2022",
+        "credential": "DCA-2022"
+      }
+    }
+  },
+  "education": {
+    "title": "教育",
+    "items": {
+      "computerScience": {
+        "degree": "コンピュータサイエンス学士号",
+        "school": "テクノロジー大学",
+        "year": "2015 - 2019",
+        "description": "ソフトウェアエンジニアリングとウェブ技術に焦点を当てて優秀な成績で卒業"
+      }
+    }
+  },
+  "githubStats": {
+    "title": "GitHubアクティビティ",
+    "subtitle": "私のプログラミングの旅とオープンソースへの貢献",
+    "commits": "コミット",
+    "repositories": "リポジトリ",
+    "stars": "獲得スター",
+    "contributions": "貢献",
+    "languageDistribution": "言語分布",
+    "recentRepositories": "最近のリポジトリ",
+    "contributionGraph": "貢献アクティビティ",
+    "graphPlaceholder": "GitHubの貢献グラフがここに表示されます",
+    "graphDescription": "これは過去1年間の私のプログラミングアクティビティを示しています",
+    "repos": {
+      "portfolio": {
+        "description": "Next.jsとTypeScriptで構築された私の個人ポートフォリオウェブサイト"
+      },
+      "componentLibrary": {
+        "description": "TypeScriptサポート付きの再利用可能なReactコンポーネントライブラリ"
+      },
+      "apiBoilerplate": {
+        "description": "認証付きの本番対応Node.js APIテンプレート"
       }
     }
   }

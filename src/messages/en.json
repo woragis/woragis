@@ -10,6 +10,15 @@
     "contact": "Contact",
     "getInTouch": "Get In Touch"
   },
+  "nav": {
+    "about": "About",
+    "skills": "Skills",
+    "experience": "Experience",
+    "projects": "Projects",
+    "contact": "Contact"
+  },
+  "logo": "</> Developer",
+  "getInTouch": "Get In Touch",
   "hero": {
     "greeting": "👋 Hello, I'm a Programmer",
     "title": "Building Digital",
@@ -17,6 +26,7 @@
     "subtitle": "Passionate full-stack developer crafting innovative solutions with modern technologies. I turn ideas into reality through clean code and creative problem-solving.",
     "viewWork": "View My Work",
     "getInTouch": "Get In Touch",
+    "contact": "Get In Touch",
     "downloadResume": "Download Resume",
     "experienceYears": "5+",
     "scrollToExplore": "Scroll to explore"
