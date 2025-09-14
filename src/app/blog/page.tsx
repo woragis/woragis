@@ -18,40 +18,12 @@ import type { BlogPost } from "@/types";
 export default function BlogPage() {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedTag, setSelectedTag] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "popular">(
     "newest"
   );
 
   const { data: allPosts = [], isLoading, error } = usePublicBlogPosts();
-
-  // Extract unique categories and tags
-  const categories = useMemo(() => {
-    const cats = allPosts
-      .map((post) => post.category)
-      .filter(Boolean)
-      .filter((cat, index, arr) => arr.indexOf(cat) === index);
-    return cats;
-  }, [allPosts]);
-
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    allPosts.forEach((post) => {
-      if (post.tags) {
-        try {
-          const parsedTags = JSON.parse(post.tags);
-          if (Array.isArray(parsedTags)) {
-            parsedTags.forEach((tag) => tags.add(tag));
-          }
-        } catch (e) {
-          // Handle invalid JSON
-        }
-      }
-    });
-    return Array.from(tags).sort();
-  }, [allPosts]);
 
   // Filter and sort posts
   const filteredAndSortedPosts = useMemo(() => {
@@ -62,14 +34,7 @@ export default function BlogPage() {
         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
         post.content.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesCategory =
-        !selectedCategory || post.category === selectedCategory;
-
-      const matchesTag =
-        !selectedTag ||
-        (post.tags && JSON.parse(post.tags).includes(selectedTag));
-
-      return matchesSearch && matchesCategory && matchesTag;
+      return matchesSearch;
     });
 
     // Sort posts
@@ -93,7 +58,7 @@ export default function BlogPage() {
     });
 
     return filtered;
-  }, [allPosts, searchTerm, selectedCategory, selectedTag, sortBy]);
+  }, [allPosts, searchTerm, sortBy]);
 
   // Pagination
   const postsPerPage = 9;
@@ -114,8 +79,6 @@ export default function BlogPage() {
 
   const clearFilters = () => {
     setSearchTerm("");
-    setSelectedCategory("");
-    setSelectedTag("");
     setCurrentPage(1);
   };
 
@@ -190,25 +153,13 @@ export default function BlogPage() {
             setSearchTerm(term);
             setCurrentPage(1);
           }}
-          selectedCategory={selectedCategory}
-          onCategoryChange={(category) => {
-            setSelectedCategory(category);
-            setCurrentPage(1);
-          }}
-          selectedTag={selectedTag}
-          onTagChange={(tag) => {
-            setSelectedTag(tag);
-            setCurrentPage(1);
-          }}
           sortBy={sortBy}
           onSortChange={(sort) => {
             setSortBy(sort);
             setCurrentPage(1);
           }}
-          categories={categories}
-          tags={allTags}
           onClearFilters={clearFilters}
-          hasActiveFilters={!!(searchTerm || selectedCategory || selectedTag)}
+          hasActiveFilters={!!searchTerm}
         />
 
         {/* Results Count */}
