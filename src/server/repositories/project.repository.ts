@@ -2,21 +2,18 @@ import { eq, desc, asc, and, like, sql } from "drizzle-orm";
 import { db } from "../db";
 import {
   projects,
-  projectTags,
-  projectCategories,
-  projectLanguages,
+  projectTagAssignments,
   projectFrameworks,
+  projectTags,
+  frameworks,
 } from "../db/schemas";
-import { tags, categories, languages, frameworks } from "../db/schemas";
 import type {
   Project,
   NewProject,
   ProjectOrderUpdate,
   ProjectFilters,
   ProjectWithRelations,
-  Tag,
-  Category,
-  Language,
+  ProjectTag,
   Framework,
 } from "@/types";
 
@@ -222,23 +219,14 @@ export class ProjectRepository {
     const project = await this.findById(id, userId);
     if (!project) return null;
 
-    const [
-      projectTags,
-      projectCategories,
-      projectLanguages,
-      projectFrameworks,
-    ] = await Promise.all([
+    const [projectTags, projectFrameworks] = await Promise.all([
       this.getProjectTags(id),
-      this.getProjectCategories(id),
-      this.getProjectLanguages(id),
       this.getProjectFrameworks(id),
     ]);
 
     return {
       ...project,
       tags: projectTags,
-      categories: projectCategories,
-      languages: projectLanguages,
       frameworks: projectFrameworks,
     };
   }
@@ -249,89 +237,35 @@ export class ProjectRepository {
     const project = await this.findPublicById(id);
     if (!project) return null;
 
-    const [
-      projectTags,
-      projectCategories,
-      projectLanguages,
-      projectFrameworks,
-    ] = await Promise.all([
+    const [projectTags, projectFrameworks] = await Promise.all([
       this.getProjectTags(id),
-      this.getProjectCategories(id),
-      this.getProjectLanguages(id),
       this.getProjectFrameworks(id),
     ]);
 
     return {
       ...project,
       tags: projectTags,
-      categories: projectCategories,
-      languages: projectLanguages,
       frameworks: projectFrameworks,
     };
   }
 
-  async getProjectTags(projectId: string): Promise<Tag[]> {
+  async getProjectTags(projectId: string): Promise<ProjectTag[]> {
     const result = await db
       .select({
-        id: tags.id,
-        userId: tags.userId,
-        name: tags.name,
-        slug: tags.slug,
-        description: tags.description,
-        color: tags.color,
-        visible: tags.visible,
-        createdAt: tags.createdAt,
-        updatedAt: tags.updatedAt,
+        id: projectTags.id,
+        userId: projectTags.userId,
+        name: projectTags.name,
+        slug: projectTags.slug,
+        description: projectTags.description,
+        color: projectTags.color,
+        visible: projectTags.visible,
+        order: projectTags.order,
+        createdAt: projectTags.createdAt,
+        updatedAt: projectTags.updatedAt,
       })
-      .from(projectTags)
-      .innerJoin(tags, eq(projectTags.tagId, tags.id))
-      .where(eq(projectTags.projectId, projectId));
-
-    return result;
-  }
-
-  async getProjectCategories(projectId: string): Promise<Category[]> {
-    const result = await db
-      .select({
-        id: categories.id,
-        userId: categories.userId,
-        name: categories.name,
-        slug: categories.slug,
-        description: categories.description,
-        icon: categories.icon,
-        color: categories.color,
-        order: categories.order,
-        visible: categories.visible,
-        public: categories.public,
-        createdAt: categories.createdAt,
-        updatedAt: categories.updatedAt,
-      })
-      .from(projectCategories)
-      .innerJoin(categories, eq(projectCategories.categoryId, categories.id))
-      .where(eq(projectCategories.projectId, projectId));
-
-    return result;
-  }
-
-  async getProjectLanguages(projectId: string): Promise<Language[]> {
-    const result = await db
-      .select({
-        id: languages.id,
-        userId: languages.userId,
-        name: languages.name,
-        slug: languages.slug,
-        description: languages.description,
-        icon: languages.icon,
-        color: languages.color,
-        website: languages.website,
-        order: languages.order,
-        visible: languages.visible,
-        createdAt: languages.createdAt,
-        updatedAt: languages.updatedAt,
-      })
-      .from(projectLanguages)
-      .innerJoin(languages, eq(projectLanguages.languageId, languages.id))
-      .where(eq(projectLanguages.projectId, projectId));
+      .from(projectTagAssignments)
+      .innerJoin(projectTags, eq(projectTagAssignments.tagId, projectTags.id))
+      .where(eq(projectTagAssignments.projectId, projectId));
 
     return result;
   }
@@ -369,102 +303,28 @@ export class ProjectRepository {
       tagId,
     }));
 
-    await db.insert(projectTags).values(values);
+    await db.insert(projectTagAssignments).values(values);
   }
 
   async removeTag(projectId: string, tagId: string): Promise<void> {
     await db
-      .delete(projectTags)
+      .delete(projectTagAssignments)
       .where(
-        and(eq(projectTags.projectId, projectId), eq(projectTags.tagId, tagId))
+        and(
+          eq(projectTagAssignments.projectId, projectId),
+          eq(projectTagAssignments.tagId, tagId)
+        )
       );
   }
 
   async updateTags(projectId: string, tagIds: string[]): Promise<void> {
     // Remove existing tags
-    await db.delete(projectTags).where(eq(projectTags.projectId, projectId));
+    await db
+      .delete(projectTagAssignments)
+      .where(eq(projectTagAssignments.projectId, projectId));
 
     // Add new tags
     await this.assignTags(projectId, tagIds);
-  }
-
-  // Category relations
-  async assignCategories(
-    projectId: string,
-    categoryIds: string[]
-  ): Promise<void> {
-    if (categoryIds.length === 0) return;
-
-    const values = categoryIds.map((categoryId) => ({
-      projectId,
-      categoryId,
-    }));
-
-    await db.insert(projectCategories).values(values);
-  }
-
-  async removeCategory(projectId: string, categoryId: string): Promise<void> {
-    await db
-      .delete(projectCategories)
-      .where(
-        and(
-          eq(projectCategories.projectId, projectId),
-          eq(projectCategories.categoryId, categoryId)
-        )
-      );
-  }
-
-  async updateCategories(
-    projectId: string,
-    categoryIds: string[]
-  ): Promise<void> {
-    // Remove existing categories
-    await db
-      .delete(projectCategories)
-      .where(eq(projectCategories.projectId, projectId));
-
-    // Add new categories
-    await this.assignCategories(projectId, categoryIds);
-  }
-
-  // Language relations
-  async assignLanguages(
-    projectId: string,
-    languageAssignments: { languageId: string; proficiency?: string }[]
-  ): Promise<void> {
-    if (languageAssignments.length === 0) return;
-
-    const values = languageAssignments.map(({ languageId, proficiency }) => ({
-      projectId,
-      languageId,
-      proficiency,
-    }));
-
-    await db.insert(projectLanguages).values(values);
-  }
-
-  async removeLanguage(projectId: string, languageId: string): Promise<void> {
-    await db
-      .delete(projectLanguages)
-      .where(
-        and(
-          eq(projectLanguages.projectId, projectId),
-          eq(projectLanguages.languageId, languageId)
-        )
-      );
-  }
-
-  async updateLanguages(
-    projectId: string,
-    languageAssignments: { languageId: string; proficiency?: string }[]
-  ): Promise<void> {
-    // Remove existing languages
-    await db
-      .delete(projectLanguages)
-      .where(eq(projectLanguages.projectId, projectId));
-
-    // Add new languages
-    await this.assignLanguages(projectId, languageAssignments);
   }
 
   // Framework relations
