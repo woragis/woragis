@@ -78,6 +78,7 @@ export const RefreshTokenRequestSchema = z.object({
 
 // Type exports
 export type User = z.infer<typeof UserSchema>;
+export type UserWithPassword = User & { passwordHash: string };
 export type UserSession = z.infer<typeof UserSessionSchema>;
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export type LoginCredentials = LoginRequest; // Alias for consistency
@@ -110,11 +111,14 @@ export type UpdateUser = Partial<
     | "firstName"
     | "lastName"
     | "avatar"
+    | "role"
     | "isActive"
     | "emailVerified"
     | "lastLoginAt"
   >
->;
+> & {
+  passwordHash?: string;
+};
 
 export type UpdateUserSession = Partial<
   Pick<UserSession, "isActive" | "expiresAt">
