@@ -6,6 +6,7 @@ export { ThemeToggle } from "./ThemeToggle";
 export { LanguageSwitcher } from "./LanguageSwitcher";
 export { EmptyState } from "./EmptyState";
 export { Breadcrumb } from "./Breadcrumb";
+export { Modal } from "./Modal";
 export { ClientOnly } from "../ClientOnly";
 export * from "./ValorantBackground";
 export { ValorantBackground as GamingBackground } from "./ValorantBackground";
