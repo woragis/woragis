@@ -2,10 +2,16 @@
 export * from "./auth";
 export * from "./projects";
 export * from "./settings";
-export * from "./tags";
-export * from "./categories";
-export * from "./languages";
-export * from "./frameworks";
+export * from "./frameworks"; // Now includes both frameworks and languages
 export * from "./testimonials";
 export * from "./blog";
 export * from "./experience";
+export * from "./about";
+
+// Export tag schemas
+export * from "./blog-tags";
+export * from "./blog-post-tags";
+export * from "./project-tags";
+export * from "./project-tag-assignments";
+export * from "./testimonial-tags";
+export * from "./testimonial-tag-assignments";
