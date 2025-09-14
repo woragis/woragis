@@ -36,6 +36,7 @@ export interface ProjectOrderUpdate {
 // Form types for admin
 export interface ProjectFormData {
   title: string;
+  slug: string;
   description: string;
   longDescription?: string;
   technologies: string[];
