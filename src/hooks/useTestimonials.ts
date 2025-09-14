@@ -5,6 +5,7 @@ import type {
   NewTestimonial,
   TestimonialFilters,
   TestimonialOrderUpdate,
+  TestimonialCreateRequest,
 } from "@/types";
 
 // Query keys
@@ -67,7 +68,9 @@ export function useCreateTestimonial() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (testimonial: NewTestimonial) => {
+    mutationFn: async (
+      testimonial: TestimonialCreateRequest["testimonial"]
+    ) => {
       const response = await testimonialApi.createTestimonial(testimonial);
       if (!response.success || !response.data) {
         throw new Error(response.error || "Failed to create testimonial");
