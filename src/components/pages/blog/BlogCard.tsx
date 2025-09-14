@@ -3,13 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui";
-import { Calendar, Clock, Eye, ArrowRight, Tag } from "lucide-react";
+import { Calendar, Clock, Eye, ArrowRight } from "lucide-react";
 import type { BlogPost } from "@/types";
 
 interface BlogCardProps {
   post: BlogPost;
   showExcerpt?: boolean;
-  showTags?: boolean;
   showMeta?: boolean;
   className?: string;
 }
@@ -17,7 +16,6 @@ interface BlogCardProps {
 export const BlogCard: React.FC<BlogCardProps> = ({
   post,
   showExcerpt = true,
-  showTags = true,
   showMeta = true,
   className = "",
 }) => {
@@ -28,8 +26,6 @@ export const BlogCard: React.FC<BlogCardProps> = ({
       day: "numeric",
     });
   };
-
-  const tags = post.tags ? JSON.parse(post.tags) : [];
 
   return (
     <Card hover className={`flex flex-col h-full overflow-hidden ${className}`}>
@@ -48,11 +44,6 @@ export const BlogCard: React.FC<BlogCardProps> = ({
             </span>
           </div>
         )}
-        <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-medium rounded-full shadow-lg">
-            {post.category || "General"}
-          </span>
-        </div>
       </div>
 
       {/* Content */}
@@ -123,4 +114,3 @@ export const BlogCard: React.FC<BlogCardProps> = ({
     </Card>
   );
 };
-
