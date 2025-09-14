@@ -4,17 +4,30 @@ import { useState } from "react";
 import {
   useProjects,
   useDeleteProject,
+  useCreateProject,
+  useUpdateProject,
   useToggleProjectVisibility,
   useToggleProjectFeatured,
 } from "@/hooks/useProjects";
-import type { ProjectFilters } from "@/types";
+import { Modal } from "@/components/ui";
+import { ProjectForm } from "@/components/pages/admin/ProjectForm";
+import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
+import type { ProjectFilters, Project, NewProject } from "@/types";
 
 export default function ProjectsAdminPage() {
   const [filters, setFilters] = useState<ProjectFilters>({});
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Modal states
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
   const { data: projects, isLoading, error } = useProjects(filters);
   const deleteProject = useDeleteProject();
+  const createProject = useCreateProject();
+  const updateProject = useUpdateProject();
   const toggleVisibility = useToggleProjectVisibility();
   const toggleFeatured = useToggleProjectFeatured();
 
@@ -23,9 +36,52 @@ export default function ProjectsAdminPage() {
     setFilters({ ...filters, search: searchTerm });
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this project?")) {
-      await deleteProject.mutateAsync(id);
+  // Create project
+  const handleCreateProject = async (projectData: NewProject) => {
+    try {
+      await createProject.mutateAsync(projectData);
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      console.error("Failed to create project:", error);
+    }
+  };
+
+  // Edit project
+  const handleEditProject = (project: Project) => {
+    setSelectedProject(project);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateProject = async (projectData: NewProject) => {
+    if (!selectedProject) return;
+
+    try {
+      await updateProject.mutateAsync({
+        id: selectedProject.id,
+        project: projectData,
+      });
+      setIsEditModalOpen(false);
+      setSelectedProject(null);
+    } catch (error) {
+      console.error("Failed to update project:", error);
+    }
+  };
+
+  // Delete project
+  const handleDeleteProject = (project: Project) => {
+    setSelectedProject(project);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedProject) return;
+
+    try {
+      await deleteProject.mutateAsync(selectedProject.id);
+      setIsDeleteModalOpen(false);
+      setSelectedProject(null);
+    } catch (error) {
+      console.error("Failed to delete project:", error);
     }
   };
 
@@ -46,7 +102,10 @@ export default function ProjectsAdminPage() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Projects
         </h1>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
           Add Project
         </button>
       </div>
@@ -162,11 +221,14 @@ export default function ProjectsAdminPage() {
                   >
                     {project.featured ? "Featured" : "Not Featured"}
                   </button>
-                  <button className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm">
+                  <button
+                    onClick={() => handleEditProject(project)}
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm"
+                  >
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(project.id)}
+                    onClick={() => handleDeleteProject(project)}
                     className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm"
                   >
                     Delete
@@ -177,6 +239,57 @@ export default function ProjectsAdminPage() {
           ))}
         </ul>
       </div>
+
+      {/* Create Project Modal */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        title="Create New Project"
+        size="lg"
+      >
+        <ProjectForm
+          onSubmit={handleCreateProject}
+          onCancel={() => setIsCreateModalOpen(false)}
+          isLoading={createProject.isPending}
+        />
+      </Modal>
+
+      {/* Edit Project Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedProject(null);
+        }}
+        title="Edit Project"
+        size="lg"
+      >
+        {selectedProject && (
+          <ProjectForm
+            project={selectedProject}
+            onSubmit={handleUpdateProject}
+            onCancel={() => {
+              setIsEditModalOpen(false);
+              setSelectedProject(null);
+            }}
+            isLoading={updateProject.isPending}
+          />
+        )}
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedProject(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Project"
+        message="Are you sure you want to delete this project? This action cannot be undone."
+        itemName={selectedProject?.title}
+        isLoading={deleteProject.isPending}
+      />
     </div>
   );
 }
