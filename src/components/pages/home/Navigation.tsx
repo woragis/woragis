@@ -86,6 +86,7 @@ export const Navigation: React.FC = () => {
             <Button
               variant="modern"
               size="sm"
+              className="w-48"
               onClick={() => scrollToSection("#contact")}
             >
               {t("getInTouch")}
