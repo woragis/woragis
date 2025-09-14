@@ -27,7 +27,7 @@ export const Hero: React.FC = () => {
       <AbstractShapes />
 
       <Container>
-        <div className="grid lg:grid-cols-2 gap-16 items-center relative z-10">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center relative z-10 py-8 sm:py-12 lg:py-16">
           <div className="text-center lg:text-left">
             <div className="mb-8">
               <div className="inline-block mb-6">
@@ -36,13 +36,13 @@ export const Hero: React.FC = () => {
                   {t("hero.greeting")}
                 </div>
               </div>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 dark:text-white mb-6">
                 <span className="animate-fade-in-up">{t("hero.title")}</span>
                 <span className="block gradient-text animate-fade-in-up-delay">
                   {t("hero.titleHighlight")}
                 </span>
               </h1>
-              <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto lg:mx-0 mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto lg:mx-0 mb-8 leading-relaxed">
                 {t("hero.subtitle")}
               </p>
             </div>
@@ -58,7 +58,7 @@ export const Hero: React.FC = () => {
 
           <div className="flex justify-center lg:justify-end">
             <div className="relative">
-              <div className="w-80 h-80 lg:w-96 lg:h-96 modern-card overflow-hidden hover-lift">
+              <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 modern-card overflow-hidden hover-lift">
                 <img
                   src="/api/placeholder/400/400"
                   alt="Professional headshot"

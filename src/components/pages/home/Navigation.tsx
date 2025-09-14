@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { Button } from "@/components/ui/Button";
 import { CodeIcon } from "@/components/ui/AbstractIcons";
+import { usePathname } from "next/navigation";
 
 export const Navigation: React.FC = () => {
   const { t } = useLanguage();
@@ -36,6 +37,11 @@ export const Navigation: React.FC = () => {
     { name: t("nav.projects"), href: "#projects" },
     { name: t("nav.contact"), href: "#contact" },
   ];
+
+  const pathname = usePathname();
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <nav
