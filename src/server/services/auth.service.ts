@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { AuthRepository } from "../repositories";
 import type {
@@ -10,6 +10,7 @@ import type {
   UpdateProfileRequest,
   AuthResponse,
   User,
+  UserWithPassword,
   UserSession,
   UserRole,
 } from "../../types";
@@ -107,17 +108,21 @@ export class AuthService {
       throw new Error("Username is already taken");
     }
 
+    // Check if this will be the first user
+    const userCount = await this.authRepository.getUsersCount();
+    const isFirstUser = userCount === 0;
+
     // Hash password
     const passwordHash = await this.hashPassword(userData.password);
 
-    // Create user
+    // Create user - first user gets admin role
     const createUserData: CreateUser = {
       email: userData.email,
       username: userData.username,
       passwordHash,
       firstName: userData.firstName,
       lastName: userData.lastName,
-      role: "user" as UserRole,
+      role: isFirstUser ? ("admin" as UserRole) : ("user" as UserRole),
       isActive: true,
       emailVerified: false,
     };
@@ -151,8 +156,11 @@ export class AuthService {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
-      token: accessToken,
-      expiresAt: session.expiresAt,
+      tokens: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresAt: session.expiresAt,
+      },
     };
   }
 
@@ -162,7 +170,9 @@ export class AuthService {
     ipAddress?: string
   ): Promise<AuthResponse> {
     // Find user by email
-    const user = await this.authRepository.getUserByEmail(credentials.email);
+    const user = await this.authRepository.getUserByEmailWithPassword(
+      credentials.email
+    );
     if (!user) {
       throw new Error("Invalid email or password");
     }
@@ -180,6 +190,9 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new Error("Invalid email or password");
     }
+
+    // Ensure first user is admin (for existing users)
+    await this.ensureFirstUserIsAdmin(user.id);
 
     // Update last login
     await this.authRepository.updateUser(user.id, { lastLoginAt: new Date() });
@@ -211,8 +224,11 @@ export class AuthService {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
-      token: accessToken,
-      expiresAt: session.expiresAt,
+      tokens: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresAt: session.expiresAt,
+      },
     };
   }
 
@@ -254,8 +270,11 @@ export class AuthService {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
-      token: accessToken,
-      expiresAt: session.expiresAt,
+      tokens: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresAt: session.expiresAt,
+      },
     };
   }
 
@@ -281,7 +300,7 @@ export class AuthService {
     userId: string,
     passwordData: ChangePasswordRequest
   ): Promise<boolean> {
-    const user = await this.authRepository.getUserById(userId);
+    const user = await this.authRepository.getUserByIdWithPassword(userId);
     if (!user) {
       throw new Error("User not found");
     }
@@ -358,9 +377,7 @@ export class AuthService {
     return await this.authRepository.deleteUser(userId);
   }
 
-  async verifyToken(
-    token: string
-  ): Promise<{
+  async verifyToken(token: string): Promise<{
     userId: string;
     email: string;
     username: string;
@@ -381,5 +398,51 @@ export class AuthService {
 
   async cleanupExpiredSessions(): Promise<number> {
     return await this.authRepository.deleteExpiredSessions();
+  }
+
+  // Admin management methods
+  async ensureFirstUserIsAdmin(userId: string): Promise<void> {
+    const isFirstUser = await this.authRepository.isFirstUser(userId);
+    if (isFirstUser) {
+      const user = await this.authRepository.getUserById(userId);
+      if (user && user.role !== "admin") {
+        await this.authRepository.updateUser(userId, { role: "admin" });
+        console.log(`Promoted first user ${user.email} to admin role`);
+      }
+    }
+  }
+
+  async promoteFirstUserToAdmin(): Promise<boolean> {
+    const firstUser = await this.authRepository.getFirstUser();
+    if (firstUser && firstUser.role !== "admin") {
+      const result = await this.authRepository.updateUser(firstUser.id, {
+        role: "admin",
+      });
+      console.log(`Promoted first user ${firstUser.email} to admin role`);
+      return result !== null;
+    }
+    return false;
+  }
+
+  async initializeAdminUser(): Promise<void> {
+    try {
+      const userCount = await this.authRepository.getUsersCount();
+
+      if (userCount === 0) {
+        console.log(
+          "ℹ️  No users found - first user to register will automatically be admin"
+        );
+        return;
+      }
+
+      const firstUser = await this.authRepository.getFirstUser();
+      if (firstUser && firstUser.role !== "admin") {
+        await this.promoteFirstUserToAdmin();
+      } else if (firstUser) {
+        console.log(`✅ First user ${firstUser.email} is already admin`);
+      }
+    } catch (error) {
+      console.error("❌ Error initializing admin user:", error);
+    }
   }
 }

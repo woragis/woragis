@@ -7,6 +7,7 @@ import type {
   UpdateUser,
   UpdateUserSession,
   User,
+  UserWithPassword,
   UserSession,
 } from "../../types";
 
@@ -22,7 +23,19 @@ export class AuthRepository {
     return user || null;
   }
 
+  async getUserByIdWithPassword(id: string): Promise<UserWithPassword | null> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || null;
+  }
+
   async getUserByEmail(email: string): Promise<User | null> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || null;
+  }
+
+  async getUserByEmailWithPassword(
+    email: string
+  ): Promise<UserWithPassword | null> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || null;
   }
@@ -61,6 +74,20 @@ export class AuthRepository {
   async getUsersCount(): Promise<number> {
     const result = await db.select({ count: users.id }).from(users);
     return result.length;
+  }
+
+  async getFirstUser(): Promise<User | null> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .orderBy(users.createdAt)
+      .limit(1);
+    return user || null;
+  }
+
+  async isFirstUser(userId: string): Promise<boolean> {
+    const firstUser = await this.getFirstUser();
+    return firstUser?.id === userId;
   }
 
   // User session operations
