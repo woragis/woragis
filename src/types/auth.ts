@@ -65,8 +65,11 @@ export const UpdateProfileRequestSchema = z.object({
 // Auth response schemas
 export const AuthResponseSchema = z.object({
   user: UserSchema,
-  token: z.string(),
-  expiresAt: z.date(),
+  tokens: z.object({
+    accessToken: z.string(),
+    refreshToken: z.string(),
+    expiresAt: z.date(),
+  }),
 });
 
 export const RefreshTokenRequestSchema = z.object({
