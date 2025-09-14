@@ -7,9 +7,6 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { projectTags } from "./tags";
-import { projectCategories } from "./categories";
-import { projectLanguages } from "./languages";
 import { projectFrameworks } from "./frameworks";
 import { users } from "./auth";
 
@@ -40,8 +37,5 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
     fields: [projects.userId],
     references: [users.id],
   }),
-  projectTags: many(projectTags),
-  projectCategories: many(projectCategories),
-  projectLanguages: many(projectLanguages),
   projectFrameworks: many(projectFrameworks),
 }));
