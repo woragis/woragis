@@ -47,7 +47,13 @@ export class AboutCoreRepository {
   }
 
   async create(about: NewAboutCore): Promise<AboutCore> {
-    const result = await db.insert(aboutCore).values(about).returning();
+    // Clean up the data - convert empty strings to null for UUID fields
+    const cleanedAbout = { ...about };
+    if (cleanedAbout.currentProfessionId === "") {
+      cleanedAbout.currentProfessionId = null;
+    }
+
+    const result = await db.insert(aboutCore).values(cleanedAbout).returning();
     return result[0];
   }
 
@@ -60,9 +66,16 @@ export class AboutCoreRepository {
     if (userId) {
       conditions.push(eq(aboutCore.userId, userId));
     }
+
+    // Clean up the data - convert empty strings to null for UUID fields
+    const cleanedAbout = { ...about };
+    if (cleanedAbout.currentProfessionId === "") {
+      cleanedAbout.currentProfessionId = null;
+    }
+
     const result = await db
       .update(aboutCore)
-      .set({ ...about, updatedAt: new Date() })
+      .set({ ...cleanedAbout, updatedAt: new Date() })
       .where(and(...conditions))
       .returning();
     return result[0] || null;
