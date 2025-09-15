@@ -36,7 +36,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   return (
     <div
       className={cn(
-        "bg-white dark:bg-gray-800 p-4 rounded-lg shadow animate-fade-in-up transition-all duration-300 hover:shadow-lg",
+        "bg-white dark:bg-gray-800 p-4 rounded-lg shadow animate-fade-in-up transition-all duration-300 hover:shadow-lg mb-6",
         className
       )}
     >
