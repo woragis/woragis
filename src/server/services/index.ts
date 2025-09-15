@@ -13,6 +13,11 @@ import {
   AboutCoreService,
   MusicGenreService,
   LastListenedSongService,
+  AnimeService,
+  BookService,
+  GameService,
+  PoliticalViewService,
+  YoutuberService,
 } from "./about";
 
 // Export all services
@@ -30,6 +35,11 @@ export {
   AboutCoreService,
   MusicGenreService,
   LastListenedSongService,
+  AnimeService,
+  BookService,
+  GameService,
+  PoliticalViewService,
+  YoutuberService,
 };
 
 // Create singleton instances
@@ -48,3 +58,8 @@ export const testimonialTagService = new TestimonialTagService();
 export const aboutCoreService = new AboutCoreService();
 export const musicGenreService = new MusicGenreService();
 export const lastListenedSongService = new LastListenedSongService();
+export const animeService = new AnimeService();
+export const bookService = new BookService();
+export const gameService = new GameService();
+export const politicalViewService = new PoliticalViewService();
+export const youtuberService = new YoutuberService();
