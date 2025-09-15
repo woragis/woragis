@@ -1,12 +1,12 @@
 import { NextRequest } from "next/server";
-import { languageService } from "@/server/services";
+import { frameworkService } from "@/server/services";
 import {
   handleServiceResult,
   withErrorHandling,
   notFoundResponse,
   deletedResponse,
 } from "@/utils/response-helpers";
-import type { NewLanguage } from "@/types";
+import type { NewFramework } from "@/types";
 
 // GET /api/admin/languages/[id] - Get language by ID
 export const GET = withErrorHandling(
@@ -15,7 +15,7 @@ export const GET = withErrorHandling(
     { params }: { params: Promise<{ id: string }> }
   ) => {
     const { id } = await params;
-    const result = await languageService.getLanguageById(id);
+    const result = await frameworkService.getFrameworkById(id);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Language not found");
@@ -33,9 +33,9 @@ export const PUT = withErrorHandling(
   ) => {
     const { id } = await params;
     const body = await request.json();
-    const languageData: Partial<NewLanguage> = body;
+    const languageData: Partial<NewFramework> = { ...body, type: "language" };
 
-    const result = await languageService.updateLanguage(id, languageData);
+    const result = await frameworkService.updateFramework(id, languageData);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Language not found");
@@ -52,7 +52,7 @@ export const DELETE = withErrorHandling(
     { params }: { params: Promise<{ id: string }> }
   ) => {
     const { id } = await params;
-    const result = await languageService.deleteLanguage(id);
+    const result = await frameworkService.deleteFramework(id);
 
     if (!result.success) {
       return notFoundResponse(result.error || "Language not found");
