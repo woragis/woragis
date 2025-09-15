@@ -58,4 +58,10 @@ export const youtuberApi = {
   ): Promise<ApiResponse<Youtuber[]>> {
     return apiClient.get(`/admin/about/youtubers?category=${category}`);
   },
+
+  async toggleYoutuberVisibility(
+    id: string
+  ): Promise<ApiResponse<Youtuber | null>> {
+    return apiClient.put(`/admin/about/youtubers/${id}/toggle-visibility`);
+  },
 };

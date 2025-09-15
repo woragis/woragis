@@ -69,4 +69,8 @@ export const gameApi = {
       startedAt,
     });
   },
+
+  async toggleGameVisibility(id: string): Promise<ApiResponse<Game | null>> {
+    return apiClient.put(`/admin/about/games/${id}/toggle-visibility`);
+  },
 };

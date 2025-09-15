@@ -63,4 +63,8 @@ export const bookApi = {
       startedAt,
     });
   },
+
+  async toggleBookVisibility(id: string): Promise<ApiResponse<Book | null>> {
+    return apiClient.put(`/admin/about/books/${id}/toggle-visibility`);
+  },
 };

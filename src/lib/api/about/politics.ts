@@ -52,4 +52,10 @@ export const politicalViewApi = {
 
     return apiClient.get(`/admin/about/politics?${params.toString()}`);
   },
+
+  async togglePoliticalViewVisibility(
+    id: string
+  ): Promise<ApiResponse<PoliticalView | null>> {
+    return apiClient.put(`/admin/about/politics/${id}/toggle-visibility`);
+  },
 };

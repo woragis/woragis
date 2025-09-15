@@ -61,4 +61,8 @@ export const animeApi = {
       completedAt,
     });
   },
+
+  async toggleAnimeVisibility(id: string): Promise<ApiResponse<Anime | null>> {
+    return apiClient.put(`/admin/about/anime/${id}/toggle-visibility`);
+  },
 };
