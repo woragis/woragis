@@ -3,11 +3,11 @@ import type { Book, NewBook, BookFilters, ApiResponse } from "@/types";
 import { BaseService } from "../base.service";
 
 export class BookService extends BaseService {
-  async getAllBooks(filters?: BookFilters): Promise<ApiResponse<Book[]>> {
+  async getAllBooks(filters?: BookFilters, userId?: string): Promise<ApiResponse<Book[]>> {
     try {
       const books = filters
-        ? await bookRepository.search(filters)
-        : await bookRepository.findAll();
+        ? await bookRepository.search(filters, userId)
+        : await bookRepository.findAll(userId);
       return this.success(books);
     } catch (error) {
       return this.handleError(error, "getAllBooks");
@@ -39,7 +39,7 @@ export class BookService extends BaseService {
     }
   }
 
-  async createBook(bookData: NewBook): Promise<ApiResponse<Book>> {
+  async createBook(bookData: NewBook, userId: string): Promise<ApiResponse<Book>> {
     try {
       const requiredFields: (keyof NewBook)[] = ["title", "author"];
       const validationErrors = this.validateRequired(bookData, requiredFields);
@@ -51,7 +51,8 @@ export class BookService extends BaseService {
         };
       }
 
-      const book = await bookRepository.create(bookData);
+      const bookWithUserId = { ...bookData, userId };
+      const book = await bookRepository.create(bookWithUserId);
       return this.success(book, "Book created successfully");
     } catch (error) {
       return this.handleError(error, "createBook");

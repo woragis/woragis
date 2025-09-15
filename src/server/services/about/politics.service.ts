@@ -9,12 +9,13 @@ import { BaseService } from "../base.service";
 
 export class PoliticalViewService extends BaseService {
   async getAllPoliticalViews(
-    filters?: PoliticalViewFilters
+    filters?: PoliticalViewFilters,
+    userId?: string
   ): Promise<ApiResponse<PoliticalView[]>> {
     try {
       const politicalViews = filters
-        ? await politicalViewRepository.search(filters)
-        : await politicalViewRepository.findAll();
+        ? await politicalViewRepository.search(filters, userId)
+        : await politicalViewRepository.findAll(userId);
       return this.success(politicalViews);
     } catch (error) {
       return this.handleError(error, "getAllPoliticalViews");
@@ -49,10 +50,11 @@ export class PoliticalViewService extends BaseService {
   }
 
   async createPoliticalView(
-    politicalViewData: NewPoliticalView
+    politicalViewData: NewPoliticalView,
+    userId: string
   ): Promise<ApiResponse<PoliticalView>> {
     try {
-      const requiredFields: (keyof NewPoliticalView)[] = ["title"];
+      const requiredFields: (keyof NewPoliticalView)[] = ["personName"];
       const validationErrors = this.validateRequired(
         politicalViewData,
         requiredFields
@@ -65,8 +67,9 @@ export class PoliticalViewService extends BaseService {
         };
       }
 
+      const politicalViewWithUserId = { ...politicalViewData, userId };
       const politicalView = await politicalViewRepository.create(
-        politicalViewData
+        politicalViewWithUserId
       );
       return this.success(politicalView, "Political view created successfully");
     } catch (error) {

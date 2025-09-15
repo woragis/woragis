@@ -9,12 +9,13 @@ import { BaseService } from "../base.service";
 
 export class YoutuberService extends BaseService {
   async getAllYoutubers(
-    filters?: YoutuberFilters
+    filters?: YoutuberFilters,
+    userId?: string
   ): Promise<ApiResponse<Youtuber[]>> {
     try {
       const youtubers = filters
-        ? await youtuberRepository.search(filters)
-        : await youtuberRepository.findAll();
+        ? await youtuberRepository.search(filters, userId)
+        : await youtuberRepository.findAll(userId);
       return this.success(youtubers);
     } catch (error) {
       return this.handleError(error, "getAllYoutubers");
@@ -47,10 +48,11 @@ export class YoutuberService extends BaseService {
   }
 
   async createYoutuber(
-    youtuberData: NewYoutuber
+    youtuberData: NewYoutuber,
+    userId: string
   ): Promise<ApiResponse<Youtuber>> {
     try {
-      const requiredFields: (keyof NewYoutuber)[] = ["name"];
+      const requiredFields: (keyof NewYoutuber)[] = ["channelName"];
       const validationErrors = this.validateRequired(
         youtuberData,
         requiredFields
@@ -63,7 +65,8 @@ export class YoutuberService extends BaseService {
         };
       }
 
-      const youtuber = await youtuberRepository.create(youtuberData);
+      const youtuberWithUserId = { ...youtuberData, userId };
+      const youtuber = await youtuberRepository.create(youtuberWithUserId);
       return this.success(youtuber, "Youtuber created successfully");
     } catch (error) {
       return this.handleError(error, "createYoutuber");

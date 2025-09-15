@@ -3,11 +3,11 @@ import type { Anime, NewAnime, AnimeFilters, ApiResponse } from "@/types";
 import { BaseService } from "../base.service";
 
 export class AnimeService extends BaseService {
-  async getAllAnime(filters?: AnimeFilters): Promise<ApiResponse<Anime[]>> {
+  async getAllAnime(filters?: AnimeFilters, userId?: string): Promise<ApiResponse<Anime[]>> {
     try {
       const anime = filters
-        ? await animeRepository.search(filters)
-        : await animeRepository.findAll();
+        ? await animeRepository.search(filters, userId)
+        : await animeRepository.findAll(userId);
       return this.success(anime);
     } catch (error) {
       return this.handleError(error, "getAllAnime");
@@ -39,7 +39,7 @@ export class AnimeService extends BaseService {
     }
   }
 
-  async createAnime(animeData: NewAnime): Promise<ApiResponse<Anime>> {
+  async createAnime(animeData: NewAnime, userId: string): Promise<ApiResponse<Anime>> {
     try {
       const requiredFields: (keyof NewAnime)[] = ["title"];
       const validationErrors = this.validateRequired(animeData, requiredFields);
@@ -51,7 +51,8 @@ export class AnimeService extends BaseService {
         };
       }
 
-      const anime = await animeRepository.create(animeData);
+      const animeWithUserId = { ...animeData, userId };
+      const anime = await animeRepository.create(animeWithUserId);
       return this.success(anime, "Anime created successfully");
     } catch (error) {
       return this.handleError(error, "createAnime");

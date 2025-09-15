@@ -3,11 +3,11 @@ import type { Game, NewGame, GameFilters, ApiResponse } from "@/types";
 import { BaseService } from "../base.service";
 
 export class GameService extends BaseService {
-  async getAllGames(filters?: GameFilters): Promise<ApiResponse<Game[]>> {
+  async getAllGames(filters?: GameFilters, userId?: string): Promise<ApiResponse<Game[]>> {
     try {
       const games = filters
-        ? await gameRepository.search(filters)
-        : await gameRepository.findAll();
+        ? await gameRepository.search(filters, userId)
+        : await gameRepository.findAll(userId);
       return this.success(games);
     } catch (error) {
       return this.handleError(error, "getAllGames");
@@ -39,7 +39,7 @@ export class GameService extends BaseService {
     }
   }
 
-  async createGame(gameData: NewGame): Promise<ApiResponse<Game>> {
+  async createGame(gameData: NewGame, userId: string): Promise<ApiResponse<Game>> {
     try {
       const requiredFields: (keyof NewGame)[] = ["title"];
       const validationErrors = this.validateRequired(gameData, requiredFields);
@@ -51,7 +51,8 @@ export class GameService extends BaseService {
         };
       }
 
-      const game = await gameRepository.create(gameData);
+      const gameWithUserId = { ...gameData, userId };
+      const game = await gameRepository.create(gameWithUserId);
       return this.success(game, "Game created successfully");
     } catch (error) {
       return this.handleError(error, "createGame");
