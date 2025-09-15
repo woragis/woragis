@@ -7,7 +7,16 @@ import {
   useUpdateTestimonial,
   useDeleteTestimonial,
 } from "@/hooks/useTestimonials";
-import { Section, Container, Card, Button, EmptyState } from "@/components/ui";
+import { useTestimonialTags } from "@/hooks/useTestimonialTags";
+import {
+  Section,
+  Container,
+  Card,
+  Button,
+  EmptyState,
+  Modal,
+} from "@/components/ui";
+import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import {
   Plus,
   Search,
@@ -17,17 +26,23 @@ import {
   EyeOff,
   Star,
   StarOff,
+  Tag,
+  X,
 } from "lucide-react";
 import type {
   Testimonial,
   TestimonialFilters,
   TestimonialFormData,
 } from "@/types";
+import type { TestimonialTag } from "@/types/testimonial-tags";
 
 export default function TestimonialsPage() {
   const [filters, setFilters] = useState<TestimonialFilters>({});
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTestimonial, setEditingTestimonial] =
+    useState<Testimonial | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedTestimonial, setSelectedTestimonial] =
     useState<Testimonial | null>(null);
   const [formData, setFormData] = useState<TestimonialFormData>({
     name: "",
@@ -41,12 +56,14 @@ export default function TestimonialsPage() {
     visible: true,
     public: true,
   });
+  const [selectedTags, setSelectedTags] = useState<TestimonialTag[]>([]);
 
   const {
     data: testimonials = [],
     isLoading,
     error,
   } = useTestimonials(filters);
+  const { data: availableTags = [] } = useTestimonialTags({ visible: true });
   const createTestimonial = useCreateTestimonial();
   const updateTestimonial = useUpdateTestimonial();
   const deleteTestimonial = useDeleteTestimonial();
@@ -70,6 +87,7 @@ export default function TestimonialsPage() {
       visible: true,
       public: true,
     });
+    setSelectedTags([]);
     setIsFormOpen(true);
   };
 
@@ -82,12 +100,24 @@ export default function TestimonialsPage() {
       content: testimonial.content,
       avatar: testimonial.avatar || "",
       rating: testimonial.rating,
-      featured: testimonial.featured,
+      featured: testimonial.featured || false,
       order: testimonial.order,
-      visible: testimonial.visible,
-      public: testimonial.public,
+      visible: testimonial.visible || true,
+      public: testimonial.public || true,
     });
+    // TODO: Load existing tags for this testimonial
+    setSelectedTags([]);
     setIsFormOpen(true);
+  };
+
+  const handleAddTag = (tag: TestimonialTag) => {
+    if (!selectedTags.find((t) => t.id === tag.id)) {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  const handleRemoveTag = (tagId: string) => {
+    setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,7 +130,7 @@ export default function TestimonialsPage() {
           testimonial: formData,
         });
       } else {
-        await createTestimonial.mutateAsync(formData);
+        await createTestimonial.mutateAsync(formData as any);
       }
       setIsFormOpen(false);
       setEditingTestimonial(null);
@@ -109,13 +139,20 @@ export default function TestimonialsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this testimonial?")) {
-      try {
-        await deleteTestimonial.mutateAsync(id);
-      } catch (error) {
-        console.error("Error deleting testimonial:", error);
-      }
+  const handleDelete = (testimonial: Testimonial) => {
+    setSelectedTestimonial(testimonial);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedTestimonial) return;
+
+    try {
+      await deleteTestimonial.mutateAsync(selectedTestimonial.id);
+      setIsDeleteModalOpen(false);
+      setSelectedTestimonial(null);
+    } catch (error) {
+      console.error("Error deleting testimonial:", error);
     }
   };
 
@@ -175,9 +212,19 @@ export default function TestimonialsPage() {
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Testimonials
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
             Manage client testimonials and reviews
           </p>
+          <div className="flex justify-center gap-4">
+            <Button
+              variant="outline"
+              onClick={() => window.open("/admin/testimonials/tags", "_blank")}
+              className="flex items-center gap-2"
+            >
+              <Tag className="w-4 h-4" />
+              Manage Tags
+            </Button>
+          </div>
         </div>
 
         {/* Search and Filter */}
@@ -284,7 +331,7 @@ export default function TestimonialsPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDelete(testimonial.id)}
+                        onClick={() => handleDelete(testimonial)}
                         className="text-red-600 hover:text-red-700"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -429,6 +476,65 @@ export default function TestimonialsPage() {
                     />
                   </div>
 
+                  {/* Testimonial Tags */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Testimonial Tags
+                    </label>
+
+                    {/* Selected Tags */}
+                    {selectedTags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {selectedTags.map((tag) => (
+                          <span
+                            key={tag.id}
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white"
+                            style={{ backgroundColor: tag.color || "#F59E0B" }}
+                          >
+                            {tag.name}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveTag(tag.id)}
+                              className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Available Tags */}
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Available tags:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {availableTags
+                          .filter(
+                            (tag: TestimonialTag) =>
+                              !selectedTags.find((t) => t.id === tag.id)
+                          )
+                          .map((tag: TestimonialTag) => (
+                            <button
+                              key={tag.id}
+                              type="button"
+                              onClick={() => handleAddTag(tag)}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                            >
+                              <div
+                                className="w-2 h-2 rounded-full"
+                                style={{
+                                  backgroundColor: tag.color || "#F59E0B",
+                                }}
+                              />
+                              {tag.name}
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="grid md:grid-cols-3 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -530,6 +636,20 @@ export default function TestimonialsPage() {
             </Card>
           </div>
         )}
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setSelectedTestimonial(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          title="Delete Testimonial"
+          message="Are you sure you want to delete this testimonial? This action cannot be undone."
+          itemName={selectedTestimonial?.name}
+          isLoading={deleteTestimonial.isPending}
+        />
       </Container>
     </div>
   );
