@@ -6,11 +6,11 @@ import { useAuth } from "@/stores/auth-store";
 import { LoginForm } from "@/components/pages/auth/LoginForm";
 
 export default function AdminLoginPage() {
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { isAuthenticated, user, isLoading, isInitialized } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (isInitialized && !isLoading && isAuthenticated) {
       console.log("Login redirect - User:", user);
       console.log("Login redirect - User role:", user?.role);
       if (user?.role === "admin") {
@@ -21,10 +21,10 @@ export default function AdminLoginPage() {
         router.push("/");
       }
     }
-  }, [isAuthenticated, user, isLoading, router]);
+  }, [isAuthenticated, user, isLoading, isInitialized, router]);
 
   // Show loading while checking authentication
-  if (isLoading) {
+  if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
