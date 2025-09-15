@@ -24,6 +24,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     return handleAuthError("Unauthorized");
   }
 
+  if (!authResult.userId) {
+    return handleAuthError("User ID not found");
+  }
+
   const body = await request.json();
   const experienceData: NewExperience = {
     title: body.title,
@@ -35,9 +39,12 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     technologies: body.technologies || [],
     icon: body.icon || "💼",
     order: body.order || 0,
-    isActive: body.isActive ? "true" : "false",
+    visible: body.visible !== undefined ? body.visible : true,
   };
 
-  const result = await experienceService.createExperience(experienceData);
+  const result = await experienceService.createExperience(
+    experienceData,
+    authResult.userId
+  );
   return handleServiceResult(result, "Experience created successfully", 201);
 });

@@ -56,7 +56,7 @@ export const PUT = withErrorHandling(
       technologies: body.technologies,
       icon: body.icon,
       order: body.order,
-      isActive: body.isActive ? "true" : "false",
+      visible: body.visible !== undefined ? body.visible : undefined,
     };
 
     const experience = await experienceService.updateExperience(id, updateData);
