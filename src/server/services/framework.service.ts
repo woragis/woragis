@@ -3,6 +3,7 @@ import type {
   Framework,
   NewFramework,
   FrameworkFilters,
+  FrameworkType,
   ApiResponse,
 } from "@/types";
 import { BaseService } from "./base.service";
@@ -61,7 +62,8 @@ export class FrameworkService extends BaseService {
   }
 
   async createFramework(
-    frameworkData: NewFramework
+    frameworkData: NewFramework,
+    userId: string
   ): Promise<ApiResponse<Framework>> {
     try {
       const requiredFields: (keyof NewFramework)[] = ["name", "slug"];
@@ -77,7 +79,9 @@ export class FrameworkService extends BaseService {
         };
       }
 
-      const framework = await frameworkRepository.create(frameworkData);
+      // Add userId to framework data
+      const frameworkWithUser = { ...frameworkData, userId };
+      const framework = await frameworkRepository.create(frameworkWithUser);
       return this.success(framework, "Framework created successfully");
     } catch (error) {
       return this.handleError(error, "createFramework");
@@ -224,5 +228,37 @@ export class FrameworkService extends BaseService {
     } catch (error) {
       return this.handleError(error, "updateFrameworkOrder");
     }
+  }
+
+  // Type-specific methods
+  async getFrameworksByType(
+    type: FrameworkType
+  ): Promise<ApiResponse<Framework[]>> {
+    try {
+      const frameworks = await frameworkRepository.findByType(type);
+      return this.success(frameworks);
+    } catch (error) {
+      return this.handleError(error, "getFrameworksByType");
+    }
+  }
+
+  async getVisibleFrameworksByType(
+    type: FrameworkType
+  ): Promise<ApiResponse<Framework[]>> {
+    try {
+      const frameworks = await frameworkRepository.findVisibleByType(type);
+      return this.success(frameworks);
+    } catch (error) {
+      return this.handleError(error, "getVisibleFrameworksByType");
+    }
+  }
+
+  // Legacy methods for backward compatibility
+  async getAllLanguages(): Promise<ApiResponse<Framework[]>> {
+    return this.getFrameworksByType("language");
+  }
+
+  async getVisibleLanguages(): Promise<ApiResponse<Framework[]>> {
+    return this.getVisibleFrameworksByType("language");
   }
 }
