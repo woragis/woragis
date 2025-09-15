@@ -43,6 +43,7 @@ export interface AuthState {
   tokens: AuthTokens | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitialized: boolean; // New field to track if auth has been initialized
   error: string | null;
 
   // Actions
@@ -55,6 +56,7 @@ export interface AuthState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   checkAuth: () => Promise<void>;
+  setInitialized: (initialized: boolean) => void;
 }
 
 // Token utilities
@@ -114,6 +116,7 @@ export const useAuthStore = create<AuthState>()(
       tokens: null,
       isAuthenticated: false,
       isLoading: false,
+      isInitialized: false,
       error: null,
 
       // Actions
@@ -320,6 +323,10 @@ export const useAuthStore = create<AuthState>()(
         set({ error });
       },
 
+      setInitialized: (initialized: boolean) => {
+        set({ isInitialized: initialized });
+      },
+
       checkAuth: async () => {
         const storedTokens = getStoredTokens();
 
@@ -329,6 +336,7 @@ export const useAuthStore = create<AuthState>()(
             tokens: null,
             isAuthenticated: false,
             isLoading: false,
+            isInitialized: true,
           });
           return;
         }
@@ -364,6 +372,7 @@ export const useAuthStore = create<AuthState>()(
               tokens: storedTokens,
               isAuthenticated: true,
               isLoading: false,
+              isInitialized: true,
               error: null,
             });
           } else {
@@ -376,6 +385,7 @@ export const useAuthStore = create<AuthState>()(
             tokens: null,
             isAuthenticated: false,
             isLoading: false,
+            isInitialized: true,
             error: null,
           });
           clearStoredTokens();
@@ -389,6 +399,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         tokens: state.tokens,
         isAuthenticated: state.isAuthenticated,
+        isInitialized: state.isInitialized,
       }),
     }
   )
@@ -401,6 +412,7 @@ export const useAuth = () => {
     user: store.user,
     isAuthenticated: store.isAuthenticated,
     isLoading: store.isLoading,
+    isInitialized: store.isInitialized,
     error: store.error,
     login: store.login,
     logout: store.logout,
@@ -421,5 +433,6 @@ export const useAuthActions = () => {
     setLoading: store.setLoading,
     setError: store.setError,
     checkAuth: store.checkAuth,
+    setInitialized: store.setInitialized,
   };
 };
