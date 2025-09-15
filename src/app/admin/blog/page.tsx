@@ -7,7 +7,16 @@ import {
   useUpdateBlogPost,
   useDeleteBlogPost,
 } from "@/hooks/useBlog";
-import { Section, Container, Card, Button, EmptyState } from "@/components/ui";
+import { useBlogTags } from "@/hooks/useBlogTags";
+import {
+  Section,
+  Container,
+  Card,
+  Button,
+  EmptyState,
+  Modal,
+} from "@/components/ui";
+import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import {
   Plus,
   Search,
@@ -18,24 +27,28 @@ import {
   Star,
   StarOff,
   Globe,
-  GlobeOff,
   Calendar,
   Clock,
+  Tag,
+  X,
 } from "lucide-react";
 import type { BlogPost, BlogPostFilters, BlogPostFormData } from "@/types";
+import type { BlogTag } from "@/types/blog-tags";
 
 export default function BlogPage() {
   const [filters, setFilters] = useState<BlogPostFilters>({});
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBlogPost, setEditingBlogPost] = useState<BlogPost | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedBlogPost, setSelectedBlogPost] = useState<BlogPost | null>(
+    null
+  );
   const [formData, setFormData] = useState<BlogPostFormData>({
     title: "",
     slug: "",
     excerpt: "",
     content: "",
     featuredImage: "",
-    tags: [],
-    category: "",
     readingTime: 0,
     featured: false,
     published: false,
@@ -44,8 +57,10 @@ export default function BlogPage() {
     visible: true,
     public: true,
   });
+  const [selectedTags, setSelectedTags] = useState<BlogTag[]>([]);
 
   const { data: blogPosts = [], isLoading, error } = useBlogPosts(filters);
+  const { data: availableTags = [] } = useBlogTags({ visible: true });
   const createBlogPost = useCreateBlogPost();
   const updateBlogPost = useUpdateBlogPost();
   const deleteBlogPost = useDeleteBlogPost();
@@ -63,8 +78,6 @@ export default function BlogPage() {
       excerpt: "",
       content: "",
       featuredImage: "",
-      tags: [],
-      category: "",
       readingTime: 0,
       featured: false,
       published: false,
@@ -73,6 +86,7 @@ export default function BlogPage() {
       visible: true,
       public: true,
     });
+    setSelectedTags([]);
     setIsFormOpen(true);
   };
 
@@ -84,19 +98,29 @@ export default function BlogPage() {
       excerpt: blogPost.excerpt,
       content: blogPost.content,
       featuredImage: blogPost.featuredImage || "",
-      tags: blogPost.tags ? JSON.parse(blogPost.tags) : [],
-      category: blogPost.category || "",
       readingTime: blogPost.readingTime || 0,
-      featured: blogPost.featured,
-      published: blogPost.published,
+      featured: blogPost.featured || false,
+      published: blogPost.published || false,
       publishedAt: blogPost.publishedAt
         ? new Date(blogPost.publishedAt)
         : undefined,
       order: blogPost.order,
-      visible: blogPost.visible,
-      public: blogPost.public,
+      visible: blogPost.visible || true,
+      public: blogPost.public || true,
     });
+    // TODO: Load existing tags for this blog post
+    setSelectedTags([]);
     setIsFormOpen(true);
+  };
+
+  const handleAddTag = (tag: BlogTag) => {
+    if (!selectedTags.find((t) => t.id === tag.id)) {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  const handleRemoveTag = (tagId: string) => {
+    setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,7 +129,6 @@ export default function BlogPage() {
     try {
       const submitData = {
         ...formData,
-        tags: JSON.stringify(formData.tags),
         publishedAt: formData.publishedAt || null,
       };
 
@@ -124,13 +147,20 @@ export default function BlogPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this blog post?")) {
-      try {
-        await deleteBlogPost.mutateAsync(id);
-      } catch (error) {
-        console.error("Error deleting blog post:", error);
-      }
+  const handleDelete = (blogPost: BlogPost) => {
+    setSelectedBlogPost(blogPost);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedBlogPost) return;
+
+    try {
+      await deleteBlogPost.mutateAsync(selectedBlogPost.id);
+      setIsDeleteModalOpen(false);
+      setSelectedBlogPost(null);
+    } catch (error) {
+      console.error("Error deleting blog post:", error);
     }
   };
 
@@ -193,9 +223,19 @@ export default function BlogPage() {
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Blog Posts
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
             Manage your blog posts and articles
           </p>
+          <div className="flex justify-center gap-4">
+            <Button
+              variant="outline"
+              onClick={() => window.open("/admin/blog/tags", "_blank")}
+              className="flex items-center gap-2"
+            >
+              <Tag className="w-4 h-4" />
+              Manage Tags
+            </Button>
+          </div>
         </div>
 
         {/* Search and Filter */}
@@ -302,11 +342,6 @@ export default function BlogPage() {
                       </span>
                     </div>
                   )}
-                  <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-medium rounded-full shadow-lg">
-                      {post.category || "General"}
-                    </span>
-                  </div>
                   <div className="absolute top-4 right-4 flex space-x-2">
                     <Button
                       size="sm"
@@ -319,7 +354,7 @@ export default function BlogPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleDelete(post.id)}
+                      onClick={() => handleDelete(post)}
                       className="bg-white dark:bg-gray-800 text-red-600 hover:text-red-700"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -344,7 +379,9 @@ export default function BlogPage() {
                     <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
-                        {formatDate(post.publishedAt || post.createdAt)}
+                        {formatDate(
+                          post.publishedAt || post.createdAt || new Date()
+                        )}
                       </div>
                       <div className="flex items-center">
                         <Eye className="w-4 h-4 mr-1" />
@@ -445,19 +482,6 @@ export default function BlogPage() {
                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Category
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.category}
-                        onChange={(e) =>
-                          setFormData({ ...formData, category: e.target.value })
-                        }
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                      />
-                    </div>
                   </div>
 
                   <div>
@@ -507,25 +531,63 @@ export default function BlogPage() {
                     />
                   </div>
 
+                  {/* Tags Selection */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Tags (comma-separated)
+                      Tags
                     </label>
-                    <input
-                      type="text"
-                      value={formData.tags.join(", ")}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          tags: e.target.value
-                            .split(",")
-                            .map((tag) => tag.trim())
-                            .filter(Boolean),
-                        })
-                      }
-                      placeholder="react, javascript, tutorial"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                    />
+
+                    {/* Selected Tags */}
+                    {selectedTags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {selectedTags.map((tag) => (
+                          <span
+                            key={tag.id}
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white"
+                            style={{ backgroundColor: tag.color || "#3B82F6" }}
+                          >
+                            {tag.name}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveTag(tag.id)}
+                              className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Available Tags */}
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Available tags:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {availableTags
+                          .filter(
+                            (tag: BlogTag) =>
+                              !selectedTags.find((t) => t.id === tag.id)
+                          )
+                          .map((tag: BlogTag) => (
+                            <button
+                              key={tag.id}
+                              type="button"
+                              onClick={() => handleAddTag(tag)}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                            >
+                              <div
+                                className="w-2 h-2 rounded-full"
+                                style={{
+                                  backgroundColor: tag.color || "#3B82F6",
+                                }}
+                              />
+                              {tag.name}
+                            </button>
+                          ))}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="grid md:grid-cols-3 gap-6">
@@ -645,6 +707,20 @@ export default function BlogPage() {
             </Card>
           </div>
         )}
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setSelectedBlogPost(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          title="Delete Blog Post"
+          message="Are you sure you want to delete this blog post? This action cannot be undone."
+          itemName={selectedBlogPost?.title}
+          isLoading={deleteBlogPost.isPending}
+        />
       </Container>
     </div>
   );
