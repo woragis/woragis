@@ -6,12 +6,6 @@ import type {
   ProjectOrderUpdate,
   ProjectWithRelations,
 } from "@/types/projects";
-import type {
-  Category,
-  NewCategory,
-  CategoryFilters,
-} from "@/types/categories";
-import type { Tag, NewTag, TagFilters } from "@/types/tags";
 import type { Language, NewLanguage, LanguageFilters } from "@/types/languages";
 import type {
   Framework,
@@ -98,21 +92,6 @@ export class ProjectApiService {
   }
 
   // Project relations
-  async updateProjectTags(
-    projectId: string,
-    tagIds: string[]
-  ): Promise<ApiResponse<void>> {
-    return apiClient.post(`/admin/projects/${projectId}/tags`, { tagIds });
-  }
-
-  async updateProjectCategories(
-    projectId: string,
-    categoryIds: string[]
-  ): Promise<ApiResponse<void>> {
-    return apiClient.post(`/admin/projects/${projectId}/categories`, {
-      categoryIds,
-    });
-  }
 
   async updateProjectLanguages(
     projectId: string,
@@ -134,134 +113,6 @@ export class ProjectApiService {
     return apiClient.post(`/admin/projects/${projectId}/frameworks`, {
       frameworkAssignments,
     });
-  }
-}
-
-// Category API
-export class CategoryApiService {
-  async getAllCategories(): Promise<ApiResponse<Category[]>> {
-    return apiClient.get("/admin/categories");
-  }
-
-  async getVisibleCategories(): Promise<ApiResponse<Category[]>> {
-    return apiClient.get("/categories");
-  }
-
-  async getCategoryById(id: string): Promise<ApiResponse<Category | null>> {
-    return apiClient.get(`/admin/categories/${id}`);
-  }
-
-  async getCategoryBySlug(slug: string): Promise<ApiResponse<Category | null>> {
-    return apiClient.get(`/categories/${slug}`);
-  }
-
-  async createCategory(
-    categoryData: NewCategory
-  ): Promise<ApiResponse<Category>> {
-    return apiClient.post("/admin/categories", categoryData);
-  }
-
-  async updateCategory(
-    id: string,
-    categoryData: Partial<NewCategory>
-  ): Promise<ApiResponse<Category | null>> {
-    return apiClient.put(`/admin/categories/${id}`, categoryData);
-  }
-
-  async deleteCategory(id: string): Promise<ApiResponse<void>> {
-    return apiClient.delete(`/admin/categories/${id}`);
-  }
-
-  async searchCategories(
-    filters: CategoryFilters
-  ): Promise<ApiResponse<Category[]>> {
-    const params = new URLSearchParams();
-
-    if (filters.visible !== undefined)
-      params.append("visible", filters.visible.toString());
-    if (filters.search) params.append("search", filters.search);
-    if (filters.limit) params.append("limit", filters.limit.toString());
-    if (filters.offset) params.append("offset", filters.offset.toString());
-
-    return apiClient.get(`/admin/categories?${params.toString()}`);
-  }
-
-  async getCategoryWithProjectCount(
-    id: string
-  ): Promise<ApiResponse<{ category: Category; projectCount: number } | null>> {
-    return apiClient.get(`/admin/categories/${id}/project-count`);
-  }
-
-  async getPopularCategories(
-    limit?: number
-  ): Promise<ApiResponse<Array<{ category: Category; projectCount: number }>>> {
-    const params = limit ? `?limit=${limit}` : "";
-    return apiClient.get(`/admin/categories/popular${params}`);
-  }
-
-  async updateCategoryOrder(
-    categoryOrders: { id: string; order: number }[]
-  ): Promise<ApiResponse<void>> {
-    return apiClient.post("/admin/categories/order", { categoryOrders });
-  }
-}
-
-// Tag API
-export class TagApiService {
-  async getAllTags(): Promise<ApiResponse<Tag[]>> {
-    return apiClient.get("/admin/tags");
-  }
-
-  async getVisibleTags(): Promise<ApiResponse<Tag[]>> {
-    return apiClient.get("/tags");
-  }
-
-  async getTagById(id: string): Promise<ApiResponse<Tag | null>> {
-    return apiClient.get(`/admin/tags/${id}`);
-  }
-
-  async getTagBySlug(slug: string): Promise<ApiResponse<Tag | null>> {
-    return apiClient.get(`/tags/${slug}`);
-  }
-
-  async createTag(tagData: NewTag): Promise<ApiResponse<Tag>> {
-    return apiClient.post("/admin/tags", tagData);
-  }
-
-  async updateTag(
-    id: string,
-    tagData: Partial<NewTag>
-  ): Promise<ApiResponse<Tag | null>> {
-    return apiClient.put(`/admin/tags/${id}`, tagData);
-  }
-
-  async deleteTag(id: string): Promise<ApiResponse<void>> {
-    return apiClient.delete(`/admin/tags/${id}`);
-  }
-
-  async searchTags(filters: TagFilters): Promise<ApiResponse<Tag[]>> {
-    const params = new URLSearchParams();
-
-    if (filters.visible !== undefined)
-      params.append("visible", filters.visible.toString());
-    if (filters.search) params.append("search", filters.search);
-    if (filters.limit) params.append("limit", filters.limit.toString());
-    if (filters.offset) params.append("offset", filters.offset.toString());
-
-    return apiClient.get(`/admin/tags?${params.toString()}`);
-  }
-
-  async getTagWithProjectCount(
-    id: string
-  ): Promise<ApiResponse<{ tag: Tag; projectCount: number } | null>> {
-    return apiClient.get(`/admin/tags/${id}/project-count`);
-  }
-
-  async getPopularTags(
-    limit?: number
-  ): Promise<ApiResponse<Array<{ tag: Tag; projectCount: number }>>> {
-    const params = limit ? `?limit=${limit}` : "";
-    return apiClient.get(`/admin/tags/popular${params}`);
   }
 }
 
@@ -520,8 +371,6 @@ export class SettingsApiService {
 
 // Export API service instances
 export const projectApi = new ProjectApiService();
-export const categoryApi = new CategoryApiService();
-export const tagApi = new TagApiService();
 export const languageApi = new LanguageApiService();
 export const frameworkApi = new FrameworkApiService();
 export const settingsApi = new SettingsApiService();

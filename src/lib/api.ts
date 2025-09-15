@@ -8,14 +8,25 @@ export default apiClient;
 export { apiClient } from "./api-client";
 export {
   projectApi,
-  categoryApi,
-  tagApi,
   languageApi,
   frameworkApi,
   settingsApi,
 } from "./api-service";
 export { blogApi } from "./api/blog";
+export { blogTagApi } from "./api/blog-tags";
+export { projectTagApi } from "./api/project-tags";
+export { testimonialTagApi } from "./api/testimonial-tags";
 export { experienceApi } from "./api/experience";
 export { testimonialApi } from "./api/testimonials";
+export {
+  aboutCoreApi,
+  musicGenreApi,
+  lastListenedSongApi,
+  animeApi,
+  bookApi,
+  politicalViewApi,
+  youtuberApi,
+  gameApi,
+} from "./api/about";
 export { authService } from "./auth-service";
 export { useAuthStore, useAuth, useAuthActions } from "../stores/auth-store";
