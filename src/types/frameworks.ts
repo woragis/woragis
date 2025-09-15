@@ -1,8 +1,12 @@
 import type {
   frameworks,
   projectFrameworks,
+  frameworkTypeEnum,
 } from "@/server/db/schemas/frameworks";
 import type { ProficiencyLevel } from "./index";
+
+// Framework/Language type enum
+export type FrameworkType = (typeof frameworkTypeEnum.enumValues)[number];
 
 // Base types from schema
 export type Framework = typeof frameworks.$inferSelect;
@@ -23,6 +27,7 @@ export interface FrameworkWithProficiency extends Omit<Framework, "version"> {
 export interface FrameworkFilters {
   visible?: boolean;
   search?: string;
+  type?: FrameworkType;
   limit?: number;
   offset?: number;
 }
@@ -35,6 +40,7 @@ export interface FrameworkFormData {
   icon?: string;
   color?: string;
   website?: string;
+  type: FrameworkType;
   version?: string;
   order: number;
   visible: boolean;
@@ -69,3 +75,18 @@ export interface ProjectFrameworkRemoveRequest {
   projectId: string;
   frameworkId: string;
 }
+
+// Legacy type aliases for backward compatibility
+export type Language = Framework;
+export type NewLanguage = NewFramework;
+export type ProjectLanguage = ProjectFramework;
+export type NewProjectLanguage = NewProjectFramework;
+export type LanguageWithCount = FrameworkWithCount;
+export type LanguageWithProficiency = FrameworkWithProficiency;
+export type LanguageFilters = FrameworkFilters;
+export type LanguageFormData = FrameworkFormData;
+export type LanguageListResponse = FrameworkListResponse;
+export type LanguageCreateRequest = FrameworkCreateRequest;
+export type LanguageUpdateRequest = FrameworkUpdateRequest;
+export type ProjectLanguageAssignRequest = ProjectFrameworkAssignRequest;
+export type ProjectLanguageRemoveRequest = ProjectFrameworkRemoveRequest;
