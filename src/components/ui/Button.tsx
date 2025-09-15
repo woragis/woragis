@@ -21,22 +21,22 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 animate-fade-in";
 
   const variantClasses = {
     primary:
-      "bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 font-semibold",
+      "bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:ring-indigo-500 font-semibold",
     secondary:
-      "bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-500",
+      "bg-slate-600 text-white hover:bg-slate-700 dark:bg-slate-500 dark:hover:bg-slate-600 focus:ring-slate-500",
     outline:
-      "border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white focus:ring-indigo-500 font-semibold",
+      "border-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 focus:ring-indigo-500 font-semibold",
     ghost:
       "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800",
     modern: "modern-button",
     glass:
       "glass-morphism text-slate-700 dark:text-slate-200 hover:bg-white/20 dark:hover:bg-white/10 font-semibold",
     gradient:
-      "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 focus:ring-indigo-500 font-semibold",
+      "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500 dark:hover:from-indigo-600 dark:hover:to-purple-600 focus:ring-indigo-500 font-semibold",
   };
 
   const sizeClasses = {

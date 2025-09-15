@@ -24,10 +24,12 @@ export const Card: React.FC<CardProps> = ({
 
   const hoverClasses = hover
     ? "hover:shadow-xl hover:scale-105 transition-all duration-300"
-    : "";
+    : "transition-all duration-200";
 
   return (
-    <div className={`${variantClasses[variant]} ${hoverClasses} ${className}`}>
+    <div
+      className={`${variantClasses[variant]} ${hoverClasses} animate-fade-in-up ${className}`}
+    >
       {children}
     </div>
   );

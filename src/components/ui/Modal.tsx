@@ -50,28 +50,31 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto animate-fade-in">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 animate-fade-in"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div
-          className={`relative w-full ${sizeClasses[size]} transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all`}
+          className={`relative w-full ${sizeClasses[size]} transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 animate-scale-in`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <div
+            className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4 animate-fade-in"
+            style={{ animationDelay: "100ms", animationFillMode: "both" }}
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-200">
               {title}
             </h3>
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 hover:scale-110 active:scale-95"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -79,7 +82,12 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
 
           {/* Content */}
-          <div className="px-6 py-4">{children}</div>
+          <div
+            className="px-6 py-4 animate-fade-in"
+            style={{ animationDelay: "200ms", animationFillMode: "both" }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>

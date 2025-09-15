@@ -40,9 +40,9 @@ export function LoginForm() {
   };
 
   return (
-    <Card variant="glass" className="backdrop-blur-xl">
+    <Card variant="glass" className="backdrop-blur-xl animate-fade-in-up">
       {error && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg">
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg animate-fade-in">
           <div className="flex items-center">
             <svg
               className="h-5 w-5 mr-2"
@@ -60,11 +60,18 @@ export function LoginForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 animate-fade-in"
+        style={{ animationDelay: "100ms", animationFillMode: "both" }}
+      >
+        <div
+          className="space-y-2 animate-fade-in"
+          style={{ animationDelay: "200ms", animationFillMode: "both" }}
+        >
           <label
             htmlFor="email"
-            className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
+            className="block text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors duration-200"
           >
             Email Address
           </label>
@@ -76,14 +83,17 @@ export function LoginForm() {
             onChange={handleChange}
             required
             placeholder="Enter your email"
-            className="modern-input w-full"
+            className="modern-input w-full transition-all duration-200 hover:shadow-md focus:shadow-lg"
           />
         </div>
 
-        <div className="space-y-2">
+        <div
+          className="space-y-2 animate-fade-in"
+          style={{ animationDelay: "300ms", animationFillMode: "both" }}
+        >
           <label
             htmlFor="password"
-            className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
+            className="block text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors duration-200"
           >
             Password
           </label>
@@ -95,11 +105,14 @@ export function LoginForm() {
             onChange={handleChange}
             required
             placeholder="Enter your password"
-            className="modern-input w-full"
+            className="modern-input w-full transition-all duration-200 hover:shadow-md focus:shadow-lg"
           />
         </div>
 
-        <div className="flex items-center justify-between">
+        <div
+          className="flex items-center justify-between animate-fade-in"
+          style={{ animationDelay: "400ms", animationFillMode: "both" }}
+        >
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -107,18 +120,18 @@ export function LoginForm() {
               name="rememberMe"
               checked={credentials.rememberMe}
               onChange={handleChange}
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-600 rounded"
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-600 rounded transition-all duration-200 hover:scale-110"
             />
             <label
               htmlFor="rememberMe"
-              className="ml-2 block text-sm text-slate-600 dark:text-slate-400"
+              className="ml-2 block text-sm text-slate-600 dark:text-slate-400 transition-colors duration-200"
             >
               Remember me
             </label>
           </div>
           <a
             href="#"
-            className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium"
+            className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors duration-200 hover:scale-105"
           >
             Forgot password?
           </a>
@@ -129,7 +142,8 @@ export function LoginForm() {
           variant="gradient"
           size="lg"
           disabled={isLoading}
-          className="w-full"
+          className="w-full animate-fade-in"
+          style={{ animationDelay: "500ms", animationFillMode: "both" }}
         >
           {isLoading ? (
             <div className="flex items-center">

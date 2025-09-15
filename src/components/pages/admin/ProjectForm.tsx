@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
+import { useProjectTags } from "@/hooks/useProjectTags";
+import { Tag, X } from "lucide-react";
 import type { Project, NewProject } from "@/types";
+import type { ProjectTag } from "@/types/project-tags";
 
 interface ProjectFormProps {
   project?: Project;
@@ -33,6 +36,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   });
 
   const [technologyInput, setTechnologyInput] = useState("");
+  const [selectedTags, setSelectedTags] = useState<ProjectTag[]>([]);
+
+  const { data: availableTags = [] } = useProjectTags({ visible: true });
 
   useEffect(() => {
     if (project) {
@@ -104,6 +110,16 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
       ...prev,
       technologies: prev.technologies.filter((t) => t !== tech),
     }));
+  };
+
+  const handleAddTag = (tag: ProjectTag) => {
+    if (!selectedTags.find((t) => t.id === tag.id)) {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  const handleRemoveTag = (tagId: string) => {
+    setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -221,6 +237,62 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
               </button>
             </span>
           ))}
+        </div>
+      </div>
+
+      {/* Project Tags */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Project Tags
+        </label>
+
+        {/* Selected Tags */}
+        {selectedTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {selectedTags.map((tag) => (
+              <span
+                key={tag.id}
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white"
+                style={{ backgroundColor: tag.color || "#10B981" }}
+              >
+                {tag.name}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag.id)}
+                  className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Available Tags */}
+        <div className="space-y-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Available tags:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {availableTags
+              .filter(
+                (tag: ProjectTag) => !selectedTags.find((t) => t.id === tag.id)
+              )
+              .map((tag: ProjectTag) => (
+                <button
+                  key={tag.id}
+                  type="button"
+                  onClick={() => handleAddTag(tag)}
+                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                >
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: tag.color || "#10B981" }}
+                  />
+                  {tag.name}
+                </button>
+              ))}
+          </div>
         </div>
       </div>
 
