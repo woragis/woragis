@@ -5,6 +5,7 @@ import type {
   Framework,
   NewFramework,
   FrameworkFilters,
+  FrameworkType,
   ProficiencyLevel,
 } from "@/types";
 
@@ -99,6 +100,10 @@ export class FrameworkRepository {
       conditions.push(eq(frameworks.visible, filters.visible));
     }
 
+    if (filters.type) {
+      conditions.push(eq(frameworks.type, filters.type));
+    }
+
     if (filters.search) {
       conditions.push(like(frameworks.name, `%${filters.search}%`));
     }
@@ -118,6 +123,37 @@ export class FrameworkRepository {
     }
 
     return await query.orderBy(asc(frameworks.order), asc(frameworks.name));
+  }
+
+  // Type-specific methods
+  async findByType(type: FrameworkType, userId?: string): Promise<Framework[]> {
+    const conditions = [eq(frameworks.type, type)];
+    if (userId) {
+      conditions.push(eq(frameworks.userId, userId));
+    }
+    return await db
+      .select()
+      .from(frameworks)
+      .where(and(...conditions))
+      .orderBy(asc(frameworks.order), asc(frameworks.name));
+  }
+
+  async findVisibleByType(
+    type: FrameworkType,
+    userId?: string
+  ): Promise<Framework[]> {
+    const conditions = [
+      eq(frameworks.type, type),
+      eq(frameworks.visible, true),
+    ];
+    if (userId) {
+      conditions.push(eq(frameworks.userId, userId));
+    }
+    return await db
+      .select()
+      .from(frameworks)
+      .where(and(...conditions))
+      .orderBy(asc(frameworks.order), asc(frameworks.name));
   }
 
   // Project relations
