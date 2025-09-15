@@ -13,6 +13,7 @@ import {
   ZapIcon,
   TargetIcon,
 } from "../../ui";
+import { usePathname } from "next/navigation";
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -41,6 +42,11 @@ export const Footer: React.FC = () => {
     ZapIcon,
     TargetIcon,
   ];
+
+  const pathname = usePathname();
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <ValorantBackground variant="minimal" className="py-12">
