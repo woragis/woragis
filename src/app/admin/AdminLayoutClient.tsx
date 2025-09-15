@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -11,8 +12,6 @@ import {
   LayoutDashboard,
   FolderOpen,
   Tag,
-  Folder,
-  Globe,
   Code,
   Settings,
   Menu,
@@ -23,6 +22,14 @@ import {
   Briefcase,
   LogOut,
   User,
+  ChevronDown,
+  ChevronRight,
+  UserCircle,
+  Music,
+  Gamepad2,
+  Users,
+  Book,
+  Tv,
 } from "lucide-react";
 
 interface AdminLayoutClientProps {
@@ -41,24 +48,135 @@ export function AdminLayoutClient({
   user: serverUser,
 }: AdminLayoutClientProps) {
   const { theme } = useTheme();
+  const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user: clientUser, logout } = useAuth();
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const {
+    user: clientUser,
+    logout,
+    isAuthenticated,
+    isInitialized,
+    isLoading,
+  } = useAuth();
 
   // Use server user if available, otherwise fall back to client user
   const user = serverUser || clientUser;
 
+  // Redirect if not authenticated after initialization
+  useEffect(() => {
+    if (isInitialized && !isLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, isInitialized, isLoading, router]);
+
+  // Auto-expand navigation items when on tag management pages or about pages
+  useEffect(() => {
+    if (pathname.includes("/tags")) {
+      if (pathname.includes("/blog/tags")) {
+        setExpandedItems((prev) => new Set([...prev, "Blog"]));
+      } else if (pathname.includes("/projects/tags")) {
+        setExpandedItems((prev) => new Set([...prev, "Projects"]));
+      } else if (pathname.includes("/testimonials/tags")) {
+        setExpandedItems((prev) => new Set([...prev, "Testimonials"]));
+      }
+    } else if (pathname.includes("/about")) {
+      setExpandedItems((prev) => new Set([...prev, "About"]));
+    }
+  }, [pathname]);
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
+  const toggleExpanded = (itemName: string) => {
+    setExpandedItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemName)) {
+        newSet.delete(itemName);
+      } else {
+        newSet.add(itemName);
+      }
+      return newSet;
+    });
+  };
+
+  const isActive = (href: string) => {
+    if (href === "/admin") {
+      return pathname === "/admin";
+    }
+    return pathname.startsWith(href);
+  };
+
   const navigation = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-    { name: "Projects", href: "/admin/projects", icon: FolderOpen },
+    {
+      name: "Projects",
+      href: "/admin/projects",
+      icon: FolderOpen,
+      subItems: [
+        { name: "Manage Tags", href: "/admin/projects/tags", icon: Tag },
+      ],
+    },
     { name: "Experience", href: "/admin/experience", icon: Briefcase },
-    { name: "Blog", href: "/admin/blog", icon: FileText },
-    { name: "Testimonials", href: "/admin/testimonials", icon: MessageSquare },
-    { name: "Tags", href: "/admin/tags", icon: Tag },
-    { name: "Categories", href: "/admin/categories", icon: Folder },
-    { name: "Languages", href: "/admin/languages", icon: Globe },
+    {
+      name: "Blog",
+      href: "/admin/blog",
+      icon: FileText,
+      subItems: [{ name: "Manage Tags", href: "/admin/blog/tags", icon: Tag }],
+    },
+    {
+      name: "Testimonials",
+      href: "/admin/testimonials",
+      icon: MessageSquare,
+      subItems: [
+        { name: "Manage Tags", href: "/admin/testimonials/tags", icon: Tag },
+      ],
+    },
     { name: "Frameworks", href: "/admin/frameworks", icon: Code },
+    {
+      name: "About",
+      href: "/admin/about",
+      icon: UserCircle,
+      subItems: [
+        { name: "Core", href: "/admin/about/core", icon: User },
+        {
+          name: "Music Genres",
+          href: "/admin/about/music/genres",
+          icon: Music,
+        },
+        {
+          name: "Last Listened Songs",
+          href: "/admin/about/music/songs",
+          icon: Music,
+        },
+        { name: "Anime List", href: "/admin/about/anime", icon: Tv },
+        { name: "Books", href: "/admin/about/books", icon: Book },
+        { name: "Political Views", href: "/admin/about/politics", icon: Users },
+        { name: "YouTubers", href: "/admin/about/youtubers", icon: Users },
+        { name: "Games", href: "/admin/about/games", icon: Gamepad2 },
+      ],
+    },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
+
+  // Show loading while auth is initializing
+  if (!isInitialized || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     // <AuthGuard> // Temporarily disabled
@@ -109,28 +227,85 @@ export function AdminLayoutClient({
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
-            <div className="px-4 py-4 pb-6 space-y-2">
+            <div className="px-4 py-4 pb-6 space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon;
+                const hasSubItems = item.subItems && item.subItems.length > 0;
+                const isExpanded = expandedItems.has(item.name);
+
                 return (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      theme === "dark"
-                        ? "text-gray-300 hover:text-white hover:bg-gray-700"
-                        : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-                    }`}
-                  >
-                    <Icon
-                      className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                        theme === "dark"
-                          ? "text-gray-400 group-hover:text-gray-300"
-                          : "text-gray-500 group-hover:text-gray-500"
-                      }`}
-                    />
-                    {item.name}
-                  </a>
+                  <div key={item.name}>
+                    <div className="flex items-center">
+                      <Link
+                        href={item.href}
+                        className={`group flex-1 flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                          isActive(item.href)
+                            ? theme === "dark"
+                              ? "bg-gray-700 text-white"
+                              : "bg-gray-100 text-gray-900"
+                            : theme === "dark"
+                            ? "text-gray-300 hover:text-white hover:bg-gray-700"
+                            : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                        }`}
+                      >
+                        <Icon
+                          className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                            theme === "dark"
+                              ? "text-gray-400 group-hover:text-gray-300"
+                              : "text-gray-500 group-hover:text-gray-500"
+                          }`}
+                        />
+                        {item.name}
+                      </Link>
+                      {hasSubItems && (
+                        <button
+                          onClick={() => toggleExpanded(item.name)}
+                          className={`p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ${
+                            theme === "dark" ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          {isExpanded ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Sub-items */}
+                    {hasSubItems && isExpanded && (
+                      <div className="ml-6 mt-1 space-y-1">
+                        {item.subItems!.map((subItem) => {
+                          const SubIcon = subItem.icon;
+                          return (
+                            <Link
+                              key={subItem.name}
+                              href={subItem.href}
+                              className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                                isActive(subItem.href)
+                                  ? theme === "dark"
+                                    ? "bg-gray-700 text-white"
+                                    : "bg-gray-100 text-gray-900"
+                                  : theme === "dark"
+                                  ? "text-gray-400 hover:text-white hover:bg-gray-700"
+                                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                              }`}
+                            >
+                              <SubIcon
+                                className={`mr-3 h-4 w-4 flex-shrink-0 ${
+                                  theme === "dark"
+                                    ? "text-gray-500 group-hover:text-gray-300"
+                                    : "text-gray-400 group-hover:text-gray-500"
+                                }`}
+                              />
+                              {subItem.name}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -206,7 +381,7 @@ export function AdminLayoutClient({
               </Link>
 
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                   theme === "dark"
                     ? "text-gray-300 hover:text-white hover:bg-gray-700"
