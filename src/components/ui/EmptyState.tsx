@@ -7,7 +7,7 @@ interface EmptyStateProps {
   description: string;
   actionLabel?: string;
   onAction?: () => void;
-  icon?: React.ReactNode;
+  icon?: React.ComponentType<any> | React.ReactNode;
   className?: string;
 }
 
@@ -21,7 +21,15 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <Card className={`p-12 text-center ${className}`}>
-      {icon && <div className="mb-4 flex justify-center">{icon}</div>}
+      {icon && (
+        <div className="mb-4 flex justify-center">
+          {React.isValidElement(icon)
+            ? icon
+            : React.createElement(icon as React.ComponentType<any>, {
+                className: "w-12 h-12 text-gray-400",
+              })}
+        </div>
+      )}
       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
         {title}
       </h3>
