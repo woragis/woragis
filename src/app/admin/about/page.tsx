@@ -2,17 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  User,
-  Music,
-  Tv,
-  Book,
-  Users,
-  Gamepad2,
-  Plus,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Music, Tv, Book, Users, Gamepad2, Plus, Eye } from "lucide-react";
 import {
   useAboutCore,
   useCreateAboutCore,
@@ -20,9 +10,13 @@ import {
   useDeleteAboutCore,
 } from "@/hooks/about/useAboutCore";
 import { Modal, Button } from "@/components/ui";
-import { AboutCoreForm } from "@/components/pages/admin/AboutCoreForm";
-import { AboutCoreList } from "@/components/pages/admin/AboutCoreList";
-import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
+import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
+import {
+  AboutCoreForm,
+  AboutCoreList,
+  DeleteConfirmationModal,
+} from "@/components/pages/admin";
+import { ActionButton } from "@/components/ui/ActionButton";
 import type { AboutCore, NewAboutCore } from "@/types";
 
 export default function AboutAdminPage() {
@@ -156,73 +150,75 @@ export default function AboutAdminPage() {
     },
   ];
 
+  const headerActions = (
+    <>
+      <Button
+        variant="outline"
+        onClick={() => window.open("/about", "_blank")}
+        className="flex items-center gap-2"
+      >
+        <Eye className="w-4 h-4" />
+        View Public Page
+      </Button>
+      <ActionButton
+        onClick={() => setIsCreateModalOpen(true)}
+        disabled={!!aboutCore}
+      >
+        {aboutCore ? "About Configured" : "Create About"}
+      </ActionButton>
+    </>
+  );
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          About Management
-        </h1>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() => window.open("/about", "_blank")}
-            className="flex items-center gap-2"
-          >
-            <Eye className="w-4 h-4" />
-            View Public Page
-          </Button>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            disabled={!!aboutCore}
-          >
-            {aboutCore ? "About Configured" : "Create About"}
-          </button>
-        </div>
-      </div>
+    <>
+      <AdminPageLayout
+        title="About Management"
+        description="Manage your personal information and interests"
+        headerActions={headerActions}
+      >
+        {/* About Core List */}
+        <AboutCoreList
+          aboutCore={aboutCore}
+          onEdit={handleEditAboutCore}
+          onDelete={handleDeleteAboutCore}
+          onToggleVisibility={handleToggleVisibility}
+          isLoading={isLoading}
+        />
 
-      {/* About Core List */}
-      <AboutCoreList
-        aboutCore={aboutCore}
-        onEdit={handleEditAboutCore}
-        onDelete={handleDeleteAboutCore}
-        onToggleVisibility={handleToggleVisibility}
-        isLoading={isLoading}
-      />
-
-      {/* About Sections Grid */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-          About Sections
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {aboutSections.map((section) => {
-            const IconComponent = section.icon;
-            return (
-              <Link
-                key={section.name}
-                href={section.href}
-                className="group flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                <div
-                  className={`flex-shrink-0 p-2 rounded-lg ${section.color} text-white mr-3`}
+        {/* About Sections Grid */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+            About Sections
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {aboutSections.map((section) => {
+              const IconComponent = section.icon;
+              return (
+                <Link
+                  key={section.name}
+                  href={section.href}
+                  className="group flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <IconComponent className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                    {section.name}
-                  </h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {section.description}
-                  </p>
-                </div>
-                <Plus className="h-4 w-4 text-gray-400 group-hover:text-blue-500" />
-              </Link>
-            );
-          })}
+                  <div
+                    className={`flex-shrink-0 p-2 rounded-lg ${section.color} text-white mr-3`}
+                  >
+                    <IconComponent className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      {section.name}
+                    </h4>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {section.description}
+                    </p>
+                  </div>
+                  <Plus className="h-4 w-4 text-gray-400 group-hover:text-blue-500" />
+                </Link>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </AdminPageLayout>
 
       {/* Create About Core Modal */}
       <Modal
@@ -274,6 +270,6 @@ export default function AboutAdminPage() {
         itemName={selectedAboutCore?.name}
         isLoading={deleteAboutCore.isPending}
       />
-    </div>
+    </>
   );
 }

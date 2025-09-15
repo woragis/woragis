@@ -2,657 +2,255 @@
 
 import { useState } from "react";
 import { Modal } from "@/components/ui";
-import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
+import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
+import { FilterSection } from "@/components/layout/FilterSection";
+import {
+  YouTubersForm,
+  DeleteConfirmationModal,
+} from "@/components/pages/admin";
+import { ActionButton } from "@/components/ui/ActionButton";
 import {
   useYoutubers,
   useCreateYoutuber,
   useUpdateYoutuber,
   useDeleteYoutuber,
+  useToggleYoutuberVisibility,
 } from "@/hooks/about/useYoutubers";
 import type { Youtuber, NewYoutuber, YoutuberCategory } from "@/types";
+
+const categoryOptions = [
+  { value: "all", label: "All" },
+  { value: "current", label: "Current" },
+  { value: "childhood", label: "Childhood" },
+];
 
 export default function YouTubersAdminPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedYoutuber, setSelectedYoutuber] = useState<Youtuber | null>(
+  const [selectedYouTuber, setSelectedYouTuber] = useState<Youtuber | null>(
     null
   );
   const [selectedCategory, setSelectedCategory] = useState<
     YoutuberCategory | "all"
   >("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Hooks
-  const { data: youtubers, isLoading, error } = useYoutubers();
-  const createYoutuber = useCreateYoutuber();
-  const updateYoutuber = useUpdateYoutuber();
-  const deleteYoutuber = useDeleteYoutuber();
+  const { data: youTubers, isLoading, error } = useYoutubers();
+  const createYouTuber = useCreateYoutuber();
+  const updateYouTuber = useUpdateYoutuber();
+  const deleteYouTuber = useDeleteYoutuber();
+  const toggleVisibility = useToggleYoutuberVisibility();
 
-  // Form state
-  const [formData, setFormData] = useState<Partial<NewYoutuber>>({
-    channelName: "",
-    description: "",
-    category: "current",
-    youtubeUrl: "",
-    profileImage: "",
-    subscriberCount: "",
-    contentType: "",
-    notes: "",
-    order: 0,
-    visible: true,
-  });
-
-  const categoryOptions: { value: YoutuberCategory; label: string }[] = [
-    { value: "current", label: "Current" },
-    { value: "childhood", label: "Childhood" },
-  ];
-
-  const filteredYoutubers =
+  const filteredYouTubers =
     selectedCategory === "all"
-      ? youtubers
-      : youtubers?.filter(
-          (youtuber) => youtuber.category === selectedCategory
-        ) || [];
+      ? youTubers
+      : youTubers?.filter((item) => item.category === selectedCategory) || [];
 
-  const handleCreate = async () => {
+  const searchedYouTubers =
+    filteredYouTubers?.filter(
+      (item) =>
+        item.channelName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.contentType?.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
+
+  // Create YouTuber
+  const handleCreateYouTuber = async (youTuberData: NewYoutuber) => {
     try {
-      await createYoutuber.mutateAsync(formData as NewYoutuber);
+      await createYouTuber.mutateAsync(youTuberData);
       setIsCreateModalOpen(false);
-      setFormData({
-        channelName: "",
-        description: "",
-        category: "current",
-        youtubeUrl: "",
-        profileImage: "",
-        subscriberCount: "",
-        contentType: "",
-        notes: "",
-        order: 0,
-        visible: true,
-      });
     } catch (error) {
-      console.error("Failed to create youtuber:", error);
+      console.error("Failed to create YouTuber:", error);
     }
   };
 
-  const handleEdit = (youtuber: Youtuber) => {
-    setSelectedYoutuber(youtuber);
-    setFormData({
-      channelName: youtuber.channelName,
-      description: youtuber.description,
-      category: youtuber.category,
-      youtubeUrl: youtuber.youtubeUrl,
-      profileImage: youtuber.profileImage,
-      subscriberCount: youtuber.subscriberCount,
-      contentType: youtuber.contentType,
-      notes: youtuber.notes,
-      order: youtuber.order,
-      visible: youtuber.visible,
-    });
+  // Edit YouTuber
+  const handleEditYouTuber = (youTuberItem: Youtuber) => {
+    setSelectedYouTuber(youTuberItem);
     setIsEditModalOpen(true);
   };
 
-  const handleUpdate = async () => {
-    if (!selectedYoutuber) return;
+  const handleUpdateYouTuber = async (youTuberData: NewYoutuber) => {
+    if (!selectedYouTuber) return;
 
     try {
-      await updateYoutuber.mutateAsync({
-        id: selectedYoutuber.id,
-        youtuber: formData,
+      await updateYouTuber.mutateAsync({
+        id: selectedYouTuber.id,
+        youtuber: youTuberData,
       });
       setIsEditModalOpen(false);
-      setSelectedYoutuber(null);
+      setSelectedYouTuber(null);
     } catch (error) {
-      console.error("Failed to update youtuber:", error);
+      console.error("Failed to update YouTuber:", error);
     }
   };
 
-  const handleDelete = (youtuber: Youtuber) => {
-    setSelectedYoutuber(youtuber);
+  // Delete YouTuber
+  const handleDeleteYouTuber = (youTuberItem: Youtuber) => {
+    setSelectedYouTuber(youTuberItem);
     setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedYoutuber) return;
+    if (!selectedYouTuber) return;
 
     try {
-      await deleteYoutuber.mutateAsync(selectedYoutuber.id);
+      await deleteYouTuber.mutateAsync(selectedYouTuber.id);
       setIsDeleteModalOpen(false);
-      setSelectedYoutuber(null);
+      setSelectedYouTuber(null);
     } catch (error) {
-      console.error("Failed to delete youtuber:", error);
+      console.error("Failed to delete YouTuber:", error);
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading youtubers</div>;
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is handled by filtered state
+  };
+
+  const handleToggleVisibility = async (id: string) => {
+    await toggleVisibility.mutateAsync(id);
+  };
+
+  if (error) return <div>Error loading YouTubers</div>;
+
+  const headerActions = (
+    <ActionButton onClick={() => setIsCreateModalOpen(true)}>
+      Add YouTuber
+    </ActionButton>
+  );
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">YouTubers</h1>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          Add YouTuber
-        </button>
-      </div>
+    <>
+      <AdminPageLayout
+        title="YouTubers"
+        description="Manage YouTubers you watch currently and from childhood"
+        headerActions={headerActions}
+      >
+        {/* Search and Filters */}
+        <FilterSection
+          searchValue={searchTerm}
+          onSearchChange={setSearchTerm}
+          onSearchSubmit={handleSearch}
+          searchPlaceholder="Search YouTubers..."
+          filterOptions={categoryOptions}
+          selectedFilter={selectedCategory}
+          onFilterChange={(value) =>
+            setSelectedCategory(value as YoutuberCategory | "all")
+          }
+        />
 
-      {/* Category Filter */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <div className="flex gap-4">
-          <label className="flex items-center text-gray-700">
-            <input
-              type="radio"
-              name="category"
-              value="all"
-              checked={selectedCategory === "all"}
-              onChange={(e) =>
-                setSelectedCategory(e.target.value as YoutuberCategory | "all")
-              }
-              className="mr-2"
-            />
-            All
-          </label>
-          {categoryOptions.map((option) => (
-            <label
-              key={option.value}
-              className="flex items-center text-gray-700"
-            >
-              <input
-                type="radio"
-                name="category"
-                value={option.value}
-                checked={selectedCategory === option.value}
-                onChange={(e) =>
-                  setSelectedCategory(e.target.value as YoutuberCategory)
-                }
-                className="mr-2"
-              />
-              {option.label}
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* YouTubers Table */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
-        <ul className="divide-y divide-gray-200">
-          {filteredYoutubers?.map((youtuber) => (
-            <li key={youtuber.id} className="px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    {youtuber.profileImage ? (
+        {/* YouTubers List */}
+        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+            {searchedYouTubers?.map((youTuberItem) => (
+              <li key={youTuberItem.id} className="px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
                       <img
-                        className="h-12 w-12 rounded-full object-cover"
-                        src={youtuber.profileImage}
-                        alt={youtuber.channelName}
+                        className="h-10 w-10 rounded-lg object-cover"
+                        src={youTuberItem.profileImage}
+                        alt={youTuberItem.channelName}
                       />
-                    ) : (
-                      <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-500 text-sm">📺</span>
+                    </div>
+                    <div className="ml-4">
+                      <div className="flex items-center">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                          {youTuberItem.channelName}
+                        </h3>
+                        {!youTuberItem.visible && (
+                          <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
+                            Hidden
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="ml-4">
-                    <div className="flex items-center">
-                      <h3 className="text-sm font-medium text-gray-900">
-                        {youtuber.channelName}
-                      </h3>
-                      <span
-                        className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          youtuber.category === "current"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {
-                          categoryOptions.find(
-                            (c) => c.value === youtuber.category
-                          )?.label
-                        }
-                      </span>
-                    </div>
-                    {youtuber.description && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        {youtuber.description}
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {youTuberItem.description}
                       </p>
-                    )}
-                    <div className="mt-1 flex items-center space-x-4">
-                      {youtuber.subscriberCount && (
-                        <span className="text-xs text-gray-400">
-                          {youtuber.subscriberCount} subscribers
+                      <div className="mt-1">
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                          Category:{" "}
+                          {youTuberItem.category
+                            ?.replace(/_/g, " ")
+                            .replace(/\b\w/g, (l) => l.toUpperCase())}
+                          {youTuberItem.contentType &&
+                            ` • Content: ${youTuberItem.contentType}`}
+                          {youTuberItem.subscriberCount &&
+                            ` • Subscribers: ${youTuberItem.subscriberCount}`}
+                          {youTuberItem.youtubeUrl && ` • YouTube Available`}
                         </span>
-                      )}
-                      {youtuber.contentType && (
-                        <span className="text-xs text-gray-400">
-                          {youtuber.contentType}
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-400">
-                        Order: {youtuber.order}
-                      </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      youtuber.visible
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {youtuber.visible ? "Visible" : "Hidden"}
-                  </span>
-                  {youtuber.youtubeUrl && (
-                    <a
-                      href={youtuber.youtubeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-red-600 hover:text-red-900 text-sm"
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleToggleVisibility(youTuberItem.id)}
+                      className={`px-3 py-1 text-xs rounded-full ${
+                        youTuberItem.visible
+                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                          : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                      }`}
                     >
-                      YouTube
-                    </a>
-                  )}
-                  <button
-                    onClick={() => handleEdit(youtuber)}
-                    className="text-blue-600 hover:text-blue-900 text-sm"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(youtuber)}
-                    className="text-red-600 hover:text-red-900 text-sm"
-                  >
-                    Delete
-                  </button>
+                      {youTuberItem.visible ? "Visible" : "Hidden"}
+                    </button>
+                    <button
+                      onClick={() => handleEditYouTuber(youTuberItem)}
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteYouTuber(youTuberItem)}
+                      className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-        {filteredYoutubers?.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No YouTubers found. Add some to get started!
-          </div>
-        )}
-      </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </AdminPageLayout>
 
-      {/* Create Modal */}
+      {/* Create YouTuber Modal */}
       <Modal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Create New YouTuber"
+        title="Add New YouTuber"
         size="lg"
       >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Channel Name *
-            </label>
-            <input
-              type="text"
-              value={formData.channelName || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, channelName: e.target.value })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Category *
-            </label>
-            <select
-              value={formData.category || "current"}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  category: e.target.value as YoutuberCategory,
-                })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            >
-              {categoryOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <textarea
-              value={formData.description || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              rows={3}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              YouTube URL
-            </label>
-            <input
-              type="url"
-              value={formData.youtubeUrl || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, youtubeUrl: e.target.value })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Profile Image URL
-            </label>
-            <input
-              type="url"
-              value={formData.profileImage || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, profileImage: e.target.value })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Subscriber Count
-              </label>
-              <input
-                type="text"
-                value={formData.subscriberCount || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, subscriberCount: e.target.value })
-                }
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                placeholder="e.g., 1.2M, 500K"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Content Type
-              </label>
-              <input
-                type="text"
-                value={formData.contentType || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, contentType: e.target.value })
-                }
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                placeholder="e.g., Gaming, Tech, Vlogs"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Notes
-            </label>
-            <textarea
-              value={formData.notes || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
-              rows={2}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Order
-            </label>
-            <input
-              type="number"
-              value={formData.order || 0}
-              onChange={(e) =>
-                setFormData({ ...formData, order: parseInt(e.target.value) })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="visible"
-              checked={formData.visible || false}
-              onChange={(e) =>
-                setFormData({ ...formData, visible: e.target.checked })
-              }
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label
-              htmlFor="visible"
-              className="ml-2 block text-sm text-gray-900"
-            >
-              Visible
-            </label>
-          </div>
-
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={() => setIsCreateModalOpen(false)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleCreate}
-              disabled={createYoutuber.isPending || !formData.channelName}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-            >
-              {createYoutuber.isPending ? "Creating..." : "Create"}
-            </button>
-          </div>
-        </div>
+        <YouTubersForm
+          onSubmit={handleCreateYouTuber}
+          onCancel={() => setIsCreateModalOpen(false)}
+          isLoading={createYouTuber.isPending}
+        />
       </Modal>
 
-      {/* Edit Modal */}
+      {/* Edit YouTuber Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false);
-          setSelectedYoutuber(null);
+          setSelectedYouTuber(null);
         }}
         title="Edit YouTuber"
         size="lg"
       >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Channel Name *
-            </label>
-            <input
-              type="text"
-              value={formData.channelName || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, channelName: e.target.value })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Category *
-            </label>
-            <select
-              value={formData.category || "current"}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  category: e.target.value as YoutuberCategory,
-                })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            >
-              {categoryOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <textarea
-              value={formData.description || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              rows={3}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              YouTube URL
-            </label>
-            <input
-              type="url"
-              value={formData.youtubeUrl || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, youtubeUrl: e.target.value })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Profile Image URL
-            </label>
-            <input
-              type="url"
-              value={formData.profileImage || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, profileImage: e.target.value })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Subscriber Count
-              </label>
-              <input
-                type="text"
-                value={formData.subscriberCount || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, subscriberCount: e.target.value })
-                }
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                placeholder="e.g., 1.2M, 500K"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Content Type
-              </label>
-              <input
-                type="text"
-                value={formData.contentType || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, contentType: e.target.value })
-                }
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                placeholder="e.g., Gaming, Tech, Vlogs"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Notes
-            </label>
-            <textarea
-              value={formData.notes || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
-              rows={2}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Order
-            </label>
-            <input
-              type="number"
-              value={formData.order || 0}
-              onChange={(e) =>
-                setFormData({ ...formData, order: parseInt(e.target.value) })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-            />
-          </div>
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="visible-edit"
-              checked={formData.visible || false}
-              onChange={(e) =>
-                setFormData({ ...formData, visible: e.target.checked })
-              }
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label
-              htmlFor="visible-edit"
-              className="ml-2 block text-sm text-gray-900"
-            >
-              Visible
-            </label>
-          </div>
-
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={() => {
-                setIsEditModalOpen(false);
-                setSelectedYoutuber(null);
-              }}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleUpdate}
-              disabled={updateYoutuber.isPending || !formData.channelName}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-            >
-              {updateYoutuber.isPending ? "Updating..." : "Update"}
-            </button>
-          </div>
-        </div>
+        {selectedYouTuber && (
+          <YouTubersForm
+            youTuber={selectedYouTuber}
+            onSubmit={handleUpdateYouTuber}
+            onCancel={() => {
+              setIsEditModalOpen(false);
+              setSelectedYouTuber(null);
+            }}
+            isLoading={updateYouTuber.isPending}
+          />
+        )}
       </Modal>
 
       {/* Delete Confirmation Modal */}
@@ -660,14 +258,14 @@ export default function YouTubersAdminPage() {
         isOpen={isDeleteModalOpen}
         onClose={() => {
           setIsDeleteModalOpen(false);
-          setSelectedYoutuber(null);
+          setSelectedYouTuber(null);
         }}
         onConfirm={handleConfirmDelete}
         title="Delete YouTuber"
         message="Are you sure you want to delete this YouTuber? This action cannot be undone."
-        itemName={selectedYoutuber?.channelName}
-        isLoading={deleteYoutuber.isPending}
+        itemName={selectedYouTuber?.channelName}
+        isLoading={deleteYouTuber.isPending}
       />
-    </div>
+    </>
   );
 }

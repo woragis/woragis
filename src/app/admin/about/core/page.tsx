@@ -1,224 +1,253 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Modal } from "@/components/ui";
-import type { AboutCore, NewAboutCore } from "@/types";
+import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
+import {
+  AboutCoreForm,
+  DeleteConfirmationModal,
+} from "@/components/pages/admin";
+import { ActionButton } from "@/components/ui/ActionButton";
+import {
+  useAboutCore,
+  useCreateAboutCore,
+  useUpdateAboutCore,
+  useDeleteAboutCore,
+  useToggleAboutCoreVisibility,
+} from "@/hooks/about/useAboutCore";
+import type { AboutCore, NewAboutCore, AboutCoreResponse } from "@/types";
 
 export default function AboutCoreAdminPage() {
-  const [aboutCore, setAboutCore] = useState<AboutCore | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Modal states
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedAboutCore, setSelectedAboutCore] = useState<AboutCore | null>(
+    null
+  );
 
-  // Form state
-  const [formData, setFormData] = useState<Partial<NewAboutCore>>({
-    name: "",
-    biography: "",
-    featuredBiography: "",
-    visible: true,
-  });
+  const { data: aboutCoreData, isLoading, error } = useAboutCore();
+  const aboutCore = aboutCoreData?.about || null;
+  const createAboutCore = useCreateAboutCore();
+  const updateAboutCore = useUpdateAboutCore();
+  const deleteAboutCore = useDeleteAboutCore();
+  const toggleVisibility = useToggleAboutCoreVisibility();
 
-  useEffect(() => {
-    fetchAboutCore();
-  }, []);
-
-  const fetchAboutCore = async () => {
+  // Create about core
+  const handleCreateAboutCore = async (aboutCoreData: NewAboutCore) => {
     try {
-      const response = await fetch("/api/admin/about/core");
-      const data = await response.json();
-      if (data.success && data.data) {
-        setAboutCore(data.data.about);
-        setFormData({
-          name: data.data.about.name,
-          currentProfessionId: data.data.about.currentProfessionId,
-          biography: data.data.about.biography,
-          featuredBiography: data.data.about.featuredBiography,
-          visible: data.data.about.visible,
-        });
-      }
+      await createAboutCore.mutateAsync(aboutCoreData);
+      setIsCreateModalOpen(false);
     } catch (error) {
-      console.error("Failed to fetch about core:", error);
-    } finally {
-      setIsLoading(false);
+      console.error("Failed to create about core:", error);
     }
   };
 
-  const handleSave = async () => {
-    try {
-      setIsCreating(true);
-      const url = aboutCore ? "/api/admin/about/core" : "/api/admin/about/core";
-      const method = aboutCore ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        await fetchAboutCore();
-        setIsEditModalOpen(false);
-      } else {
-        console.error("Failed to save about core:", data.error);
-      }
-    } catch (error) {
-      console.error("Failed to save about core:", error);
-    } finally {
-      setIsCreating(false);
+  // Edit about core
+  const handleEditAboutCore = () => {
+    if (aboutCore) {
+      setSelectedAboutCore(aboutCore);
+      setIsEditModalOpen(true);
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  const handleUpdateAboutCore = async (aboutCoreData: NewAboutCore) => {
+    if (!selectedAboutCore) return;
+
+    try {
+      await updateAboutCore.mutateAsync(aboutCoreData);
+      setIsEditModalOpen(false);
+      setSelectedAboutCore(null);
+    } catch (error) {
+      console.error("Failed to update about core:", error);
+    }
+  };
+
+  // Delete about core
+  const handleDeleteAboutCore = () => {
+    if (aboutCore) {
+      setSelectedAboutCore(aboutCore);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedAboutCore) return;
+
+    try {
+      await deleteAboutCore.mutateAsync(selectedAboutCore.id);
+      setIsDeleteModalOpen(false);
+      setSelectedAboutCore(null);
+    } catch (error) {
+      console.error("Failed to delete about core:", error);
+    }
+  };
+
+  const handleToggleVisibility = async (id: string) => {
+    await toggleVisibility.mutateAsync(id);
+  };
+
+  if (error) return <div>Error loading about information</div>;
+
+  const headerActions = (
+    <ActionButton
+      onClick={() => setIsCreateModalOpen(true)}
+      disabled={!!aboutCore}
+    >
+      {aboutCore ? "About Configured" : "Create About"}
+    </ActionButton>
+  );
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">About Core</h1>
-        <button
-          onClick={() => setIsEditModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          {aboutCore ? "Edit" : "Create"} About
-        </button>
-      </div>
-
-      {/* Current About Core Display */}
-      {aboutCore && (
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">
-                  {aboutCore.name}
-                </h3>
-                {aboutCore.biography && (
-                  <div className="mt-2">
-                    <h4 className="text-sm font-medium text-gray-700">
-                      Biography:
-                    </h4>
-                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
-                      {aboutCore.biography}
-                    </p>
+    <>
+      <AdminPageLayout
+        title="About Core Information"
+        description="Manage your core personal information"
+        headerActions={headerActions}
+      >
+        {/* About Core List */}
+        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+          {aboutCore ? (
+            <div className="px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                      <span className="text-white font-semibold text-sm">
+                        {aboutCore.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
                   </div>
-                )}
-                {aboutCore.featuredBiography && (
-                  <div className="mt-2">
-                    <h4 className="text-sm font-medium text-gray-700">
-                      Featured Biography:
-                    </h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {aboutCore.featuredBiography}
-                    </p>
+                  <div className="ml-4">
+                    <div className="flex items-center">
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                        {aboutCore.name}
+                      </h3>
+                      {!aboutCore.visible && (
+                        <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
+                          Hidden
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {aboutCore.biography && (
+                        <div
+                          className="prose prose-sm max-w-none dark:prose-invert"
+                          dangerouslySetInnerHTML={{
+                            __html: aboutCore.biography,
+                          }}
+                        />
+                      )}
+                    </div>
+                    {aboutCore.featuredBiography && (
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 italic">
+                          Featured: {aboutCore.featuredBiography}
+                        </p>
+                      </div>
+                    )}
+                    <div className="mt-1">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        {aboutCore.currentProfessionId &&
+                          `Profession ID: ${aboutCore.currentProfessionId}`}
+                        {aboutCore.createdAt &&
+                          ` • Created: ${new Date(
+                            aboutCore.createdAt
+                          ).toLocaleDateString()}`}
+                        {aboutCore.updatedAt &&
+                          ` • Updated: ${new Date(
+                            aboutCore.updatedAt
+                          ).toLocaleDateString()}`}
+                      </span>
+                    </div>
                   </div>
-                )}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handleToggleVisibility(aboutCore.id)}
+                    className={`px-3 py-1 text-xs rounded-full ${
+                      aboutCore.visible
+                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                        : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                    }`}
+                  >
+                    {aboutCore.visible ? "Visible" : "Hidden"}
+                  </button>
+                  <button
+                    onClick={handleEditAboutCore}
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleDeleteAboutCore}
+                    className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-              <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  aboutCore.visible
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {aboutCore.visible ? "Visible" : "Hidden"}
-              </span>
             </div>
-          </div>
+          ) : (
+            <div className="px-6 py-4 text-center">
+              <p className="text-gray-500 dark:text-gray-400">
+                No about information configured yet.
+              </p>
+            </div>
+          )}
         </div>
-      )}
+      </AdminPageLayout>
 
-      {/* Edit/Create Modal */}
+      {/* Create About Core Modal */}
       <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        title={aboutCore ? "Edit About Core" : "Create About Core"}
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        title="Create About Information"
         size="lg"
       >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Name *
-            </label>
-            <input
-              type="text"
-              value={formData.name || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Biography (Markdown)
-            </label>
-            <textarea
-              value={formData.biography || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, biography: e.target.value })
-              }
-              rows={6}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-              placeholder="Write your biography in markdown format..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Featured Biography (Plain Text)
-            </label>
-            <textarea
-              value={formData.featuredBiography || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, featuredBiography: e.target.value })
-              }
-              rows={3}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-              placeholder="Short biography for home page display..."
-            />
-          </div>
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="visible"
-              checked={formData.visible || false}
-              onChange={(e) =>
-                setFormData({ ...formData, visible: e.target.checked })
-              }
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label
-              htmlFor="visible"
-              className="ml-2 block text-sm text-gray-900"
-            >
-              Visible
-            </label>
-          </div>
-
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={() => setIsEditModalOpen(false)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={isCreating || !formData.name}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isCreating ? "Saving..." : "Save"}
-            </button>
-          </div>
-        </div>
+        <AboutCoreForm
+          onSubmit={handleCreateAboutCore}
+          onCancel={() => setIsCreateModalOpen(false)}
+          isLoading={createAboutCore.isPending}
+        />
       </Modal>
-    </div>
+
+      {/* Edit About Core Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedAboutCore(null);
+        }}
+        title="Edit About Information"
+        size="lg"
+      >
+        {selectedAboutCore && (
+          <AboutCoreForm
+            aboutCore={selectedAboutCore}
+            onSubmit={handleUpdateAboutCore}
+            onCancel={() => {
+              setIsEditModalOpen(false);
+              setSelectedAboutCore(null);
+            }}
+            isLoading={updateAboutCore.isPending}
+          />
+        )}
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedAboutCore(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete About Information"
+        message="Are you sure you want to delete your about information? This action cannot be undone."
+        itemName={selectedAboutCore?.name}
+        isLoading={deleteAboutCore.isPending}
+      />
+    </>
   );
 }
