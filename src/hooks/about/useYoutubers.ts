@@ -133,3 +133,25 @@ export function useDeleteYoutuber() {
     },
   });
 }
+
+export function useToggleYoutuberVisibility() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await youtuberApi.toggleYoutuberVisibility(id);
+      if (!response.success) {
+        throw new Error(
+          response.error || "Failed to toggle youtuber visibility"
+        );
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: youtuberKeys.all });
+      if (data) {
+        queryClient.setQueryData(youtuberKeys.detail(variables), data);
+      }
+    },
+  });
+}

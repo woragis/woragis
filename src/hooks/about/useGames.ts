@@ -161,3 +161,23 @@ export function useUpdateGameStatus() {
     },
   });
 }
+
+export function useToggleGameVisibility() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await gameApi.toggleGameVisibility(id);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to toggle game visibility");
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: gameKeys.all });
+      if (data) {
+        queryClient.setQueryData(gameKeys.detail(variables), data);
+      }
+    },
+  });
+}

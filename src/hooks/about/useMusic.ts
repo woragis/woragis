@@ -131,6 +131,26 @@ export function useDeleteMusicGenre() {
   });
 }
 
+export function useToggleMusicGenreVisibility() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await musicGenreApi.toggleGenreVisibility(id);
+      if (!response.success) {
+        throw new Error(
+          response.error || "Failed to toggle music genre visibility"
+        );
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: musicGenreKeys.all });
+      queryClient.setQueryData(musicGenreKeys.detail(variables), data);
+    },
+  });
+}
+
 // Last Listened Song Hooks
 export function useLastListenedSongs(filters: LastListenedSongFilters = {}) {
   return useQuery({
@@ -235,6 +255,26 @@ export function useDeleteLastListenedSong() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: lastListenedSongKeys.all });
+    },
+  });
+}
+
+export function useToggleLastListenedSongVisibility() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await lastListenedSongApi.toggleSongVisibility(id);
+      if (!response.success) {
+        throw new Error(
+          response.error || "Failed to toggle last listened song visibility"
+        );
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: lastListenedSongKeys.all });
+      queryClient.setQueryData(lastListenedSongKeys.detail(variables), data);
     },
   });
 }

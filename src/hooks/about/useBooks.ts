@@ -146,3 +146,23 @@ export function useUpdateBookStatus() {
     },
   });
 }
+
+export function useToggleBookVisibility() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await bookApi.toggleBookVisibility(id);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to toggle book visibility");
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: bookKeys.all });
+      if (data) {
+        queryClient.setQueryData(bookKeys.detail(variables), data);
+      }
+    },
+  });
+}

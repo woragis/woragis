@@ -122,3 +122,25 @@ export function useDeletePoliticalView() {
     },
   });
 }
+
+export function useTogglePoliticalViewVisibility() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await politicalViewApi.togglePoliticalViewVisibility(id);
+      if (!response.success) {
+        throw new Error(
+          response.error || "Failed to toggle political view visibility"
+        );
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: politicalViewKeys.all });
+      if (data) {
+        queryClient.setQueryData(politicalViewKeys.detail(variables), data);
+      }
+    },
+  });
+}

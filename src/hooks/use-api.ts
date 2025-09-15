@@ -1,24 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  projectApi,
-  categoryApi,
-  tagApi,
-  languageApi,
-  frameworkApi,
-  settingsApi,
-} from "@/lib/api";
+import { projectApi, languageApi, frameworkApi, settingsApi } from "@/lib/api";
 import type {
   Project,
   NewProject,
   ProjectFilters,
   ProjectOrderUpdate,
 } from "@/types/projects";
-import type {
-  Category,
-  NewCategory,
-  CategoryFilters,
-} from "@/types/categories";
-import type { Tag, NewTag, TagFilters } from "@/types/tags";
 import type { Language, NewLanguage, LanguageFilters } from "@/types/languages";
 import type {
   Framework,
@@ -39,28 +26,6 @@ export const queryKeys = {
     featured: (limit?: number) =>
       [...queryKeys.projects.all, "featured", limit] as const,
     visible: () => [...queryKeys.projects.all, "visible"] as const,
-  },
-  categories: {
-    all: ["categories"] as const,
-    lists: () => [...queryKeys.categories.all, "list"] as const,
-    list: (filters: CategoryFilters) =>
-      [...queryKeys.categories.lists(), filters] as const,
-    details: () => [...queryKeys.categories.all, "detail"] as const,
-    detail: (id: string) => [...queryKeys.categories.details(), id] as const,
-    visible: () => [...queryKeys.categories.all, "visible"] as const,
-    popular: (limit?: number) =>
-      [...queryKeys.categories.all, "popular", limit] as const,
-  },
-  tags: {
-    all: ["tags"] as const,
-    lists: () => [...queryKeys.tags.all, "list"] as const,
-    list: (filters: TagFilters) =>
-      [...queryKeys.tags.lists(), filters] as const,
-    details: () => [...queryKeys.tags.all, "detail"] as const,
-    detail: (id: string) => [...queryKeys.tags.details(), id] as const,
-    visible: () => [...queryKeys.tags.all, "visible"] as const,
-    popular: (limit?: number) =>
-      [...queryKeys.tags.all, "popular", limit] as const,
   },
   languages: {
     all: ["languages"] as const,
@@ -156,126 +121,6 @@ export const useDeleteProject = () => {
     mutationFn: (id: string) => projectApi.deleteProject(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.projects.all });
-    },
-  });
-};
-
-// Category hooks
-export const useCategories = (filters?: CategoryFilters) => {
-  return useQuery({
-    queryKey: queryKeys.categories.list(filters || {}),
-    queryFn: () => categoryApi.searchCategories(filters || {}),
-    enabled: !!filters,
-  });
-};
-
-export const useVisibleCategories = () => {
-  return useQuery({
-    queryKey: queryKeys.categories.visible(),
-    queryFn: () => categoryApi.getVisibleCategories(),
-  });
-};
-
-export const useCategory = (id: string) => {
-  return useQuery({
-    queryKey: queryKeys.categories.detail(id),
-    queryFn: () => categoryApi.getCategoryById(id),
-    enabled: !!id,
-  });
-};
-
-export const useCreateCategory = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: NewCategory) => categoryApi.createCategory(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
-    },
-  });
-};
-
-export const useUpdateCategory = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<NewCategory> }) =>
-      categoryApi.updateCategory(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.categories.detail(id),
-      });
-      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
-    },
-  });
-};
-
-export const useDeleteCategory = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => categoryApi.deleteCategory(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
-    },
-  });
-};
-
-// Tag hooks
-export const useTags = (filters?: TagFilters) => {
-  return useQuery({
-    queryKey: queryKeys.tags.list(filters || {}),
-    queryFn: () => tagApi.searchTags(filters || {}),
-    enabled: !!filters,
-  });
-};
-
-export const useVisibleTags = () => {
-  return useQuery({
-    queryKey: queryKeys.tags.visible(),
-    queryFn: () => tagApi.getVisibleTags(),
-  });
-};
-
-export const useTag = (id: string) => {
-  return useQuery({
-    queryKey: queryKeys.tags.detail(id),
-    queryFn: () => tagApi.getTagById(id),
-    enabled: !!id,
-  });
-};
-
-export const useCreateTag = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: NewTag) => tagApi.createTag(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tags.all });
-    },
-  });
-};
-
-export const useUpdateTag = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<NewTag> }) =>
-      tagApi.updateTag(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tags.detail(id) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.tags.all });
-    },
-  });
-};
-
-export const useDeleteTag = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => tagApi.deleteTag(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tags.all });
     },
   });
 };

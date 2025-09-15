@@ -5,6 +5,7 @@ import type {
   NewAboutCore,
   AboutCoreFilters,
   AboutCoreWithProfession,
+  AboutCoreResponse,
 } from "@/types";
 
 // Query keys
@@ -106,6 +107,26 @@ export function useDeleteAboutCore() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: aboutCoreKeys.all });
+    },
+  });
+}
+
+export function useToggleAboutCoreVisibility() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await aboutCoreApi.toggleAboutCoreVisibility(id);
+      if (!response.success) {
+        throw new Error(
+          response.error || "Failed to toggle about core visibility"
+        );
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: aboutCoreKeys.all });
+      queryClient.setQueryData(aboutCoreKeys.detail(variables), data);
     },
   });
 }

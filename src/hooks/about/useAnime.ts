@@ -143,3 +143,23 @@ export function useUpdateAnimeStatus() {
     },
   });
 }
+
+export function useToggleAnimeVisibility() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await animeApi.toggleAnimeVisibility(id);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to toggle anime visibility");
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: animeKeys.all });
+      if (data) {
+        queryClient.setQueryData(animeKeys.detail(variables), data);
+      }
+    },
+  });
+}
