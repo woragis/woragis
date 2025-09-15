@@ -8,14 +8,18 @@ import {
   useCreateExperience,
   useUpdateExperience,
 } from "@/hooks/useExperience";
-import { ExperienceFormData } from "@/types";
+import { ExperienceFormData, Experience } from "@/types";
 import { ExperienceForm } from "@/components/pages/experience";
+import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 
 export default function ExperienceAdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingExperience, setEditingExperience] =
     useState<ExperienceFormData | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedExperience, setSelectedExperience] =
+    useState<Experience | null>(null);
 
   const { data: experiences, isLoading, error } = useExperience();
   const deleteExperience = useDeleteExperience();
@@ -28,9 +32,20 @@ export default function ExperienceAdminPage() {
     // Search functionality can be implemented here
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this experience entry?")) {
-      await deleteExperience.mutateAsync(id);
+  const handleDelete = (experience: Experience) => {
+    setSelectedExperience(experience);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedExperience) return;
+
+    try {
+      await deleteExperience.mutateAsync(selectedExperience.id);
+      setIsDeleteModalOpen(false);
+      setSelectedExperience(null);
+    } catch (error) {
+      console.error("Failed to delete experience:", error);
     }
   };
 
@@ -190,7 +205,7 @@ export default function ExperienceAdminPage() {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(experience.id)}
+                    onClick={() => handleDelete(experience)}
                     className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm"
                   >
                     Delete
@@ -214,6 +229,20 @@ export default function ExperienceAdminPage() {
           isLoading={createExperience.isPending || updateExperience.isPending}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedExperience(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Experience Entry"
+        message="Are you sure you want to delete this experience entry? This action cannot be undone."
+        itemName={selectedExperience?.title}
+        isLoading={deleteExperience.isPending}
+      />
     </div>
   );
 }
