@@ -6,7 +6,8 @@ import type {
   ProjectFilters,
   ProjectOrderUpdate,
 } from "@/types/projects";
-import type { Language, NewLanguage, LanguageFilters } from "@/types/languages";
+import type { Language, NewLanguage } from "@/types/about/languages";
+import type { LanguageFilters } from "@/types";
 import type {
   Framework,
   NewFramework,
