@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Project } from "@/server/db/schema";
+import { Project } from "@/types/projects";
 import { ProjectForm } from "./ProjectForm";
 import { ProjectList } from "./ProjectList";
 import { Button, Card } from "@/components/ui";
@@ -17,7 +17,7 @@ import {
 } from "@/hooks/useProjects";
 import { useSettings, useUpdateSetting } from "@/hooks/useSettings";
 import { useAuth } from "@/stores/auth-store";
-import type { NewProject } from "@/types";
+import type { NewProject } from "@/types/projects";
 
 export const AdminDashboard: React.FC = () => {
   const [showForm, setShowForm] = useState(false);

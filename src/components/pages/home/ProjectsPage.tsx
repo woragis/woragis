@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Project } from "@/server/db/schema";
+import { Project } from "@/types/projects";
 import { Section, Container, Card, Button, EmptyState } from "../../ui";
 import { ExternalLink, Github } from "lucide-react";
 import { usePublicProjects } from "@/hooks/usePublicProjects";

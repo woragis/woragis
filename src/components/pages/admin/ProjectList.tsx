@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Project } from "@/server/db/schema";
+import { Project } from "@/types/projects";
 import { Button, Card } from "@/components/ui";
 import {
   Edit,

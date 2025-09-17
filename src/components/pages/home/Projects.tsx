@@ -18,7 +18,7 @@ import {
   ZapIcon,
   TargetIcon,
 } from "../../ui";
-import { Project } from "@/server/db/schema";
+import { Project } from "@/types/projects";
 import { ExternalLink, Github } from "lucide-react";
 import { usePublicFeaturedProjects } from "@/hooks/usePublicProjects";
 
