@@ -8,8 +8,11 @@ import {
 
 // GET /api/projects/[id] - Get public project by ID
 export const GET = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
-    const { id } = params;
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const relations = searchParams.get("relations");
 

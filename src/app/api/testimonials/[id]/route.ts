@@ -8,8 +8,11 @@ import {
 
 // GET /api/testimonials/[id] - Get public testimonial by ID
 export const GET = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
-    const { id } = params;
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    const { id } = await params;
 
     const result = await testimonialService.getPublicTestimonialById(id);
 

@@ -8,8 +8,11 @@ import {
 
 // GET /api/blog/[slug] - Get public blog post by slug
 export const GET = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { slug: string } }) => {
-    const { slug } = params;
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ slug: string }> }
+  ) => {
+    const { slug } = await params;
     const { searchParams } = new URL(request.url);
     const incrementViews = searchParams.get("increment_views") === "true";
 
