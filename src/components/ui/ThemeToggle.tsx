@@ -5,27 +5,16 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export const ThemeToggle: React.FC = () => {
-  const { theme, setTheme, actualTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
 
   const themes = [
     { value: "light", label: t("theme.light"), icon: "☀️" },
     { value: "dark", label: t("theme.dark"), icon: "🌙" },
-    { value: "system", label: t("theme.system"), icon: "💻" },
   ] as const;
 
-  const currentTheme = themes.find((t) => t.value === theme) || themes[2];
-
-  // Get the display label for system theme with actual theme indication
-  const getSystemLabel = () => {
-    if (theme === "system") {
-      return `${t("theme.system")} (${
-        actualTheme === "dark" ? t("theme.dark") : t("theme.light")
-      })`;
-    }
-    return t("theme.system");
-  };
+  const currentTheme = themes.find((t) => t.value === theme) || themes[0];
 
   return (
     <div className="relative">
@@ -46,7 +35,7 @@ export const ThemeToggle: React.FC = () => {
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
+          <div className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
             <div className="py-1">
               {themes.map((themeOption) => (
                 <button
@@ -62,11 +51,7 @@ export const ThemeToggle: React.FC = () => {
                   }`}
                 >
                   <span className="text-base">{themeOption.icon}</span>
-                  <span className="flex-1">
-                    {themeOption.value === "system"
-                      ? getSystemLabel()
-                      : themeOption.label}
-                  </span>
+                  <span className="flex-1">{themeOption.label}</span>
                   {theme === themeOption.value && (
                     <span className="ml-auto text-blue-600 dark:text-blue-400">
                       ✓
