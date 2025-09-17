@@ -1,9 +1,31 @@
-import type { aboutCore } from "@/server/db/schemas/about/core";
-import type { Experience } from "./experience";
+// import type { aboutCore } from "@/server/db/schemas/about/core";
+import type { Experience } from "../experience";
 
-// Base types from schema
-export type AboutCore = typeof aboutCore.$inferSelect;
-export type NewAboutCore = typeof aboutCore.$inferInsert;
+// Base types from schema - TODO: Create aboutCore schema
+// export type AboutCore = typeof aboutCore.$inferSelect;
+// export type NewAboutCore = typeof aboutCore.$inferInsert;
+
+// Temporary types until schema is created
+export interface AboutCore {
+  id: string;
+  userId: string;
+  name: string;
+  currentProfessionId?: string | null;
+  biography?: string | null;
+  featuredBiography?: string | null;
+  visible: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface NewAboutCore {
+  userId: string;
+  name: string;
+  currentProfessionId?: string | null;
+  biography?: string | null;
+  featuredBiography?: string | null;
+  visible?: boolean;
+}
 
 // Extended types
 export interface AboutCoreWithProfession extends AboutCore {
