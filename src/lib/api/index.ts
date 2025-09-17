@@ -18,7 +18,7 @@ export { blogTagApi } from "./blog-tags";
 export { projectTagApi } from "./project-tags";
 export { testimonialTagApi } from "./testimonial-tags";
 export {
-  aboutCoreApi,
+  biographyApi,
   musicGenreApi,
   lastListenedSongApi,
   animeApi,
@@ -26,6 +26,10 @@ export {
   politicalViewApi,
   youtuberApi,
   gameApi,
+  instrumentsApi,
+  martialArtsApi,
+  languagesApi,
+  hobbiesApi,
 } from "./about";
 
 // Re-export the main client as default for backward compatibility

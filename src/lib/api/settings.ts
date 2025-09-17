@@ -1,5 +1,15 @@
 import { apiClient } from "./client";
-import type { Setting, NewSetting } from "@/types/settings";
+import type {
+  Setting,
+  NewSetting,
+  SocialMedia,
+  NewSocialMedia,
+  ContactInfo,
+  NewContactInfo,
+  SiteSettings,
+  NewSiteSettings,
+} from "@/types/settings";
+import type { Biography } from "@/types/about/biography";
 import type { ApiResponse } from "@/types";
 
 // Settings API functions
@@ -90,5 +100,53 @@ export const settingsApi = {
 
   async setMaintenanceMode(enabled: boolean): Promise<ApiResponse<Setting>> {
     return apiClient.post("/admin/settings/maintenance-mode", { enabled });
+  },
+
+  // Structured Settings Methods
+  // Note: Core Profile methods have been moved to biography API
+
+  // Social Media
+  async getSocialMedia(): Promise<ApiResponse<SocialMedia | null>> {
+    return apiClient.get("/admin/settings/social");
+  },
+
+  async updateSocialMedia(
+    socialSettings: Partial<NewSocialMedia>
+  ): Promise<ApiResponse<SocialMedia>> {
+    return apiClient.put("/admin/settings/social", socialSettings);
+  },
+
+  // Contact Info
+  async getContactInfo(): Promise<ApiResponse<ContactInfo | null>> {
+    return apiClient.get("/admin/settings/contact");
+  },
+
+  async updateContactInfo(
+    contactSettings: Partial<NewContactInfo>
+  ): Promise<ApiResponse<ContactInfo>> {
+    return apiClient.put("/admin/settings/contact", contactSettings);
+  },
+
+  // Site Settings
+  async getSiteSettings(): Promise<ApiResponse<SiteSettings | null>> {
+    return apiClient.get("/admin/settings/site");
+  },
+
+  async updateSiteSettings(
+    siteSettings: Partial<NewSiteSettings>
+  ): Promise<ApiResponse<SiteSettings>> {
+    return apiClient.put("/admin/settings/site", siteSettings);
+  },
+
+  // Public Settings
+  async getPublicSettings(): Promise<
+    ApiResponse<{
+      biography: Biography | null;
+      social: SocialMedia | null;
+      contact: ContactInfo | null;
+      site: SiteSettings | null;
+    }>
+  > {
+    return apiClient.get("/settings/public");
   },
 };
