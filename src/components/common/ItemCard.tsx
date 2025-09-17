@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface ItemCardProps {
@@ -38,10 +39,12 @@ export const ItemCard: React.FC<ItemCardProps> = ({
       <div className="flex items-start space-x-4 group">
         {image && (
           <div className="flex-shrink-0">
-            <img
+            <Image
               className="h-12 w-12 rounded-lg object-cover transition-transform duration-300 group-hover:scale-110"
               src={image}
               alt={imageAlt || title}
+              width={48}
+              height={48}
             />
           </div>
         )}

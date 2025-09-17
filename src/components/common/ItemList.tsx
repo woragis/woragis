@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
   DataTable,
   DataTableRow,
@@ -78,23 +79,18 @@ export const ItemList: React.FC<ItemListProps> = ({
   return (
     <DataTable className={className}>
       {items.map((item, index) => (
-        <DataTableRow
-          key={item.id}
-          className="animate-fade-in-up"
-          style={{
-            animationDelay: `${index * 50}ms`,
-            animationFillMode: "both",
-          }}
-        >
+        <DataTableRow key={item.id} className="animate-fade-in-up">
           <DataTableCell>
             <div className="flex items-center justify-between group">
               <div className="flex items-center">
                 {item.image && (
                   <div className="flex-shrink-0">
-                    <img
+                    <Image
                       className="h-10 w-10 rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
                       src={item.image}
                       alt={item.title}
+                      width={40}
+                      height={40}
                     />
                   </div>
                 )}
