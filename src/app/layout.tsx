@@ -100,10 +100,17 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  const theme = localStorage.getItem('theme') || 'system';
-                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                  const actualTheme = theme === 'system' ? systemTheme : theme;
-                  document.documentElement.classList.add(actualTheme);
+                  const savedTheme = localStorage.getItem('theme');
+                  let theme;
+                  
+                  if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+                    theme = savedTheme;
+                  } else {
+                    // If no saved theme, use system preference
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  }
+                  
+                  document.documentElement.classList.add(theme);
                 } catch (e) {
                   document.documentElement.classList.add('light');
                 }

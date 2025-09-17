@@ -42,13 +42,13 @@ export default function BlogPage() {
       switch (sortBy) {
         case "newest":
           return (
-            new Date(b.publishedAt || b.createdAt).getTime() -
-            new Date(a.publishedAt || a.createdAt).getTime()
+            new Date(b.publishedAt || b.createdAt || new Date()).getTime() -
+            new Date(a.publishedAt || a.createdAt || new Date()).getTime()
           );
         case "oldest":
           return (
-            new Date(a.publishedAt || a.createdAt).getTime() -
-            new Date(b.publishedAt || b.createdAt).getTime()
+            new Date(a.publishedAt || a.createdAt || new Date()).getTime() -
+            new Date(b.publishedAt || b.createdAt || new Date()).getTime()
           );
         case "popular":
           return (b.viewCount || 0) - (a.viewCount || 0);

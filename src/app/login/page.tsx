@@ -85,7 +85,7 @@ export default function AdminLoginPage() {
         </div>
         <div className="text-center animate-fade-in-up-delay">
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a
               href="/register"
               className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"

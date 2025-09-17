@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePublicBlogPost } from "@/hooks/usePublicBlog";
@@ -22,7 +23,7 @@ export default function BlogPostPage() {
   const { t } = useLanguage();
   const slug = params.slug as string;
 
-  const { data: post, isLoading, error } = usePublicBlogPost(slug, true); // Increment views on load
+  const { data: post, isLoading, error } = usePublicBlogPost(slug);
 
   // Handle not found
   if (!isLoading && !post) {
@@ -89,7 +90,8 @@ export default function BlogPostPage() {
     );
   }
 
-  const tags = post.tags ? JSON.parse(post.tags) : [];
+  // Tags are not available in the public blog post data
+  const tags: string[] = [];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
@@ -106,14 +108,7 @@ export default function BlogPostPage() {
 
           {/* Article Header */}
           <Card className="p-8 mb-8">
-            {/* Category */}
-            {post.category && (
-              <div className="mb-4">
-                <span className="inline-flex items-center px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm font-medium rounded-full">
-                  {post.category}
-                </span>
-              </div>
-            )}
+            {/* Category - not available in public blog post data */}
 
             {/* Title */}
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
@@ -146,9 +141,11 @@ export default function BlogPostPage() {
           {/* Featured Image */}
           {post.featuredImage && (
             <div className="mb-8">
-              <img
+              <Image
                 src={post.featuredImage}
                 alt={post.title}
+                width={800}
+                height={400}
                 className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
               />
             </div>
