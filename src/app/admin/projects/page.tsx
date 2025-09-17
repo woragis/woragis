@@ -13,6 +13,7 @@ import {
 import { Modal, Button } from "@/components/ui";
 import { ProjectForm } from "@/components/pages/admin/ProjectForm";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
+import { useAuth } from "@/stores/auth-store";
 import { Tag } from "lucide-react";
 import type { ProjectFilters, Project, NewProject } from "@/types";
 
@@ -26,6 +27,7 @@ export default function ProjectsAdminPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+  const { user } = useAuth();
   const { data: projects, isLoading, error } = useProjects(filters);
   const deleteProject = useDeleteProject();
   const createProject = useCreateProject();
@@ -262,6 +264,7 @@ export default function ProjectsAdminPage() {
         size="lg"
       >
         <ProjectForm
+          userId={user?.id || ""}
           onSubmit={handleCreateProject}
           onCancel={() => setIsCreateModalOpen(false)}
           isLoading={createProject.isPending}
@@ -281,6 +284,7 @@ export default function ProjectsAdminPage() {
         {selectedProject && (
           <ProjectForm
             project={selectedProject}
+            userId={user?.id || ""}
             onSubmit={handleUpdateProject}
             onCancel={() => {
               setIsEditModalOpen(false);
