@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { useBlogPosts } from "@/hooks/useBlog";
 import {
   useCreateBlogPost,
@@ -330,9 +331,10 @@ export default function BlogPage() {
                 {/* Featured Image */}
                 <div className="relative h-48 overflow-hidden">
                   {post.featuredImage ? (
-                    <img
+                    <Image
                       src={post.featuredImage}
                       alt={post.title}
+                      fill
                       className="w-full h-full object-cover"
                     />
                   ) : (

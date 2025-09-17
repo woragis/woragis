@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
@@ -30,6 +31,10 @@ import {
   Users,
   Book,
   Tv,
+  Guitar,
+  Shield,
+  Languages,
+  Heart,
 } from "lucide-react";
 
 interface AdminLayoutClientProps {
@@ -140,7 +145,7 @@ export function AdminLayoutClient({
       href: "/admin/about",
       icon: UserCircle,
       subItems: [
-        { name: "Core", href: "/admin/about/core", icon: User },
+        { name: "Biography", href: "/admin/about/biography", icon: User },
         {
           name: "Music Genres",
           href: "/admin/about/music/genres",
@@ -156,6 +161,14 @@ export function AdminLayoutClient({
         { name: "Political Views", href: "/admin/about/politics", icon: Users },
         { name: "YouTubers", href: "/admin/about/youtubers", icon: Users },
         { name: "Games", href: "/admin/about/games", icon: Gamepad2 },
+        { name: "Instruments", href: "/admin/about/instruments", icon: Guitar },
+        {
+          name: "Martial Arts",
+          href: "/admin/about/martial-arts",
+          icon: Shield,
+        },
+        { name: "Languages", href: "/admin/about/languages", icon: Languages },
+        { name: "Hobbies", href: "/admin/about/hobbies", icon: Heart },
       ],
     },
     { name: "Settings", href: "/admin/settings", icon: Settings },
@@ -326,10 +339,12 @@ export function AdminLayoutClient({
                       theme === "dark" ? "bg-indigo-600" : "bg-indigo-500"
                     }`}
                   >
-                    {user.avatar ? (
-                      <img
+                    {user?.avatar ? (
+                      <Image
                         src={user.avatar}
-                        alt={user.name}
+                        alt={user.name || "User avatar"}
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full"
                       />
                     ) : (
@@ -342,14 +357,14 @@ export function AdminLayoutClient({
                         theme === "dark" ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      {user.name}
+                      {user?.name}
                     </p>
                     <p
                       className={`text-xs truncate ${
                         theme === "dark" ? "text-gray-400" : "text-gray-500"
                       }`}
                     >
-                      {user.email}
+                      {user?.email}
                     </p>
                   </div>
                 </div>

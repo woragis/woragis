@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import { Play } from "lucide-react";
 import { Modal } from "@/components/ui";
 import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
 import { FilterSection } from "@/components/layout/FilterSection";
@@ -150,11 +152,19 @@ export default function YouTubersAdminPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <img
-                        className="h-10 w-10 rounded-lg object-cover"
-                        src={youTuberItem.profileImage}
-                        alt={youTuberItem.channelName}
-                      />
+                      {youTuberItem.profileImage ? (
+                        <Image
+                          className="h-10 w-10 rounded-lg object-cover"
+                          src={youTuberItem.profileImage}
+                          alt={youTuberItem.channelName}
+                          width={40}
+                          height={40}
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-lg bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                          <Play className="h-5 w-5 text-red-600 dark:text-red-400" />
+                        </div>
+                      )}
                     </div>
                     <div className="ml-4">
                       <div className="flex items-center">

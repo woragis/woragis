@@ -13,7 +13,21 @@ export default async function AdminLayout({
 
   return (
     <AuthProvider>
-      <AdminLayoutClient user={user}>{children}</AdminLayoutClient>
+      <AdminLayoutClient
+        user={
+          user
+            ? {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                avatar: user.avatar,
+              }
+            : undefined
+        }
+      >
+        {children}
+      </AdminLayoutClient>
     </AuthProvider>
   );
 }

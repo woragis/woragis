@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import { User } from "lucide-react";
 import { Modal } from "@/components/ui";
 import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
 import { FilterSection } from "@/components/layout/FilterSection";
@@ -137,11 +139,9 @@ export default function PoliticsAdminPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <img
-                        className="h-10 w-10 rounded-lg object-cover"
-                        src={politicalViewItem.image}
-                        alt={politicalViewItem.personName}
-                      />
+                      <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                        <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      </div>
                     </div>
                     <div className="ml-4">
                       <div className="flex items-center">
@@ -163,8 +163,8 @@ export default function PoliticsAdminPage() {
                             `Party: ${politicalViewItem.politicalParty}`}
                           {politicalViewItem.position &&
                             ` • Position: ${politicalViewItem.position}`}
-                          {politicalViewItem.country &&
-                            ` • Country: ${politicalViewItem.country}`}
+                          {politicalViewItem.order &&
+                            ` • Order: ${politicalViewItem.order}`}
                         </span>
                       </div>
                     </div>

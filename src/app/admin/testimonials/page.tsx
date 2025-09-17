@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { useTestimonials } from "@/hooks/useTestimonials";
 import {
   useCreateTestimonial,
@@ -302,9 +303,11 @@ export default function TestimonialsPage() {
                     <div className="flex items-center">
                       <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
                         {testimonial.avatar ? (
-                          <img
+                          <Image
                             src={testimonial.avatar}
                             alt={testimonial.name}
+                            width={48}
+                            height={48}
                             className="w-full h-full rounded-full object-cover"
                           />
                         ) : (

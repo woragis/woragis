@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   useProjects,
   useDeleteProject,
@@ -179,10 +180,12 @@ export default function ProjectsAdminPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <img
+                    <Image
                       className="h-10 w-10 rounded-lg object-cover"
                       src={project.image}
                       alt={project.title}
+                      width={40}
+                      height={40}
                     />
                   </div>
                   <div className="ml-4">

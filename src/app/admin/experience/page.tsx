@@ -15,8 +15,9 @@ import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirma
 export default function ExperienceAdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [editingExperience, setEditingExperience] =
-    useState<ExperienceFormData | null>(null);
+  const [editingExperience, setEditingExperience] = useState<Experience | null>(
+    null
+  );
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedExperience, setSelectedExperience] =
     useState<Experience | null>(null);
@@ -54,18 +55,7 @@ export default function ExperienceAdminPage() {
   };
 
   const handleEdit = (experience: Experience) => {
-    setEditingExperience({
-      title: experience.title,
-      company: experience.company,
-      period: experience.period,
-      location: experience.location,
-      description: experience.description,
-      achievements: experience.achievements || [],
-      technologies: experience.technologies || [],
-      icon: experience.icon,
-      order: experience.order,
-      visible: experience.visible,
-    });
+    setEditingExperience(experience);
     setShowForm(true);
   };
 
@@ -220,7 +210,22 @@ export default function ExperienceAdminPage() {
       {/* Experience Form Modal */}
       {showForm && (
         <ExperienceForm
-          experience={editingExperience}
+          experience={
+            editingExperience
+              ? {
+                  title: editingExperience.title,
+                  company: editingExperience.company,
+                  period: editingExperience.period,
+                  location: editingExperience.location,
+                  description: editingExperience.description,
+                  achievements: editingExperience.achievements || [],
+                  technologies: editingExperience.technologies || [],
+                  icon: editingExperience.icon,
+                  order: editingExperience.order,
+                  visible: editingExperience.visible,
+                }
+              : null
+          }
           onClose={() => {
             setShowForm(false);
             setEditingExperience(null);

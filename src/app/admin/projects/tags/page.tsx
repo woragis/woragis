@@ -67,7 +67,7 @@ export default function ProjectTagsPage() {
       slug: tag.slug,
       description: tag.description || "",
       color: tag.color || "#10B981",
-      visible: tag.visible,
+      visible: tag.visible ?? true,
       order: tag.order,
     });
     setIsFormOpen(true);
@@ -83,7 +83,7 @@ export default function ProjectTagsPage() {
           data: formData,
         });
       } else {
-        await createTag.mutateAsync(formData);
+        await createTag.mutateAsync(formData as any);
       }
       setIsFormOpen(false);
       setEditingTag(null);
@@ -184,12 +184,8 @@ export default function ProjectTagsPage() {
               icon={Tag}
               title="No tags found"
               description="Create your first project tag to get started"
-              action={
-                <Button onClick={handleCreate}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Tag
-                </Button>
-              }
+              onAction={handleCreate}
+              actionLabel="Add Tag"
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

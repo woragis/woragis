@@ -1,95 +1,94 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { Music } from "lucide-react";
 import { Modal } from "@/components/ui";
 import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
 import { FilterSection } from "@/components/layout/FilterSection";
-import {
-  MusicSongsForm,
-  DeleteConfirmationModal,
-} from "@/components/pages/admin";
 import { ActionButton } from "@/components/ui/ActionButton";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { DeleteConfirmationModal, HobbiesForm } from "@/components/pages/admin";
+import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 import {
-  useLastListenedSongs,
-  useCreateLastListenedSong,
-  useUpdateLastListenedSong,
-  useDeleteLastListenedSong,
-  useToggleLastListenedSongVisibility,
-} from "@/hooks/about/useMusic";
-import type { LastListenedSong, NewLastListenedSong } from "@/types";
+  useHobbies,
+  useCreateHobby,
+  useUpdateHobby,
+  useDeleteHobby,
+  useToggleHobbyVisibility,
+} from "@/hooks/about/useHobbies";
+import { Hobby, NewHobby } from "@/types/about/hobbies";
+import { toast } from "sonner";
 
-export default function LastListenedSongsAdminPage() {
+export default function HobbiesAdminPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedSong, setSelectedSong] = useState<LastListenedSong | null>(
-    null
-  );
+  const [selectedHobby, setSelectedHobby] = useState<Hobby | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("all");
 
-  // Hooks
-  const { data: songs, isLoading, error } = useLastListenedSongs();
-  const createSong = useCreateLastListenedSong();
-  const updateSong = useUpdateLastListenedSong();
-  const deleteSong = useDeleteLastListenedSong();
-  const toggleVisibility = useToggleLastListenedSongVisibility();
+  const { data: hobbies = [], isLoading, error } = useHobbies();
+  const createHobby = useCreateHobby();
+  const updateHobby = useUpdateHobby();
+  const deleteHobby = useDeleteHobby();
+  const toggleVisibility = useToggleHobbyVisibility();
 
-  const searchedSongs =
-    songs?.filter(
-      (item) =>
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.artist.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.album?.toLowerCase().includes(searchTerm.toLowerCase())
+  const searchedHobbies =
+    hobbies?.filter(
+      (item: Hobby) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
-  // Create song
-  const handleCreateSong = async (songData: NewLastListenedSong) => {
+  // Create hobby
+  const handleCreateHobby = async (hobbyData: NewHobby) => {
     try {
-      await createSong.mutateAsync(songData);
+      await createHobby.mutateAsync(hobbyData);
       setIsCreateModalOpen(false);
     } catch (error) {
-      console.error("Failed to create song:", error);
+      console.error("Failed to create hobby:", error);
     }
   };
 
-  // Edit song
-  const handleEditSong = (songItem: LastListenedSong) => {
-    setSelectedSong(songItem);
+  // Edit hobby
+  const handleEditHobby = (hobbyItem: Hobby) => {
+    setSelectedHobby(hobbyItem);
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateSong = async (songData: NewLastListenedSong) => {
-    if (!selectedSong) return;
+  const handleUpdateHobby = async (hobbyData: NewHobby) => {
+    if (!selectedHobby) return;
 
     try {
-      await updateSong.mutateAsync({
-        id: selectedSong.id,
-        song: songData,
+      await updateHobby.mutateAsync({
+        id: selectedHobby.id,
+        hobby: hobbyData,
       });
       setIsEditModalOpen(false);
-      setSelectedSong(null);
+      setSelectedHobby(null);
     } catch (error) {
-      console.error("Failed to update song:", error);
+      console.error("Failed to update hobby:", error);
     }
   };
 
-  // Delete song
-  const handleDeleteSong = (songItem: LastListenedSong) => {
-    setSelectedSong(songItem);
+  // Delete hobby
+  const handleDeleteHobby = (hobbyItem: Hobby) => {
+    setSelectedHobby(hobbyItem);
     setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedSong) return;
+    if (!selectedHobby) return;
 
     try {
-      await deleteSong.mutateAsync(selectedSong.id);
+      await deleteHobby.mutateAsync(selectedHobby.id);
       setIsDeleteModalOpen(false);
-      setSelectedSong(null);
+      setSelectedHobby(null);
     } catch (error) {
-      console.error("Failed to delete song:", error);
+      console.error("Failed to delete hobby:", error);
     }
   };
 
@@ -102,88 +101,84 @@ export default function LastListenedSongsAdminPage() {
     await toggleVisibility.mutateAsync(id);
   };
 
-  if (error) return <div>Error loading songs</div>;
+  if (error) return <div>Error loading hobbies</div>;
 
   const headerActions = (
     <ActionButton onClick={() => setIsCreateModalOpen(true)}>
-      Add Song
+      Add Hobby
     </ActionButton>
   );
 
   return (
     <>
       <AdminPageLayout
-        title="Last Listened Songs"
-        description="Manage your recently played tracks and music history"
+        title="Hobbies List"
+        description="Manage your hobbies and interests"
         headerActions={headerActions}
       >
-        {/* Search */}
+        {/* Search and Filters */}
         <FilterSection
           searchValue={searchTerm}
           onSearchChange={setSearchTerm}
           onSearchSubmit={handleSearch}
-          searchPlaceholder="Search songs..."
-          selectedFilter=""
-          onFilterChange={() => {}}
+          searchPlaceholder="Search hobbies..."
+          selectedFilter={selectedFilter}
+          onFilterChange={setSelectedFilter}
         />
 
-        {/* Songs List */}
+        {/* Hobbies List */}
         <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
           <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-            {searchedSongs?.map((songItem) => (
-              <li key={songItem.id} className="px-6 py-4">
+            {searchedHobbies?.map((hobbyItem: Hobby) => (
+              <li key={hobbyItem.id} className="px-6 py-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                        <Music className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                        <Plus className="h-5 w-5 text-green-600 dark:text-green-400" />
                       </div>
                     </div>
                     <div className="ml-4">
                       <div className="flex items-center">
                         <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                          {songItem.title}
+                          {hobbyItem.name}
                         </h3>
-                        {!songItem.visible && (
+                        {!hobbyItem.visible && (
                           <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
                             Hidden
                           </span>
                         )}
                       </div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {songItem.artist}
-                        {songItem.album && ` - ${songItem.album}`}
+                        {hobbyItem.description || "No description"}
                       </p>
                       <div className="mt-1">
                         <span className="text-xs text-gray-400 dark:text-gray-500">
-                          {songItem.listenedAt &&
-                            `Last listened: ${new Date(
-                              songItem.listenedAt
-                            ).toLocaleDateString()}`}
-                          {songItem.order && ` • Order: ${songItem.order}`}
+                          Added{" "}
+                          {new Date(hobbyItem.createdAt).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => handleToggleVisibility(songItem.id)}
+                      onClick={() => handleToggleVisibility(hobbyItem.id)}
                       className={`px-3 py-1 text-xs rounded-full ${
-                        songItem.visible
+                        hobbyItem.visible
                           ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                           : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                       }`}
                     >
-                      {songItem.visible ? "Visible" : "Hidden"}
+                      {hobbyItem.visible ? "Visible" : "Hidden"}
                     </button>
                     <button
-                      onClick={() => handleEditSong(songItem)}
+                      onClick={() => handleEditHobby(hobbyItem)}
                       className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDeleteSong(songItem)}
+                      onClick={() => handleDeleteHobby(hobbyItem)}
                       className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm"
                     >
                       Delete
@@ -196,39 +191,39 @@ export default function LastListenedSongsAdminPage() {
         </div>
       </AdminPageLayout>
 
-      {/* Create Song Modal */}
+      {/* Create Hobby Modal */}
       <Modal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Add New Song"
+        title="Add New Hobby"
         size="lg"
       >
-        <MusicSongsForm
-          onSubmit={handleCreateSong}
+        <HobbiesForm
+          onSubmit={handleCreateHobby}
           onCancel={() => setIsCreateModalOpen(false)}
-          isLoading={createSong.isPending}
+          isLoading={createHobby.isPending}
         />
       </Modal>
 
-      {/* Edit Song Modal */}
+      {/* Edit Hobby Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false);
-          setSelectedSong(null);
+          setSelectedHobby(null);
         }}
-        title="Edit Song"
+        title="Edit Hobby"
         size="lg"
       >
-        {selectedSong && (
-          <MusicSongsForm
-            song={selectedSong}
-            onSubmit={handleUpdateSong}
+        {selectedHobby && (
+          <HobbiesForm
+            hobby={selectedHobby}
+            onSubmit={handleUpdateHobby}
             onCancel={() => {
               setIsEditModalOpen(false);
-              setSelectedSong(null);
+              setSelectedHobby(null);
             }}
-            isLoading={updateSong.isPending}
+            isLoading={updateHobby.isPending}
           />
         )}
       </Modal>
@@ -238,13 +233,13 @@ export default function LastListenedSongsAdminPage() {
         isOpen={isDeleteModalOpen}
         onClose={() => {
           setIsDeleteModalOpen(false);
-          setSelectedSong(null);
+          setSelectedHobby(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Delete Song"
-        message="Are you sure you want to delete this song? This action cannot be undone."
-        itemName={selectedSong?.title}
-        isLoading={deleteSong.isPending}
+        title="Delete Hobby"
+        message="Are you sure you want to delete this hobby? This action cannot be undone."
+        itemName={selectedHobby?.name}
+        isLoading={deleteHobby.isPending}
       />
     </>
   );

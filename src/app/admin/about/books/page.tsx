@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Modal } from "@/components/ui";
 import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
 import { FilterSection } from "@/components/layout/FilterSection";
@@ -148,10 +149,12 @@ export default function BooksAdminPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <img
+                      <Image
                         className="h-10 w-10 rounded-lg object-cover"
-                        src={bookItem.coverImage}
+                        src={bookItem.coverImage || "/api/placeholder/40/40"}
                         alt={bookItem.title}
+                        width={40}
+                        height={40}
                       />
                     </div>
                     <div className="ml-4">

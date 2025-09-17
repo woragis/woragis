@@ -152,10 +152,7 @@ export default function MusicGenresAdminPage() {
                       </p>
                       <div className="mt-1">
                         <span className="text-xs text-gray-400 dark:text-gray-500">
-                          {genreItem.origin && `Origin: ${genreItem.origin}`}
-                          {genreItem.decade && ` • Decade: ${genreItem.decade}`}
-                          {genreItem.popularity &&
-                            ` • Popularity: ${genreItem.popularity}/10`}
+                          Order: {genreItem.order || 0}
                         </span>
                       </div>
                     </div>
