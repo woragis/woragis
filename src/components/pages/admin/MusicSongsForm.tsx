@@ -126,7 +126,7 @@ export const MusicSongsForm: React.FC<MusicSongsFormProps> = ({
           name="order"
           value={formData.order || 0}
           onChange={handleInputChange}
-          min="0"
+          min={0}
         />
       </FormField>
 

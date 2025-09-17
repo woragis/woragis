@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import type { Framework, NewFramework } from "@/types";
+import { useAuth } from "@/stores/auth-store";
 
 interface FrameworkFormProps {
   framework?: Framework;
@@ -17,6 +18,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -80,7 +82,14 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (!user?.id) {
+      console.error("User not authenticated");
+      return;
+    }
+    onSubmit({
+      ...formData,
+      userId: user.id,
+    });
   };
 
   return (

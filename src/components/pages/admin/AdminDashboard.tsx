@@ -16,10 +16,15 @@ import {
   useToggleProjectFeatured,
 } from "@/hooks/useProjects";
 import { useSettings, useUpdateSetting } from "@/hooks/useSettings";
+import { useAuth } from "@/stores/auth-store";
+import type { NewProject } from "@/types";
 
 export const AdminDashboard: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+
+  // Auth hook
+  const { user } = useAuth();
 
   // TanStack Query hooks
   const { data: projects = [], isLoading } = useProjects();
@@ -41,14 +46,20 @@ export const AdminDashboard: React.FC = () => {
     : 6;
 
   // Create or update project
-  const handleSaveProject = async (projectData: Partial<Project>) => {
+  const handleSaveProject = async (projectData: NewProject) => {
     try {
       if (editingProject) {
+        // For updates, we can pass the full project data
         await updateProjectMutation.mutateAsync({
           id: editingProject.id.toString(),
           project: projectData,
         });
       } else {
+        // Ensure userId is included for new projects
+        if (!user?.id) {
+          throw new Error("User not authenticated");
+        }
+
         await createProjectMutation.mutateAsync(projectData);
       }
       setShowForm(false);
@@ -231,8 +242,8 @@ export const AdminDashboard: React.FC = () => {
         {showForm && (
           <div className="mb-6">
             <ProjectForm
-              project={editingProject}
-              onSave={handleSaveProject}
+              project={editingProject || undefined}
+              onSubmit={handleSaveProject}
               onCancel={handleCancelForm}
               isLoading={
                 createProjectMutation.isPending ||

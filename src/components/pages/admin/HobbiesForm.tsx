@@ -8,38 +8,36 @@ import {
   FormTextarea,
   FormCheckbox,
 } from "@/components/pages/admin";
-import type { MusicGenre, NewMusicGenre } from "@/types";
+import type { Hobby, NewHobby } from "@/types/about/hobbies";
 
-interface MusicGenresFormProps {
-  genre?: MusicGenre;
-  onSubmit: (genre: NewMusicGenre) => void;
+interface HobbiesFormProps {
+  hobby?: Hobby;
+  onSubmit: (hobby: NewHobby) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
 
-export const MusicGenresForm: React.FC<MusicGenresFormProps> = ({
-  genre,
+export const HobbiesForm: React.FC<HobbiesFormProps> = ({
+  hobby,
   onSubmit,
   onCancel,
   isLoading = false,
 }) => {
-  const [formData, setFormData] = useState<Partial<NewMusicGenre>>({
+  const [formData, setFormData] = useState<Partial<NewHobby>>({
     name: "",
     description: "",
-    order: 0,
     visible: true,
   });
 
   useEffect(() => {
-    if (genre) {
+    if (hobby) {
       setFormData({
-        name: genre.name || "",
-        description: genre.description || "",
-        order: genre.order || 0,
-        visible: genre.visible || true,
+        name: hobby.name || "",
+        description: hobby.description || "",
+        visible: hobby.visible || true,
       });
     }
-  }, [genre]);
+  }, [hobby]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -51,31 +49,28 @@ export const MusicGenresForm: React.FC<MusicGenresFormProps> = ({
     setFormData((prev) => ({
       ...prev,
       [name]:
-        type === "checkbox"
-          ? (e.target as HTMLInputElement).checked
-          : type === "number"
-          ? Number(value)
-          : value,
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewMusicGenre);
+    onSubmit(formData as NewHobby);
   };
 
   return (
     <AdminForm
       onSubmit={handleSubmit}
       onCancel={onCancel}
-      submitLabel={genre ? "Update Genre" : "Create Genre"}
+      submitLabel={hobby ? "Update Hobby" : "Create Hobby"}
       isLoading={isLoading}
     >
-      <FormField label="Name" required>
+      <FormField label="Hobby Name" required>
         <FormInput
           name="name"
           value={formData.name || ""}
           onChange={handleInputChange}
+          placeholder="e.g., Photography, Cooking, Gardening"
           required
         />
       </FormField>
@@ -85,17 +80,8 @@ export const MusicGenresForm: React.FC<MusicGenresFormProps> = ({
           name="description"
           value={formData.description || ""}
           onChange={handleInputChange}
+          placeholder="Tell us more about this hobby..."
           rows={3}
-        />
-      </FormField>
-
-      <FormField label="Display Order">
-        <FormInput
-          type="number"
-          name="order"
-          value={formData.order || 0}
-          onChange={handleInputChange}
-          min={0}
         />
       </FormField>
 

@@ -33,7 +33,7 @@ export const AboutCoreForm: React.FC<AboutCoreFormProps> = ({
     visible: true,
   });
 
-  const { data: experiences = [] } = useExperience({ visible: true });
+  const { data: experiences = [] } = useExperience();
 
   useEffect(() => {
     if (aboutCore) {

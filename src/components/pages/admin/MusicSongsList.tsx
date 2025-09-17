@@ -4,6 +4,9 @@ import React from "react";
 import { ItemList } from "@/components/common";
 import type { LastListenedSong } from "@/types";
 
+// Import ListItem type from ItemList component
+type ListItem = Parameters<typeof ItemList>[0]["items"][0];
+
 interface MusicSongsListProps {
   songs: LastListenedSong[];
   onEdit: (song: LastListenedSong) => void;
@@ -25,7 +28,7 @@ export const MusicSongsList: React.FC<MusicSongsListProps> = ({
     description: `${item.artist}${item.album ? ` - ${item.album}` : ""}`,
     image: undefined, // Songs don't have images
     status: undefined, // No status for songs
-    visible: item.visible,
+    visible: item.visible ?? undefined,
     featured: false, // Songs don't have featured field
     metadata: {
       artist: item.artist,
@@ -35,12 +38,38 @@ export const MusicSongsList: React.FC<MusicSongsListProps> = ({
     },
   }));
 
+  // Create a mapping from item ID back to song object
+  const songsMap = new Map(songs.map((item) => [item.id, item]));
+
+  const handleEdit = (listItem: ListItem) => {
+    const songItem = songsMap.get(listItem.id);
+    if (songItem) {
+      onEdit(songItem);
+    }
+  };
+
+  const handleDelete = (listItem: ListItem) => {
+    const songItem = songsMap.get(listItem.id);
+    if (songItem) {
+      onDelete(songItem);
+    }
+  };
+
+  const handleToggleVisibility = (listItem: ListItem) => {
+    if (onToggleVisibility) {
+      const songItem = songsMap.get(listItem.id);
+      if (songItem) {
+        onToggleVisibility(songItem);
+      }
+    }
+  };
+
   return (
     <ItemList
       items={items}
-      onEdit={onEdit}
-      onDelete={onDelete}
-      onToggleVisibility={onToggleVisibility}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+      onToggleVisibility={handleToggleVisibility}
       isLoading={isLoading}
       emptyMessage="No songs found"
     />

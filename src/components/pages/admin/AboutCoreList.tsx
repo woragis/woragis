@@ -29,7 +29,7 @@ export const AboutCoreList: React.FC<AboutCoreListProps> = ({
             No About Information
           </h3>
           <p className="text-gray-500 dark:text-gray-400 mb-6">
-            You haven't set up your about information yet. Create your profile
+            You haven&apos;t set up your about information yet. Create your profile
             to get started.
           </p>
         </div>

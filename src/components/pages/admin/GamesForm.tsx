@@ -165,7 +165,7 @@ export const GamesForm: React.FC<GamesFormProps> = ({
             name="playtime"
             value={formData.playtime || 0}
             onChange={handleInputChange}
-            min="0"
+            min={0}
           />
         </FormField>
 
@@ -175,8 +175,8 @@ export const GamesForm: React.FC<GamesFormProps> = ({
             name="rating"
             value={formData.rating || 0}
             onChange={handleInputChange}
-            min="0"
-            max="10"
+            min={0}
+            max={10}
           />
         </FormField>
       </div>
@@ -196,7 +196,7 @@ export const GamesForm: React.FC<GamesFormProps> = ({
           name="order"
           value={formData.order || 0}
           onChange={handleInputChange}
-          min="0"
+          min={0}
         />
       </FormField>
 

@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { Button } from "@/components/ui/Button";
 import { CodeIcon } from "@/components/ui/AbstractIcons";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export const Navigation: React.FC = () => {
   const { t } = useLanguage();
@@ -58,15 +59,15 @@ export const Navigation: React.FC = () => {
             className="flex-shrink-0 animate-fade-in"
             style={{ animationDelay: "100ms", animationFillMode: "both" }}
           >
-            <a
-              href="/#"
+            <Link
+              href="/"
               className="flex items-center space-x-2 text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 hover:scale-105"
             >
               <CodeIcon className="w-8 h-8 text-indigo-600 dark:text-indigo-400 transition-transform duration-200 hover:rotate-12" />
               <span className="text-xl font-bold gradient-text transition-all duration-200">
                 {t("logo")}
               </span>
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}

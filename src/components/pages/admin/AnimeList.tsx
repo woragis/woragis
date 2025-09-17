@@ -4,6 +4,9 @@ import React from "react";
 import { ItemList } from "@/components/common";
 import type { Anime } from "@/types";
 
+// Import ListItem type from ItemList component
+type ListItem = Parameters<typeof ItemList>[0]["items"][0];
+
 interface AnimeListProps {
   anime: Anime[];
   onEdit: (anime: Anime) => void;
@@ -12,7 +15,9 @@ interface AnimeListProps {
   isLoading?: boolean;
 }
 
-const getStatusVariant = (status: string) => {
+const getStatusVariant = (
+  status: string
+): "default" | "success" | "warning" | "error" | "info" => {
   switch (status) {
     case "completed":
       return "success";
@@ -39,13 +44,13 @@ export const AnimeList: React.FC<AnimeListProps> = ({
   const items = anime.map((item) => ({
     id: item.id,
     title: item.title,
-    description: item.description,
-    image: item.coverImage,
+    description: item.description || undefined,
+    image: item.coverImage || undefined,
     status: item.status
       ?.replace(/_/g, " ")
       .replace(/\b\w/g, (l) => l.toUpperCase()),
     statusVariant: getStatusVariant(item.status || ""),
-    visible: item.visible,
+    visible: item.visible ?? undefined,
     featured: false, // Anime doesn't have featured field
     metadata: {
       episodes: item.episodes,
@@ -55,12 +60,38 @@ export const AnimeList: React.FC<AnimeListProps> = ({
     },
   }));
 
+  // Create a mapping from item ID back to anime object
+  const animeMap = new Map(anime.map((item) => [item.id, item]));
+
+  const handleEdit = (listItem: ListItem) => {
+    const animeItem = animeMap.get(listItem.id);
+    if (animeItem) {
+      onEdit(animeItem);
+    }
+  };
+
+  const handleDelete = (listItem: ListItem) => {
+    const animeItem = animeMap.get(listItem.id);
+    if (animeItem) {
+      onDelete(animeItem);
+    }
+  };
+
+  const handleToggleVisibility = (listItem: ListItem) => {
+    if (onToggleVisibility) {
+      const animeItem = animeMap.get(listItem.id);
+      if (animeItem) {
+        onToggleVisibility(animeItem);
+      }
+    }
+  };
+
   return (
     <ItemList
       items={items}
-      onEdit={onEdit}
-      onDelete={onDelete}
-      onToggleVisibility={onToggleVisibility}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+      onToggleVisibility={handleToggleVisibility}
       isLoading={isLoading}
       emptyMessage="No anime found"
     />

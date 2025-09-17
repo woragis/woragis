@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Section,
@@ -128,9 +129,10 @@ export const Projects: React.FC = () => {
                 >
                   <div className="aspect-video glass-morphism flex items-center justify-center text-6xl relative overflow-hidden">
                     {project.image.startsWith("http") ? (
-                      <img
+                      <Image
                         src={project.image}
                         alt={project.title}
+                        fill
                         className="w-full h-full object-cover"
                       />
                     ) : (

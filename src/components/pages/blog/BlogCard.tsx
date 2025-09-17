@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Card } from "@/components/ui";
 import { Calendar, Clock, Eye, ArrowRight } from "lucide-react";
 import type { BlogPost } from "@/types";
@@ -35,9 +36,10 @@ export const BlogCard: React.FC<BlogCardProps> = ({
       {/* Featured Image */}
       <div className="relative h-48 overflow-hidden group">
         {post.featuredImage ? (
-          <img
+          <Image
             src={post.featuredImage}
             alt={post.title}
+            fill
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
         ) : (

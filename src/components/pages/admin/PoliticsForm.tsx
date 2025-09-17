@@ -163,7 +163,7 @@ export const PoliticsForm: React.FC<PoliticsFormProps> = ({
           name="order"
           value={formData.order || 0}
           onChange={handleInputChange}
-          min="0"
+          min={0}
         />
       </FormField>
 

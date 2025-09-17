@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Button,
@@ -86,9 +87,11 @@ export const Hero: React.FC = () => {
               style={{ animationDelay: "1200ms", animationFillMode: "both" }}
             >
               <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 modern-card overflow-hidden hover-lift transition-all duration-500 hover:scale-105">
-                <img
+                <Image
                   src="/api/placeholder/400/400"
                   alt="Professional headshot"
+                  width={400}
+                  height={400}
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-indigo-600/20 to-transparent transition-opacity duration-300 hover:opacity-80"></div>

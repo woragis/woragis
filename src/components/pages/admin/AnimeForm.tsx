@@ -157,7 +157,7 @@ export const AnimeForm: React.FC<AnimeFormProps> = ({
             name="episodes"
             value={formData.episodes || 0}
             onChange={handleInputChange}
-            min="0"
+            min={0}
           />
         </FormField>
 
@@ -167,7 +167,7 @@ export const AnimeForm: React.FC<AnimeFormProps> = ({
             name="currentEpisode"
             value={formData.currentEpisode || 0}
             onChange={handleInputChange}
-            min="0"
+            min={0}
           />
         </FormField>
       </div>
@@ -178,8 +178,8 @@ export const AnimeForm: React.FC<AnimeFormProps> = ({
           name="rating"
           value={formData.rating || 0}
           onChange={handleInputChange}
-          min="0"
-          max="10"
+          min={0}
+          max={10}
         />
       </FormField>
 
@@ -198,7 +198,7 @@ export const AnimeForm: React.FC<AnimeFormProps> = ({
           name="order"
           value={formData.order || 0}
           onChange={handleInputChange}
-          min="0"
+          min={0}
         />
       </FormField>
 

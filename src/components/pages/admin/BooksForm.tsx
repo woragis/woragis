@@ -168,7 +168,7 @@ export const BooksForm: React.FC<BooksFormProps> = ({
             name="pages"
             value={formData.pages || 0}
             onChange={handleInputChange}
-            min="0"
+            min={0}
           />
         </FormField>
 
@@ -178,7 +178,7 @@ export const BooksForm: React.FC<BooksFormProps> = ({
             name="currentPage"
             value={formData.currentPage || 0}
             onChange={handleInputChange}
-            min="0"
+            min={0}
           />
         </FormField>
       </div>
@@ -189,8 +189,8 @@ export const BooksForm: React.FC<BooksFormProps> = ({
           name="rating"
           value={formData.rating || 0}
           onChange={handleInputChange}
-          min="0"
-          max="10"
+          min={0}
+          max={10}
         />
       </FormField>
 
@@ -209,7 +209,7 @@ export const BooksForm: React.FC<BooksFormProps> = ({
           name="order"
           value={formData.order || 0}
           onChange={handleInputChange}
-          min="0"
+          min={0}
         />
       </FormField>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Section,
@@ -155,9 +156,11 @@ export const Testimonials: React.FC = () => {
                     <div className="flex items-center">
                       <div className="w-12 h-12 glass-morphism rounded-full flex items-center justify-center text-slate-900 dark:text-white font-bold text-lg mr-4">
                         {testimonial.avatar ? (
-                          <img
+                          <Image
                             src={testimonial.avatar}
                             alt={testimonial.name}
+                            width={48}
+                            height={48}
                             className="w-full h-full rounded-full object-cover"
                           />
                         ) : (

@@ -41,7 +41,7 @@ export const DeleteConfirmationModal: React.FC<
           {message}
           {itemName && (
             <span className="block mt-2 font-medium text-gray-900 dark:text-white">
-              "{itemName}"
+              &quot;{itemName}&quot;
             </span>
           )}
         </p>
@@ -55,7 +55,7 @@ export const DeleteConfirmationModal: React.FC<
             Cancel
           </Button>
           <Button
-            variant="destructive"
+            variant="primary"
             onClick={onConfirm}
             disabled={isLoading}
             className="bg-red-600 hover:bg-red-700 text-white"

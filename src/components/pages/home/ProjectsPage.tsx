@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { Project } from "@/server/db/schema";
 import { Section, Container, Card, Button, EmptyState } from "../../ui";
 import { ExternalLink, Github } from "lucide-react";
@@ -105,9 +106,10 @@ export const ProjectsPage: React.FC = () => {
                   >
                     <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center text-6xl">
                       {project.image.startsWith("http") ? (
-                        <img
+                        <Image
                           src={project.image}
                           alt={project.title}
+                          fill
                           className="w-full h-full object-cover"
                         />
                       ) : (
