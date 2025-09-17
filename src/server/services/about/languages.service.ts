@@ -4,7 +4,7 @@ import {
   type NewLanguage,
 } from "../../db/schemas/about/languages";
 import { BaseService } from "../base.service";
-import { ApiResponse } from "../../types";
+import { ApiResponse } from "@/types";
 
 const languagesRepository = new LanguagesRepository();
 

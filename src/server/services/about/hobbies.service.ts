@@ -1,7 +1,7 @@
 import { HobbiesRepository } from "../../repositories/about/hobbies.repository";
 import { type Hobby, type NewHobby } from "../../db/schemas/about/hobbies";
 import { BaseService } from "../base.service";
-import { ApiResponse } from "../../types";
+import { ApiResponse } from "@/types";
 
 const hobbiesRepository = new HobbiesRepository();
 

@@ -61,7 +61,10 @@ export class TestimonialTagService extends BaseService {
     try {
       const success = await testimonialTagRepository.delete(id);
       if (!success) {
-        return this.error("Testimonial tag not found", 404);
+        return {
+          success: false,
+          error: "Testimonial tag not found",
+        };
       }
       return this.success(undefined);
     } catch (error) {

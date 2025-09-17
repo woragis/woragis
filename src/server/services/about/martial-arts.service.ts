@@ -4,7 +4,7 @@ import {
   type NewMartialArt,
 } from "../../db/schemas/about/martial-arts";
 import { BaseService } from "../base.service";
-import { ApiResponse } from "../../types";
+import { ApiResponse } from "@/types";
 
 const martialArtsRepository = new MartialArtsRepository();
 

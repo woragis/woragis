@@ -72,9 +72,7 @@ export class ExperienceService extends BaseService {
         experienceData.order = allExperiences.length;
       }
 
-      // Add userId to experience data
-      const experienceWithUser = { ...experienceData, userId };
-      const experience = await experienceRepository.create(experienceWithUser);
+      const experience = await experienceRepository.create(experienceData, userId);
       return this.success(experience, "Experience created successfully");
     } catch (error) {
       return this.handleError(error, "createExperience");

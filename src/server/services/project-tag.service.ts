@@ -59,7 +59,10 @@ export class ProjectTagService extends BaseService {
     try {
       const success = await projectTagRepository.delete(id);
       if (!success) {
-        return this.error("Project tag not found", 404);
+        return {
+          success: false,
+          error: "Project tag not found",
+        };
       }
       return this.success(undefined);
     } catch (error) {

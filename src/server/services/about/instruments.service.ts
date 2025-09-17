@@ -4,7 +4,7 @@ import {
   type NewInstrument,
 } from "../../db/schemas/about/instruments";
 import { BaseService } from "../base.service";
-import { ApiResponse } from "../../types";
+import { ApiResponse } from "@/types";
 
 const instrumentsRepository = new InstrumentsRepository();
 

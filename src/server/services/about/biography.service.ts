@@ -4,7 +4,7 @@ import {
   type NewBiography,
 } from "../../db/schemas/about/biography";
 import { BaseService } from "../base.service";
-import { ApiResponse } from "../../types";
+import { ApiResponse } from "@/types";
 
 const biographyRepository = new BiographyRepository();
 

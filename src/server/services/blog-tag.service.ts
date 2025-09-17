@@ -57,7 +57,10 @@ export class BlogTagService extends BaseService {
     try {
       const success = await blogTagRepository.delete(id);
       if (!success) {
-        return this.error("Blog tag not found", 404);
+        return {
+          success: false,
+          error: "Blog tag not found",
+        };
       }
       return this.success(undefined);
     } catch (error) {
