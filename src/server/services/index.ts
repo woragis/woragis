@@ -10,7 +10,7 @@ import { BlogTagService } from "./blog-tag.service";
 import { ProjectTagService } from "./project-tag.service";
 import { TestimonialTagService } from "./testimonial-tag.service";
 import {
-  AboutCoreService,
+  BiographyService,
   MusicGenreService,
   LastListenedSongService,
   AnimeService,
@@ -18,6 +18,10 @@ import {
   GameService,
   PoliticalViewService,
   YoutuberService,
+  InstrumentsService,
+  MartialArtsService,
+  LanguagesService,
+  HobbiesService,
 } from "./about";
 
 // Export all services
@@ -32,7 +36,7 @@ export {
   BlogTagService,
   ProjectTagService,
   TestimonialTagService,
-  AboutCoreService,
+  BiographyService,
   MusicGenreService,
   LastListenedSongService,
   AnimeService,
@@ -40,6 +44,10 @@ export {
   GameService,
   PoliticalViewService,
   YoutuberService,
+  InstrumentsService,
+  MartialArtsService,
+  LanguagesService,
+  HobbiesService,
 };
 
 // Create singleton instances
@@ -55,7 +63,7 @@ export const projectTagService = new ProjectTagService();
 export const testimonialTagService = new TestimonialTagService();
 
 // Create about service instances
-export const aboutCoreService = new AboutCoreService();
+export const biographyService = new BiographyService();
 export const musicGenreService = new MusicGenreService();
 export const lastListenedSongService = new LastListenedSongService();
 export const animeService = new AnimeService();
@@ -63,3 +71,7 @@ export const bookService = new BookService();
 export const gameService = new GameService();
 export const politicalViewService = new PoliticalViewService();
 export const youtuberService = new YoutuberService();
+export const instrumentsService = new InstrumentsService();
+export const martialArtsService = new MartialArtsService();
+export const languagesService = new LanguagesService();
+export const hobbiesService = new HobbiesService();

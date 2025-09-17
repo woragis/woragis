@@ -1,5 +1,15 @@
 import { settingsRepository } from "@/server/repositories";
-import type { Setting, NewSetting, ApiResponse } from "@/types";
+import type {
+  Setting,
+  NewSetting,
+  ApiResponse,
+  SocialMedia,
+  NewSocialMedia,
+  ContactInfo,
+  NewContactInfo,
+  SiteSettings,
+  NewSiteSettings,
+} from "@/types";
 import { BaseService } from "./base.service";
 
 export class SettingsService extends BaseService {
@@ -263,5 +273,112 @@ export class SettingsService extends BaseService {
   private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  }
+
+  // Note: Core Profile methods have been moved to biography service
+
+  // Social Media methods
+  async getSocialMedia(
+    userId: string
+  ): Promise<ApiResponse<SocialMedia | null>> {
+    try {
+      const media = await settingsRepository.getSocialMedia(userId);
+      return this.success(media);
+    } catch (error) {
+      return this.handleError(error, "getSocialMedia");
+    }
+  }
+
+  async getFirstSocialMedia(): Promise<ApiResponse<SocialMedia | null>> {
+    try {
+      const media = await settingsRepository.getFirstSocialMedia();
+      return this.success(media);
+    } catch (error) {
+      return this.handleError(error, "getFirstSocialMedia");
+    }
+  }
+
+  async updateSocialMedia(
+    userId: string,
+    mediaData: Partial<NewSocialMedia>
+  ): Promise<ApiResponse<SocialMedia>> {
+    try {
+      const media = await settingsRepository.upsertSocialMedia(
+        userId,
+        mediaData
+      );
+      return this.success(media, "Social media updated successfully");
+    } catch (error) {
+      return this.handleError(error, "updateSocialMedia");
+    }
+  }
+
+  // Contact Info methods
+  async getContactInfo(
+    userId: string
+  ): Promise<ApiResponse<ContactInfo | null>> {
+    try {
+      const info = await settingsRepository.getContactInfo(userId);
+      return this.success(info);
+    } catch (error) {
+      return this.handleError(error, "getContactInfo");
+    }
+  }
+
+  async getFirstContactInfo(): Promise<ApiResponse<ContactInfo | null>> {
+    try {
+      const info = await settingsRepository.getFirstContactInfo();
+      return this.success(info);
+    } catch (error) {
+      return this.handleError(error, "getFirstContactInfo");
+    }
+  }
+
+  async updateContactInfo(
+    userId: string,
+    infoData: Partial<NewContactInfo>
+  ): Promise<ApiResponse<ContactInfo>> {
+    try {
+      const info = await settingsRepository.upsertContactInfo(userId, infoData);
+      return this.success(info, "Contact info updated successfully");
+    } catch (error) {
+      return this.handleError(error, "updateContactInfo");
+    }
+  }
+
+  // Site Settings methods
+  async getSiteSettings(
+    userId: string
+  ): Promise<ApiResponse<SiteSettings | null>> {
+    try {
+      const settings = await settingsRepository.getSiteSettings(userId);
+      return this.success(settings);
+    } catch (error) {
+      return this.handleError(error, "getSiteSettings");
+    }
+  }
+
+  async getFirstSiteSettings(): Promise<ApiResponse<SiteSettings | null>> {
+    try {
+      const settings = await settingsRepository.getFirstSiteSettings();
+      return this.success(settings);
+    } catch (error) {
+      return this.handleError(error, "getFirstSiteSettings");
+    }
+  }
+
+  async updateSiteSettings(
+    userId: string,
+    settingsData: Partial<NewSiteSettings>
+  ): Promise<ApiResponse<SiteSettings>> {
+    try {
+      const settings = await settingsRepository.upsertSiteSettings(
+        userId,
+        settingsData
+      );
+      return this.success(settings, "Site settings updated successfully");
+    } catch (error) {
+      return this.handleError(error, "updateSiteSettings");
+    }
   }
 }
