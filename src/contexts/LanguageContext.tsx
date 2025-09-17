@@ -59,7 +59,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [language, setLanguageState] = useState<Language>("en");
-  const [messages, setMessages] = useState<Record<string, string>>({});
+  const [messages, setMessages] = useState<Record<string, any>>({});
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Load language from localStorage on mount
