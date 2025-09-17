@@ -56,7 +56,7 @@ export class AuthService {
       expiresIn: this.jwtExpiresIn,
       issuer: "portfolio-app",
       audience: "portfolio-users",
-    });
+    } as jwt.SignOptions);
   }
 
   private generateRefreshToken(): string {

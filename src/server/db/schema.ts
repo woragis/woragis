@@ -1,3 +1,2 @@
-// Re-export all schemas and types from domain files
+// Re-export all schemas from domain files
 export * from "./schemas";
-export * from "../../types";
