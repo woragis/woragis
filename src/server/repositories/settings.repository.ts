@@ -1,7 +1,22 @@
 import { eq, desc, asc } from "drizzle-orm";
 import { db } from "../db";
-import { settings } from "../db/schemas";
-import type { Setting, NewSetting, SettingKey } from "@/types";
+import {
+  settings,
+  socialMedia,
+  contactInfo,
+  siteSettings,
+} from "../db/schemas";
+import type {
+  Setting,
+  NewSetting,
+  SettingKey,
+  SocialMedia,
+  NewSocialMedia,
+  ContactInfo,
+  NewContactInfo,
+  SiteSettings,
+  NewSiteSettings,
+} from "@/types";
 
 export class SettingsRepository {
   // Basic CRUD operations
@@ -117,5 +132,124 @@ export class SettingsRepository {
     });
 
     return result;
+  }
+
+  // Note: Core Profile operations have been moved to biography repository
+
+  // Social Media operations
+  async getSocialMedia(userId: string): Promise<SocialMedia | null> {
+    const [media] = await db
+      .select()
+      .from(socialMedia)
+      .where(eq(socialMedia.userId, userId))
+      .limit(1);
+    return media || null;
+  }
+
+  async getFirstSocialMedia(): Promise<SocialMedia | null> {
+    const [media] = await db.select().from(socialMedia).limit(1);
+    return media || null;
+  }
+
+  async upsertSocialMedia(
+    userId: string,
+    data: Partial<NewSocialMedia>
+  ): Promise<SocialMedia> {
+    const existing = await this.getSocialMedia(userId);
+
+    if (existing) {
+      const { updatedAt, ...dataWithoutUpdatedAt } = data;
+      const [updated] = await db
+        .update(socialMedia)
+        .set({ ...dataWithoutUpdatedAt, updatedAt: new Date() })
+        .where(eq(socialMedia.userId, userId))
+        .returning();
+      return updated;
+    } else {
+      const { updatedAt, createdAt, ...dataWithoutTimestamps } = data;
+      const [created] = await db
+        .insert(socialMedia)
+        .values({ ...dataWithoutTimestamps, userId })
+        .returning();
+      return created;
+    }
+  }
+
+  // Contact Info operations
+  async getContactInfo(userId: string): Promise<ContactInfo | null> {
+    const [info] = await db
+      .select()
+      .from(contactInfo)
+      .where(eq(contactInfo.userId, userId))
+      .limit(1);
+    return info || null;
+  }
+
+  async getFirstContactInfo(): Promise<ContactInfo | null> {
+    const [info] = await db.select().from(contactInfo).limit(1);
+    return info || null;
+  }
+
+  async upsertContactInfo(
+    userId: string,
+    data: Partial<NewContactInfo>
+  ): Promise<ContactInfo> {
+    const existing = await this.getContactInfo(userId);
+
+    if (existing) {
+      const { updatedAt, ...dataWithoutUpdatedAt } = data;
+      const [updated] = await db
+        .update(contactInfo)
+        .set({ ...dataWithoutUpdatedAt, updatedAt: new Date() })
+        .where(eq(contactInfo.userId, userId))
+        .returning();
+      return updated;
+    } else {
+      const { updatedAt, createdAt, ...dataWithoutTimestamps } = data;
+      const [created] = await db
+        .insert(contactInfo)
+        .values({ ...dataWithoutTimestamps, userId })
+        .returning();
+      return created;
+    }
+  }
+
+  // Site Settings operations
+  async getSiteSettings(userId: string): Promise<SiteSettings | null> {
+    const [settings] = await db
+      .select()
+      .from(siteSettings)
+      .where(eq(siteSettings.userId, userId))
+      .limit(1);
+    return settings || null;
+  }
+
+  async getFirstSiteSettings(): Promise<SiteSettings | null> {
+    const [settings] = await db.select().from(siteSettings).limit(1);
+    return settings || null;
+  }
+
+  async upsertSiteSettings(
+    userId: string,
+    data: Partial<NewSiteSettings>
+  ): Promise<SiteSettings> {
+    const existing = await this.getSiteSettings(userId);
+
+    if (existing) {
+      const { updatedAt, ...dataWithoutUpdatedAt } = data;
+      const [updated] = await db
+        .update(siteSettings)
+        .set({ ...dataWithoutUpdatedAt, updatedAt: new Date() })
+        .where(eq(siteSettings.userId, userId))
+        .returning();
+      return updated;
+    } else {
+      const { updatedAt, createdAt, ...dataWithoutTimestamps } = data;
+      const [created] = await db
+        .insert(siteSettings)
+        .values({ ...dataWithoutTimestamps, userId })
+        .returning();
+      return created;
+    }
   }
 }

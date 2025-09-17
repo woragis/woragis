@@ -10,7 +10,7 @@ import { BlogTagRepository } from "./blog-tag.repository";
 import { ProjectTagRepository } from "./project-tag.repository";
 import { TestimonialTagRepository } from "./testimonial-tag.repository";
 import {
-  AboutCoreRepository,
+  BiographyRepository,
   MusicGenreRepository,
   LastListenedSongRepository,
   AnimeRepository,
@@ -18,6 +18,10 @@ import {
   PoliticalViewRepository,
   YoutuberRepository,
   GameRepository,
+  InstrumentsRepository,
+  MartialArtsRepository,
+  LanguagesRepository,
+  HobbiesRepository,
 } from "./about";
 
 // Export all repositories
@@ -32,7 +36,7 @@ export {
   BlogTagRepository,
   ProjectTagRepository,
   TestimonialTagRepository,
-  AboutCoreRepository,
+  BiographyRepository,
   MusicGenreRepository,
   LastListenedSongRepository,
   AnimeRepository,
@@ -40,6 +44,10 @@ export {
   PoliticalViewRepository,
   YoutuberRepository,
   GameRepository,
+  InstrumentsRepository,
+  MartialArtsRepository,
+  LanguagesRepository,
+  HobbiesRepository,
 };
 
 // Create singleton instances
@@ -55,7 +63,7 @@ export const projectTagRepository = new ProjectTagRepository();
 export const testimonialTagRepository = new TestimonialTagRepository();
 
 // Create about repository instances
-export const aboutCoreRepository = new AboutCoreRepository();
+export const biographyRepository = new BiographyRepository();
 export const musicGenreRepository = new MusicGenreRepository();
 export const lastListenedSongRepository = new LastListenedSongRepository();
 export const animeRepository = new AnimeRepository();
@@ -63,3 +71,7 @@ export const bookRepository = new BookRepository();
 export const politicalViewRepository = new PoliticalViewRepository();
 export const youtuberRepository = new YoutuberRepository();
 export const gameRepository = new GameRepository();
+export const instrumentsRepository = new InstrumentsRepository();
+export const martialArtsRepository = new MartialArtsRepository();
+export const languagesRepository = new LanguagesRepository();
+export const hobbiesRepository = new HobbiesRepository();
