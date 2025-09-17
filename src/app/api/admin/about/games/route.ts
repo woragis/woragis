@@ -19,9 +19,16 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   }
 
   const { searchParams } = new URL(request.url);
+  const categoryParam = searchParams.get("category");
+  const validCategories = ["current", "childhood", "planned"];
+  const category =
+    categoryParam && validCategories.includes(categoryParam)
+      ? (categoryParam as any)
+      : undefined;
+
   const filters: GameFilters = {
     search: searchParams.get("search") || undefined,
-    category: searchParams.get("category") || undefined,
+    category,
     limit: searchParams.get("limit")
       ? parseInt(searchParams.get("limit")!)
       : undefined,

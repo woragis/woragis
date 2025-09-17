@@ -19,9 +19,22 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   }
 
   const { searchParams } = new URL(request.url);
+  const statusParam = searchParams.get("status");
+  const validStatuses = [
+    "completed",
+    "dropped",
+    "on_hold",
+    "want_to_read",
+    "reading",
+  ];
+  const status =
+    statusParam && validStatuses.includes(statusParam)
+      ? (statusParam as any)
+      : undefined;
+
   const filters: BookFilters = {
     search: searchParams.get("search") || undefined,
-    status: searchParams.get("status") || undefined,
+    status,
     limit: searchParams.get("limit")
       ? parseInt(searchParams.get("limit")!)
       : undefined,

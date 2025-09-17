@@ -12,13 +12,16 @@ import {
 
 // GET /api/admin/testimonials/[id] - Get testimonial by ID for admin
 export const GET = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return handleAuthError(authResult.error);
     }
 
-    const { id } = params;
+    const { id } = await params;
     const result = await testimonialService.getTestimonialById(
       id,
       authResult.userId
@@ -34,13 +37,16 @@ export const GET = withErrorHandling(
 
 // PUT /api/admin/testimonials/[id] - Update testimonial
 export const PUT = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return handleAuthError(authResult.error);
     }
 
-    const { id } = params;
+    const { id } = await params;
     const testimonialData = await request.json();
     const result = await testimonialService.updateTestimonial(
       id,
@@ -54,13 +60,16 @@ export const PUT = withErrorHandling(
 
 // DELETE /api/admin/testimonials/[id] - Delete testimonial
 export const DELETE = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return handleAuthError(authResult.error);
     }
 
-    const { id } = params;
+    const { id } = await params;
     const result = await testimonialService.deleteTestimonial(
       id,
       authResult.userId

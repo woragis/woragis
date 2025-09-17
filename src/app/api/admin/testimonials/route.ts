@@ -49,6 +49,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     return handleAuthError(authResult.error);
   }
 
+  if (!authResult.userId) {
+    return handleAuthError("User ID not found");
+  }
+
   const testimonialData = await request.json();
   const result = await testimonialService.createTestimonial(
     testimonialData,

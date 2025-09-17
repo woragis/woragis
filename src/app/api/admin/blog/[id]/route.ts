@@ -12,13 +12,16 @@ import {
 
 // GET /api/admin/blog/[id] - Get blog post by ID for admin
 export const GET = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return handleAuthError(authResult.error);
     }
 
-    const { id } = params;
+    const { id } = await params;
     const result = await blogService.getBlogPostById(id, authResult.userId);
 
     if (!result.success) {
@@ -31,13 +34,16 @@ export const GET = withErrorHandling(
 
 // PUT /api/admin/blog/[id] - Update blog post
 export const PUT = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return handleAuthError(authResult.error);
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     // Handle date conversion for publishedAt
@@ -58,13 +64,16 @@ export const PUT = withErrorHandling(
 
 // DELETE /api/admin/blog/[id] - Delete blog post
 export const DELETE = withErrorHandling(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
     const authResult = await authMiddleware(request);
     if (!authResult.success) {
       return handleAuthError(authResult.error);
     }
 
-    const { id } = params;
+    const { id } = await params;
     const result = await blogService.deleteBlogPost(id, authResult.userId);
 
     if (!result.success) {
