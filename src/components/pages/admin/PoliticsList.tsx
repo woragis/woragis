@@ -25,15 +25,15 @@ export const PoliticsList: React.FC<PoliticsListProps> = ({
     description: `${item.politicalParty}${
       item.position ? ` - ${item.position}` : ""
     }${item.description ? ` - ${item.description}` : ""}`,
-    image: item.picture,
-    status: item.politicalParty,
+    image: item.picture ?? undefined,
+    status: item.politicalParty ?? undefined,
     statusVariant: "info" as const,
-    visible: item.visible,
+    visible: item.visible ?? undefined,
     featured: false, // Politics doesn't have featured field
     metadata: {
-      position: item.position,
-      website: item.website,
-      socialMedia: item.socialMedia,
+      position: item.position ?? undefined,
+      website: item.website ?? undefined,
+      socialMedia: item.socialMedia ?? undefined,
     },
   }));
 
