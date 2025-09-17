@@ -3,7 +3,7 @@ import {
   type Instrument,
   type NewInstrument,
 } from "@/server/db/schemas/about/instruments";
-import { type ApiResponse } from "@/server/types";
+import { type ApiResponse } from "@/types";
 
 export const instrumentsApi = {
   // Admin API calls

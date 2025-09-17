@@ -3,7 +3,7 @@ import {
   type MartialArt,
   type NewMartialArt,
 } from "@/server/db/schemas/about/martial-arts";
-import { type ApiResponse } from "@/server/types";
+import { type ApiResponse } from "@/types";
 
 export const martialArtsApi = {
   // Admin API calls

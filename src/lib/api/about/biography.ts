@@ -3,7 +3,7 @@ import {
   type Biography,
   type NewBiography,
 } from "@/server/db/schemas/about/biography";
-import { type ApiResponse } from "@/server/types";
+import { type ApiResponse } from "@/types";
 
 export const biographyApi = {
   // Admin API calls

@@ -19,7 +19,6 @@ export { testimonialTagApi } from "./api/testimonial-tags";
 export { experienceApi } from "./api/experience";
 export { testimonialApi } from "./api/testimonials";
 export {
-  aboutCoreApi,
   musicGenreApi,
   lastListenedSongApi,
   animeApi,

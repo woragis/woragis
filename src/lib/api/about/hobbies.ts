@@ -1,6 +1,6 @@
 import { apiClient } from "../client";
 import { type Hobby, type NewHobby } from "@/server/db/schemas/about/hobbies";
-import { type ApiResponse } from "@/server/types";
+import { type ApiResponse } from "@/types";
 
 export const hobbiesApi = {
   // Admin API calls

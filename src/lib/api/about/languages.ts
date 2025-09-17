@@ -3,7 +3,7 @@ import {
   type Language,
   type NewLanguage,
 } from "@/server/db/schemas/about/languages";
-import { type ApiResponse } from "@/server/types";
+import { type ApiResponse } from "@/types";
 
 export const languagesApi = {
   // Admin API calls

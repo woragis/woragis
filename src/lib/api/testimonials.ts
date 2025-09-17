@@ -67,6 +67,15 @@ export const testimonialApi = {
     return apiClient.post("/admin/testimonials/order", { testimonialOrders });
   },
 
+  // Stats API
+  async getTestimonialStats(): Promise<ApiResponse<number>> {
+    return apiClient.get("/admin/testimonials/stats/total");
+  },
+
+  async getAverageRating(): Promise<ApiResponse<number>> {
+    return apiClient.get("/admin/testimonials/stats/average-rating");
+  },
+
   // Public testimonial API
   async getPublicTestimonials(
     filters: TestimonialFilters = {}

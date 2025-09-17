@@ -53,6 +53,12 @@ export const musicGenreApi = {
 
     return apiClient.get(`/admin/about/music/genres?${params.toString()}`);
   },
+
+  async toggleGenreVisibility(
+    id: string
+  ): Promise<ApiResponse<MusicGenre | null>> {
+    return apiClient.patch(`/admin/about/music/genres/${id}/toggle-visibility`);
+  },
 };
 
 // Last Listened Song API functions
@@ -98,5 +104,11 @@ export const lastListenedSongApi = {
     if (filters.offset) params.append("offset", filters.offset.toString());
 
     return apiClient.get(`/admin/about/music/songs?${params.toString()}`);
+  },
+
+  async toggleSongVisibility(
+    id: string
+  ): Promise<ApiResponse<LastListenedSong | null>> {
+    return apiClient.patch(`/admin/about/music/songs/${id}/toggle-visibility`);
   },
 };
