@@ -14,6 +14,12 @@
 3. Site de aposta
    _Ajudar na selecao natural e receber um pouco do dinheiro de pobres que provavelmente ja gastariam aquele dinheiro, porem com outro site_
 
+4. Criador de hentai com ia
+
+5. Hentai por tras de um paywall
+  _Criar um gerenciador igual ao **ds-core** so que para gerenciar hentai generators e sites com paywalls_
+
+
 # Minha pagina
 
 ## Adicionar na minha pagina
