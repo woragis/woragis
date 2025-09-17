@@ -2,12 +2,11 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark" | "system";
+type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  actualTheme: "light" | "dark";
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -34,73 +33,38 @@ const getSystemTheme = (): "light" | "dark" => {
 
 // Helper function to get initial theme
 const getInitialTheme = (): Theme => {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") return "light";
+
   const savedTheme = localStorage.getItem("theme") as Theme;
-  return savedTheme && ["light", "dark", "system"].includes(savedTheme)
-    ? savedTheme
-    : "system";
+  if (savedTheme && ["light", "dark"].includes(savedTheme)) {
+    return savedTheme;
+  }
+
+  // If no saved theme, use system preference
+  return getSystemTheme();
 };
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>("system");
-  const [actualTheme, setActualTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<Theme>("light");
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialize theme on mount
   useEffect(() => {
     const initialTheme = getInitialTheme();
-    const systemTheme = getSystemTheme();
-
     setTheme(initialTheme);
-
-    // Set actual theme based on initial theme
-    if (initialTheme === "system") {
-      setActualTheme(systemTheme);
-    } else {
-      setActualTheme(initialTheme);
-    }
-
     setIsInitialized(true);
   }, []);
 
-  // Update actual theme when theme changes
+  // Update theme class when theme changes
   useEffect(() => {
     if (!isInitialized) return;
 
     const root = window.document.documentElement;
-    let resolvedTheme: "light" | "dark";
-
-    if (theme === "system") {
-      resolvedTheme = getSystemTheme();
-    } else {
-      resolvedTheme = theme;
-    }
-
-    setActualTheme(resolvedTheme);
 
     // Remove previous theme classes
     root.classList.remove("light", "dark");
     // Add current theme class
-    root.classList.add(resolvedTheme);
-  }, [theme, isInitialized]);
-
-  // Listen for system theme changes when theme is set to "system"
-  useEffect(() => {
-    if (!isInitialized || theme !== "system") return;
-
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    const handleChange = () => {
-      const systemTheme = getSystemTheme();
-      setActualTheme(systemTheme);
-
-      const root = window.document.documentElement;
-      root.classList.remove("light", "dark");
-      root.classList.add(systemTheme);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    root.classList.add(theme);
   }, [theme, isInitialized]);
 
   const handleSetTheme = (newTheme: Theme) => {
@@ -111,9 +75,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider
-      value={{ theme, setTheme: handleSetTheme, actualTheme }}
-    >
+    <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme }}>
       {children}
     </ThemeContext.Provider>
   );
