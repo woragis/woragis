@@ -52,12 +52,21 @@ export function useTestimonialStats() {
     queryKey: testimonialKeys.stats(),
     queryFn: async () => {
       const [totalResponse, avgRatingResponse] = await Promise.all([
-        api.get("/admin/testimonials/stats/total"),
-        api.get("/admin/testimonials/stats/average-rating"),
+        testimonialApi.getTestimonialStats(),
+        testimonialApi.getAverageRating(),
       ]);
+      
+      if (!totalResponse.success || totalResponse.data === undefined) {
+        throw new Error(totalResponse.error || "Failed to fetch testimonial stats");
+      }
+      
+      if (!avgRatingResponse.success || avgRatingResponse.data === undefined) {
+        throw new Error(avgRatingResponse.error || "Failed to fetch average rating");
+      }
+      
       return {
-        total: totalResponse.data.data as number,
-        averageRating: avgRatingResponse.data.data as number,
+        total: totalResponse.data,
+        averageRating: avgRatingResponse.data,
       };
     },
   });
