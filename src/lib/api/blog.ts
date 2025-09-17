@@ -21,9 +21,6 @@ export const blogApi = {
       params.append("visible", filters.visible.toString());
     if (filters.public !== undefined)
       params.append("public", filters.public.toString());
-    if (filters.category) params.append("category", filters.category);
-    if (filters.tags && filters.tags.length > 0)
-      params.append("tags", filters.tags.join(","));
     if (filters.search) params.append("search", filters.search);
     if (filters.limit) params.append("limit", filters.limit.toString());
     if (filters.offset) params.append("offset", filters.offset.toString());
@@ -111,9 +108,6 @@ export const blogApi = {
     filters: BlogPostFilters = {}
   ): Promise<ApiResponse<BlogPost[]>> {
     const params = new URLSearchParams();
-    if (filters.category) params.append("category", filters.category);
-    if (filters.tags && filters.tags.length > 0)
-      params.append("tags", filters.tags.join(","));
     if (filters.search) params.append("search", filters.search);
     if (filters.limit) params.append("limit", filters.limit.toString());
     if (filters.offset) params.append("offset", filters.offset.toString());
