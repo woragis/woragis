@@ -66,9 +66,9 @@ export const BlogCard: React.FC<BlogCardProps> = ({
         )}
 
         {/* Tags */}
-        {post.tags && post.tags.length > 0 && (
+        {(post as any).tags && (post as any).tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {post.tags.slice(0, 3).map((tag: string, index: number) => (
+            {(post as any).tags.slice(0, 3).map((tag: string, index: number) => (
               <span
                 key={index}
                 className="inline-flex items-center px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full transition-all duration-200 hover:scale-105 animate-fade-in"
@@ -80,9 +80,9 @@ export const BlogCard: React.FC<BlogCardProps> = ({
                 {tag}
               </span>
             ))}
-            {post.tags.length > 3 && (
+            {(post as any).tags.length > 3 && (
               <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full transition-all duration-200 hover:scale-105">
-                +{post.tags.length - 3}
+                +{(post as any).tags.length - 3}
               </span>
             )}
           </div>
@@ -93,7 +93,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
           <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mb-4 transition-colors duration-200">
             <div className="flex items-center">
               <Calendar className="w-4 h-4 mr-1 transition-transform duration-200 group-hover:scale-110" />
-              {formatDate(post.publishedAt || post.createdAt)}
+              {formatDate(post.publishedAt || post.createdAt || new Date())}
             </div>
             <div className="flex items-center">
               <Eye className="w-4 h-4 mr-1 transition-transform duration-200 group-hover:scale-110" />

@@ -34,8 +34,8 @@ export const YouTubersForm: React.FC<YouTubersFormProps> = ({
     description: "",
     category: "current",
     youtubeUrl: "",
-    profilePicture: "",
-    subscriberCount: 0,
+    profileImage: "",
+    subscriberCount: "0",
     contentType: "",
     notes: "",
     order: 0,
@@ -49,8 +49,8 @@ export const YouTubersForm: React.FC<YouTubersFormProps> = ({
         description: youTuber.description || "",
         category: youTuber.category || "current",
         youtubeUrl: youTuber.youtubeUrl || "",
-        profilePicture: youTuber.profilePicture || "",
-        subscriberCount: youTuber.subscriberCount || 0,
+        profileImage: youTuber.profileImage || "",
+        subscriberCount: youTuber.subscriberCount || "0",
         contentType: youTuber.contentType || "",
         notes: youTuber.notes || "",
         order: youTuber.order || 0,
@@ -129,8 +129,8 @@ export const YouTubersForm: React.FC<YouTubersFormProps> = ({
       <FormField label="Profile Picture URL">
         <FormInput
           type="url"
-          name="profilePicture"
-          value={formData.profilePicture || ""}
+          name="profileImage"
+          value={formData.profileImage || ""}
           onChange={handleInputChange}
         />
       </FormField>
@@ -139,9 +139,9 @@ export const YouTubersForm: React.FC<YouTubersFormProps> = ({
         <FormInput
           type="number"
           name="subscriberCount"
-          value={formData.subscriberCount || 0}
+          value={formData.subscriberCount || "0"}
           onChange={handleInputChange}
-          min="0"
+          min={0}
         />
       </FormField>
 
@@ -169,7 +169,7 @@ export const YouTubersForm: React.FC<YouTubersFormProps> = ({
           name="order"
           value={formData.order || 0}
           onChange={handleInputChange}
-          min="0"
+          min={0}
         />
       </FormField>
 

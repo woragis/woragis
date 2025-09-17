@@ -14,6 +14,7 @@ import type { AboutCore, NewAboutCore } from "@/types";
 
 interface AboutCoreFormProps {
   aboutCore?: AboutCore;
+  userId: string;
   onSubmit: (aboutCore: NewAboutCore) => void;
   onCancel: () => void;
   isLoading?: boolean;
@@ -21,6 +22,7 @@ interface AboutCoreFormProps {
 
 export const AboutCoreForm: React.FC<AboutCoreFormProps> = ({
   aboutCore,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
@@ -63,7 +65,10 @@ export const AboutCoreForm: React.FC<AboutCoreFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({
+      ...formData,
+      userId,
+    });
   };
 
   const experienceOptions = experiences.map((experience) => ({

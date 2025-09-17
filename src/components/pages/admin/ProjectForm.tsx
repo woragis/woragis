@@ -9,6 +9,7 @@ import type { ProjectTag } from "@/types/project-tags";
 
 interface ProjectFormProps {
   project?: Project;
+  userId: string;
   onSubmit: (project: NewProject) => void;
   onCancel: () => void;
   isLoading?: boolean;
@@ -16,6 +17,7 @@ interface ProjectFormProps {
 
 export const ProjectForm: React.FC<ProjectFormProps> = ({
   project,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
@@ -126,6 +128,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     e.preventDefault();
     onSubmit({
       ...formData,
+      userId,
       technologies: JSON.stringify(formData.technologies),
     });
   };

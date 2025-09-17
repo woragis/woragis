@@ -12,7 +12,7 @@ interface YouTubersListProps {
   isLoading?: boolean;
 }
 
-const getCategoryVariant = (category: string) => {
+const getCategoryVariant = (category: string): "default" | "info" | "warning" | "success" | "error" => {
   switch (category) {
     case "current":
       return "info";
@@ -40,12 +40,12 @@ export const YouTubersList: React.FC<YouTubersListProps> = ({
         ? ` - ${item.subscriberCount.toLocaleString()} subscribers`
         : ""
     }`,
-    image: item.profilePicture,
+    image: item.profileImage || undefined,
     status: item.category
       ?.replace(/_/g, " ")
       .replace(/\b\w/g, (l) => l.toUpperCase()),
     statusVariant: getCategoryVariant(item.category || ""),
-    visible: item.visible,
+    visible: item.visible ?? undefined,
     featured: false, // YouTubers doesn't have featured field
     metadata: {
       contentType: item.contentType,
@@ -57,9 +57,18 @@ export const YouTubersList: React.FC<YouTubersListProps> = ({
   return (
     <ItemList
       items={items}
-      onEdit={onEdit}
-      onDelete={onDelete}
-      onToggleVisibility={onToggleVisibility}
+      onEdit={(item) => {
+        const youtuber = youTubers.find(y => y.id === item.id);
+        if (youtuber) onEdit(youtuber);
+      }}
+      onDelete={(item) => {
+        const youtuber = youTubers.find(y => y.id === item.id);
+        if (youtuber) onDelete(youtuber);
+      }}
+      onToggleVisibility={(item) => {
+        const youtuber = youTubers.find(y => y.id === item.id);
+        if (youtuber && onToggleVisibility) onToggleVisibility(youtuber);
+      }}
       isLoading={isLoading}
       emptyMessage="No YouTubers found"
     />

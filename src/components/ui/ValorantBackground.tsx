@@ -3,7 +3,7 @@ import React from "react";
 interface ValorantBackgroundProps {
   children: React.ReactNode;
   className?: string;
-  variant?: "geometric" | "abstract" | "minimal" | "gradient";
+  variant?: "geometric" | "abstract" | "minimal" | "gradient" | "cyber" | "pixel" | "neon";
 }
 
 export const ValorantBackground: React.FC<ValorantBackgroundProps> = ({
@@ -21,6 +21,12 @@ export const ValorantBackground: React.FC<ValorantBackgroundProps> = ({
         return "bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800";
       case "gradient":
         return "bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-purple-900/20 dark:to-pink-900/20";
+      case "cyber":
+        return "cyber-grid bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900";
+      case "pixel":
+        return "pixel-pattern bg-gradient-to-br from-green-900 via-black to-green-800";
+      case "neon":
+        return "neon-glow bg-gradient-to-br from-purple-900 via-pink-900 to-cyan-900";
       default:
         return "geometric-pattern";
     }

@@ -19,6 +19,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -126,7 +127,7 @@ const SortableProjectItem: React.FC<SortableProjectItemProps> = ({
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => onToggleFeatured(project.id)}
+                  onClick={() => onToggleFeatured(Number(project.id))}
                   className="p-1"
                 >
                   {project.featured ? (
@@ -138,7 +139,7 @@ const SortableProjectItem: React.FC<SortableProjectItemProps> = ({
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => onToggleVisibility(project.id)}
+                  onClick={() => onToggleVisibility(Number(project.id))}
                   className="p-1"
                 >
                   {project.visible ? (
@@ -158,7 +159,7 @@ const SortableProjectItem: React.FC<SortableProjectItemProps> = ({
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => onDelete(project.id)}
+                  onClick={() => onDelete(Number(project.id))}
                   className="p-1 text-red-500 hover:text-red-700"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -188,13 +189,10 @@ export const ProjectList: React.FC<ProjectListProps> = ({
     })
   );
 
-  const handleDragEnd = (event: {
-    active: { id: string };
-    over: { id: string } | null;
-  }) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = projects.findIndex(
         (project) => project.id === active.id
       );
@@ -202,7 +200,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
 
       const reorderedProjects = arrayMove(projects, oldIndex, newIndex);
       const projectOrders = reorderedProjects.map((project, index) => ({
-        id: project.id,
+        id: Number(project.id),
         order: index,
       }));
 

@@ -243,6 +243,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="mb-6">
             <ProjectForm
               project={editingProject || undefined}
+              userId={user?.id || ""}
               onSubmit={handleSaveProject}
               onCancel={handleCancelForm}
               isLoading={

@@ -31,7 +31,7 @@ export const BlogMeta: React.FC<BlogMetaProps> = ({
     });
   };
 
-  const tags = post.tags ? JSON.parse(post.tags) : [];
+  const tags = (post as any).tags ? JSON.parse((post as any).tags) : [];
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -39,7 +39,7 @@ export const BlogMeta: React.FC<BlogMetaProps> = ({
       <div className="flex flex-wrap items-center gap-6 text-gray-500 dark:text-gray-400">
         <div className="flex items-center">
           <Calendar className="w-5 h-5 mr-2" />
-          <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+          <span>{formatDate(post.publishedAt || post.createdAt || new Date())}</span>
         </div>
 
         {showReadingTime && post.readingTime && (

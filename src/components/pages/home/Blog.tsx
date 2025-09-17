@@ -107,7 +107,7 @@ export const Blog: React.FC = () => {
           {blogPosts.length > 0 && (
             <div className="text-center mt-12">
               <Button
-                variant="retro"
+                variant="gradient"
                 size="lg"
                 className="gaming-hover pixel-hover"
                 onClick={() => (window.location.href = "/blog")}

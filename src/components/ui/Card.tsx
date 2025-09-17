@@ -4,7 +4,7 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   hover?: boolean;
-  variant?: "default" | "modern" | "glass" | "gradient" | "geometric";
+  variant?: "default" | "modern" | "glass" | "gradient" | "geometric" | "gaming";
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -20,6 +20,7 @@ export const Card: React.FC<CardProps> = ({
     gradient:
       "bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-6 rounded-xl border border-indigo-200/50 dark:border-indigo-700/50",
     geometric: "geometric-border p-6",
+    gaming: "gaming-card p-6 border border-green-400/30 bg-gray-900/50 backdrop-blur-sm",
   };
 
   const hoverClasses = hover

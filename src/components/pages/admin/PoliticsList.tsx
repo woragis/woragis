@@ -4,6 +4,9 @@ import React from "react";
 import { ItemList } from "@/components/common";
 import type { PoliticalView } from "@/types";
 
+// Import ListItem type from ItemList component
+type ListItem = Parameters<typeof ItemList>[0]["items"][0];
+
 interface PoliticsListProps {
   politicalViews: PoliticalView[];
   onEdit: (politicalView: PoliticalView) => void;
@@ -37,12 +40,38 @@ export const PoliticsList: React.FC<PoliticsListProps> = ({
     },
   }));
 
+  // Create a mapping from item ID back to political view object
+  const politicalViewsMap = new Map(politicalViews.map((item) => [item.id, item]));
+
+  const handleEdit = (listItem: ListItem) => {
+    const politicalView = politicalViewsMap.get(listItem.id);
+    if (politicalView) {
+      onEdit(politicalView);
+    }
+  };
+
+  const handleDelete = (listItem: ListItem) => {
+    const politicalView = politicalViewsMap.get(listItem.id);
+    if (politicalView) {
+      onDelete(politicalView);
+    }
+  };
+
+  const handleToggleVisibility = (listItem: ListItem) => {
+    if (onToggleVisibility) {
+      const politicalView = politicalViewsMap.get(listItem.id);
+      if (politicalView) {
+        onToggleVisibility(politicalView);
+      }
+    }
+  };
+
   return (
     <ItemList
       items={items}
-      onEdit={onEdit}
-      onDelete={onDelete}
-      onToggleVisibility={onToggleVisibility}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+      onToggleVisibility={handleToggleVisibility}
       isLoading={isLoading}
       emptyMessage="No political views found"
     />

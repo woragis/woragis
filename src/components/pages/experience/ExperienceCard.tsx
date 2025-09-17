@@ -38,7 +38,6 @@ export const ExperienceCard: React.FC<ExperienceCardProps> = ({
     <Card
       variant="modern"
       className="hover-lift hover-glow animate-fade-in-up"
-      style={{ animationDelay: `${index * 200}ms`, animationFillMode: "both" }}
     >
       <div className="flex flex-col lg:flex-row lg:items-start gap-6">
         {/* Timeline indicator */}
