@@ -20,9 +20,9 @@ import type {
 export class ProjectRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<Project[]> {
-    const query = db.select().from(projects);
+    let query = db.select().from(projects) as any;
     if (userId) {
-      query.where(eq(projects.userId, userId));
+      query = query.where(eq(projects.userId, userId)) as any;
     }
     return await query.orderBy(asc(projects.order));
   }
@@ -194,18 +194,18 @@ export class ProjectRepository {
       conditions.push(like(projects.technologies, `%${techFilter}%`));
     }
 
-    let query = db.select().from(projects);
+    let query = db.select().from(projects) as any;
 
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      query = query.where(and(...conditions)) as any;
     }
 
     if (filters.limit) {
-      query = query.limit(filters.limit);
+      query = query.limit(filters.limit) as any;
     }
 
     if (filters.offset) {
-      query = query.offset(filters.offset);
+      query = query.offset(filters.offset) as any;
     }
 
     return await query.orderBy(asc(projects.order));
@@ -282,6 +282,7 @@ export class ProjectRepository {
         color: frameworks.color,
         website: frameworks.website,
         version: frameworks.version,
+        type: frameworks.type,
         order: frameworks.order,
         visible: frameworks.visible,
         createdAt: frameworks.createdAt,
@@ -291,7 +292,7 @@ export class ProjectRepository {
       .innerJoin(frameworks, eq(projectFrameworks.frameworkId, frameworks.id))
       .where(eq(projectFrameworks.projectId, projectId));
 
-    return result;
+    return result as Framework[];
   }
 
   // Tag relations

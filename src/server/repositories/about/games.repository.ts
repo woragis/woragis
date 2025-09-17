@@ -6,7 +6,7 @@ import type { Game, NewGame, GameFilters, GameCategory } from "@/types";
 export class GameRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<Game[]> {
-    const query = db.select().from(games);
+    const query = db.select().from(games) as any;
     if (userId) {
       query.where(eq(games.userId, userId));
     }
@@ -102,7 +102,7 @@ export class GameRepository {
       conditions.push(like(games.title, `%${filters.search}%`));
     }
 
-    let query = db.select().from(games);
+    let query = db.select().from(games) as any;
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));

@@ -10,7 +10,7 @@ import type {
 export class PoliticalViewRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<PoliticalView[]> {
-    const query = db.select().from(politicalViews);
+    const query = db.select().from(politicalViews) as any;
     if (userId) {
       query.where(eq(politicalViews.userId, userId));
     }
@@ -96,7 +96,7 @@ export class PoliticalViewRepository {
       conditions.push(like(politicalViews.personName, `%${filters.search}%`));
     }
 
-    let query = db.select().from(politicalViews);
+    let query = db.select().from(politicalViews) as any;
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));

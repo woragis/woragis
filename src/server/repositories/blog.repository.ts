@@ -11,9 +11,9 @@ import type {
 export class BlogRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<BlogPost[]> {
-    const query = db.select().from(blogPosts);
+    let query = db.select().from(blogPosts) as any;
     if (userId) {
-      query.where(eq(blogPosts.userId, userId));
+      query = query.where(eq(blogPosts.userId, userId)) as any;
     }
     return await query.orderBy(desc(blogPosts.createdAt));
   }
@@ -292,17 +292,17 @@ export class BlogRepository {
     let query = db.select().from(blogPosts) as any;
 
     if (whereClause) {
-      query = query.where(whereClause);
+      query = query.where(whereClause) as any;
     }
 
-    query = query.orderBy(orderByClause);
+    query = query.orderBy(orderByClause) as any;
 
     if (filters.limit) {
-      query = query.limit(filters.limit);
+      query = query.limit(filters.limit) as any;
     }
 
     if (filters.offset) {
-      query = query.offset(filters.offset);
+      query = query.offset(filters.offset) as any;
     }
 
     return await query;

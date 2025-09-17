@@ -13,7 +13,7 @@ import type {
 export class MusicGenreRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<MusicGenre[]> {
-    const query = db.select().from(musicGenres);
+    const query = db.select().from(musicGenres) as any;
     if (userId) {
       query.where(eq(musicGenres.userId, userId));
     }
@@ -93,7 +93,7 @@ export class MusicGenreRepository {
       conditions.push(like(musicGenres.name, `%${filters.search}%`));
     }
 
-    let query = db.select().from(musicGenres);
+    let query = db.select().from(musicGenres) as any;
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
@@ -114,7 +114,7 @@ export class MusicGenreRepository {
 export class LastListenedSongRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<LastListenedSong[]> {
-    const query = db.select().from(lastListenedSongs);
+    const query = db.select().from(lastListenedSongs) as any;
     if (userId) {
       query.where(eq(lastListenedSongs.userId, userId));
     }
@@ -208,7 +208,7 @@ export class LastListenedSongRepository {
       );
     }
 
-    let query = db.select().from(lastListenedSongs);
+    let query = db.select().from(lastListenedSongs) as any;
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));

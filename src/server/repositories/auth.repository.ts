@@ -15,29 +15,100 @@ export class AuthRepository {
   // User operations
   async createUser(userData: CreateUser): Promise<User> {
     const [user] = await db.insert(users).values(userData).returning();
-    return user;
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role as "user" | "admin" | "super_admin",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      avatar: user.avatar ?? undefined,
+      lastLoginAt: user.lastLoginAt ?? undefined,
+    };
   }
 
   async getUserById(id: string): Promise<User | null> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || null;
+    if (!user) return null;
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role as "user" | "admin" | "super_admin",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      avatar: user.avatar ?? undefined,
+      lastLoginAt: user.lastLoginAt ?? undefined,
+    };
   }
 
   async getUserByIdWithPassword(id: string): Promise<UserWithPassword | null> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || null;
+    if (!user) return null;
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      passwordHash: user.passwordHash,
+      role: user.role as "user" | "admin" | "super_admin",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      avatar: user.avatar ?? undefined,
+      lastLoginAt: user.lastLoginAt ?? undefined,
+    };
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user || null;
+    if (!user) return null;
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role as "user" | "admin" | "super_admin",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      avatar: user.avatar ?? undefined,
+      lastLoginAt: user.lastLoginAt ?? undefined,
+    };
   }
 
   async getUserByEmailWithPassword(
     email: string
   ): Promise<UserWithPassword | null> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user || null;
+    if (!user) return null;
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      passwordHash: user.passwordHash,
+      role: user.role as "user" | "admin" | "super_admin",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      avatar: user.avatar ?? undefined,
+      lastLoginAt: user.lastLoginAt ?? undefined,
+    };
   }
 
   async getUserByUsername(username: string): Promise<User | null> {
@@ -45,7 +116,21 @@ export class AuthRepository {
       .select()
       .from(users)
       .where(eq(users.username, username));
-    return user || null;
+    if (!user) return null;
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role as "user" | "admin" | "super_admin",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      avatar: user.avatar ?? undefined,
+      lastLoginAt: user.lastLoginAt ?? undefined,
+    };
   }
 
   async updateUser(id: string, userData: UpdateUser): Promise<User | null> {
@@ -54,21 +139,50 @@ export class AuthRepository {
       .set({ ...userData, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning();
-    return user || null;
+    if (!user) return null;
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role as "user" | "admin" | "super_admin",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      avatar: user.avatar ?? undefined,
+      lastLoginAt: user.lastLoginAt ?? undefined,
+    };
   }
 
   async deleteUser(id: string): Promise<boolean> {
     const result = await db.delete(users).where(eq(users.id, id));
-    return result.rowCount > 0;
+    return (result as any).rowCount > 0;
   }
 
   async getAllUsers(limit = 50, offset = 0): Promise<User[]> {
-    return await db
+    const usersList = await db
       .select()
       .from(users)
       .orderBy(desc(users.createdAt))
       .limit(limit)
       .offset(offset);
+    
+    return usersList.map(user => ({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role as "user" | "admin" | "super_admin",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      avatar: user.avatar ?? undefined,
+      lastLoginAt: user.lastLoginAt ?? undefined,
+    }));
   }
 
   async getUsersCount(): Promise<number> {
@@ -82,7 +196,21 @@ export class AuthRepository {
       .from(users)
       .orderBy(users.createdAt)
       .limit(1);
-    return user || null;
+    if (!user) return null;
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role as "user" | "admin" | "super_admin",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt ?? new Date(),
+      updatedAt: user.updatedAt ?? new Date(),
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      avatar: user.avatar ?? undefined,
+      lastLoginAt: user.lastLoginAt ?? undefined,
+    };
   }
 
   async isFirstUser(userId: string): Promise<boolean> {
@@ -96,7 +224,16 @@ export class AuthRepository {
       .insert(userSessions)
       .values(sessionData)
       .returning();
-    return session;
+    return {
+      id: session.id,
+      userId: session.userId,
+      tokenHash: session.tokenHash,
+      expiresAt: session.expiresAt,
+      isActive: session.isActive ?? true,
+      createdAt: session.createdAt ?? new Date(),
+      userAgent: session.userAgent ?? undefined,
+      ipAddress: session.ipAddress ?? undefined,
+    };
   }
 
   async getSessionByTokenHash(tokenHash: string): Promise<UserSession | null> {
@@ -109,7 +246,17 @@ export class AuthRepository {
           eq(userSessions.isActive, true)
         )
       );
-    return session || null;
+    if (!session) return null;
+    return {
+      id: session.id,
+      userId: session.userId,
+      tokenHash: session.tokenHash,
+      expiresAt: session.expiresAt,
+      isActive: session.isActive ?? true,
+      createdAt: session.createdAt ?? new Date(),
+      userAgent: session.userAgent ?? undefined,
+      ipAddress: session.ipAddress ?? undefined,
+    };
   }
 
   async getSessionById(id: string): Promise<UserSession | null> {
@@ -117,15 +264,36 @@ export class AuthRepository {
       .select()
       .from(userSessions)
       .where(eq(userSessions.id, id));
-    return session || null;
+    if (!session) return null;
+    return {
+      id: session.id,
+      userId: session.userId,
+      tokenHash: session.tokenHash,
+      expiresAt: session.expiresAt,
+      isActive: session.isActive ?? true,
+      createdAt: session.createdAt ?? new Date(),
+      userAgent: session.userAgent ?? undefined,
+      ipAddress: session.ipAddress ?? undefined,
+    };
   }
 
   async getUserSessions(userId: string): Promise<UserSession[]> {
-    return await db
+    const sessions = await db
       .select()
       .from(userSessions)
       .where(eq(userSessions.userId, userId))
       .orderBy(desc(userSessions.createdAt));
+    
+    return sessions.map(session => ({
+      id: session.id,
+      userId: session.userId,
+      tokenHash: session.tokenHash,
+      expiresAt: session.expiresAt,
+      isActive: session.isActive ?? true,
+      createdAt: session.createdAt ?? new Date(),
+      userAgent: session.userAgent ?? undefined,
+      ipAddress: session.ipAddress ?? undefined,
+    }));
   }
 
   async updateSession(
@@ -137,7 +305,17 @@ export class AuthRepository {
       .set(sessionData)
       .where(eq(userSessions.id, id))
       .returning();
-    return session || null;
+    if (!session) return null;
+    return {
+      id: session.id,
+      userId: session.userId,
+      tokenHash: session.tokenHash,
+      expiresAt: session.expiresAt,
+      isActive: session.isActive ?? true,
+      createdAt: session.createdAt ?? new Date(),
+      userAgent: session.userAgent ?? undefined,
+      ipAddress: session.ipAddress ?? undefined,
+    };
   }
 
   async deactivateSession(id: string): Promise<boolean> {
@@ -145,7 +323,7 @@ export class AuthRepository {
       .update(userSessions)
       .set({ isActive: false })
       .where(eq(userSessions.id, id));
-    return result.rowCount > 0;
+    return (result as any).rowCount > 0;
   }
 
   async deactivateAllUserSessions(userId: string): Promise<boolean> {
@@ -153,40 +331,42 @@ export class AuthRepository {
       .update(userSessions)
       .set({ isActive: false })
       .where(eq(userSessions.userId, userId));
-    return result.rowCount > 0;
+    return (result as any).rowCount > 0;
   }
 
   async deleteSession(id: string): Promise<boolean> {
     const result = await db.delete(userSessions).where(eq(userSessions.id, id));
-    return result.rowCount > 0;
+    return (result as any).rowCount > 0;
   }
 
   async deleteExpiredSessions(): Promise<number> {
     const result = await db
       .delete(userSessions)
       .where(lt(userSessions.expiresAt, new Date()));
-    return result.rowCount;
+    return (result as any).rowCount;
   }
 
   async deleteAllUserSessions(userId: string): Promise<number> {
     const result = await db
       .delete(userSessions)
       .where(eq(userSessions.userId, userId));
-    return result.rowCount;
+    return (result as any).rowCount;
   }
 
   // Utility methods
   async isEmailTaken(email: string, excludeUserId?: string): Promise<boolean> {
-    const query = db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, email));
-
+    const conditions = [eq(users.email, email)];
+    
     if (excludeUserId) {
-      query.where(and(eq(users.email, email), eq(users.id, excludeUserId)));
+      // Exclude the user with the given ID from the check
+      conditions.push(eq(users.id, excludeUserId));
     }
 
-    const result = await query;
+    const result = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(...conditions));
+
     return result.length > 0;
   }
 
@@ -194,18 +374,18 @@ export class AuthRepository {
     username: string,
     excludeUserId?: string
   ): Promise<boolean> {
-    const query = db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.username, username));
-
+    const conditions = [eq(users.username, username)];
+    
     if (excludeUserId) {
-      query.where(
-        and(eq(users.username, username), eq(users.id, excludeUserId))
-      );
+      // Exclude the user with the given ID from the check
+      conditions.push(eq(users.id, excludeUserId));
     }
 
-    const result = await query;
+    const result = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(...conditions));
+
     return result.length > 0;
   }
 

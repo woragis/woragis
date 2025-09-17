@@ -6,7 +6,7 @@ import type { Anime, NewAnime, AnimeFilters, AnimeStatus } from "@/types";
 export class AnimeRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<Anime[]> {
-    const query = db.select().from(animeList);
+    const query = db.select().from(animeList) as any;
     if (userId) {
       query.where(eq(animeList.userId, userId));
     }
@@ -99,7 +99,7 @@ export class AnimeRepository {
       conditions.push(like(animeList.title, `%${filters.search}%`));
     }
 
-    let query = db.select().from(animeList);
+    let query = db.select().from(animeList) as any;
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));

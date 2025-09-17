@@ -208,7 +208,11 @@ export class SettingsRepository {
       const { updatedAt, createdAt, ...dataWithoutTimestamps } = data;
       const [created] = await db
         .insert(contactInfo)
-        .values({ ...dataWithoutTimestamps, userId })
+        .values({ 
+          ...dataWithoutTimestamps, 
+          userId,
+          email: dataWithoutTimestamps.email || ""
+        })
         .returning();
       return created;
     }
@@ -247,7 +251,11 @@ export class SettingsRepository {
       const { updatedAt, createdAt, ...dataWithoutTimestamps } = data;
       const [created] = await db
         .insert(siteSettings)
-        .values({ ...dataWithoutTimestamps, userId })
+        .values({ 
+          ...dataWithoutTimestamps, 
+          userId,
+          title: dataWithoutTimestamps.title || "My Portfolio"
+        })
         .returning();
       return created;
     }

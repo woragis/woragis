@@ -11,14 +11,23 @@ import type {
 export class YoutuberRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<Youtuber[]> {
-    const query = db.select().from(youtubers);
+    const conditions = [];
     if (userId) {
-      query.where(eq(youtubers.userId, userId));
+      conditions.push(eq(youtubers.userId, userId));
     }
-    return await query.orderBy(
-      asc(youtubers.order),
-      asc(youtubers.channelName)
-    );
+    
+    if (conditions.length > 0) {
+      return await db
+        .select()
+        .from(youtubers)
+        .where(and(...conditions))
+        .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+    } else {
+      return await db
+        .select()
+        .from(youtubers)
+        .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+    }
   }
 
   async findVisible(userId?: string): Promise<Youtuber[]> {
@@ -110,23 +119,62 @@ export class YoutuberRepository {
       conditions.push(like(youtubers.channelName, `%${filters.search}%`));
     }
 
-    let query = db.select().from(youtubers);
-
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      if (filters.limit && filters.offset) {
+        return await db
+          .select()
+          .from(youtubers)
+          .where(and(...conditions))
+          .limit(filters.limit)
+          .offset(filters.offset)
+          .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+      } else if (filters.limit) {
+        return await db
+          .select()
+          .from(youtubers)
+          .where(and(...conditions))
+          .limit(filters.limit)
+          .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+      } else if (filters.offset) {
+        return await db
+          .select()
+          .from(youtubers)
+          .where(and(...conditions))
+          .offset(filters.offset)
+          .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+      } else {
+        return await db
+          .select()
+          .from(youtubers)
+          .where(and(...conditions))
+          .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+      }
+    } else {
+      if (filters.limit && filters.offset) {
+        return await db
+          .select()
+          .from(youtubers)
+          .limit(filters.limit)
+          .offset(filters.offset)
+          .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+      } else if (filters.limit) {
+        return await db
+          .select()
+          .from(youtubers)
+          .limit(filters.limit)
+          .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+      } else if (filters.offset) {
+        return await db
+          .select()
+          .from(youtubers)
+          .offset(filters.offset)
+          .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+      } else {
+        return await db
+          .select()
+          .from(youtubers)
+          .orderBy(asc(youtubers.order), asc(youtubers.channelName));
+      }
     }
-
-    if (filters.limit) {
-      query = query.limit(filters.limit);
-    }
-
-    if (filters.offset) {
-      query = query.offset(filters.offset);
-    }
-
-    return await query.orderBy(
-      asc(youtubers.order),
-      asc(youtubers.channelName)
-    );
   }
 }

@@ -53,7 +53,7 @@ export class TestimonialTagRepository {
     const result = await db
       .delete(testimonialTags)
       .where(eq(testimonialTags.id, id));
-    return result.rowCount > 0;
+    return (result as any).rowCount > 0;
   }
 
   async search(
@@ -82,17 +82,17 @@ export class TestimonialTagRepository {
       .select()
       .from(testimonialTags)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .orderBy(asc(testimonialTags.order), asc(testimonialTags.name));
+      .orderBy(asc(testimonialTags.order), asc(testimonialTags.name)) as any;
 
     if (filters.limit) {
-      query = query.limit(filters.limit);
+      query = query.limit(filters.limit) as any;
     }
 
     if (filters.offset) {
-      query = query.offset(filters.offset);
+      query = query.offset(filters.offset) as any;
     }
 
-    return query;
+    return await query;
   }
 
   async getVisibleTags(): Promise<(typeof testimonialTags.$inferSelect)[]> {

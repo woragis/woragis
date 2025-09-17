@@ -6,7 +6,7 @@ import type { Book, NewBook, BookFilters, BookStatus } from "@/types";
 export class BookRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<Book[]> {
-    const query = db.select().from(bookList);
+    const query = db.select().from(bookList) as any;
     if (userId) {
       query.where(eq(bookList.userId, userId));
     }
@@ -104,7 +104,7 @@ export class BookRepository {
       );
     }
 
-    let query = db.select().from(bookList);
+    let query = db.select().from(bookList) as any;
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));

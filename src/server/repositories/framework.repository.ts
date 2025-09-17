@@ -12,9 +12,9 @@ import type {
 export class FrameworkRepository {
   // Basic CRUD operations
   async findAll(userId?: string): Promise<Framework[]> {
-    const query = db.select().from(frameworks);
+    let query = db.select().from(frameworks) as any;
     if (userId) {
-      query.where(eq(frameworks.userId, userId));
+      query = query.where(eq(frameworks.userId, userId)) as any;
     }
     return await query.orderBy(asc(frameworks.order), asc(frameworks.name));
   }
@@ -108,18 +108,18 @@ export class FrameworkRepository {
       conditions.push(like(frameworks.name, `%${filters.search}%`));
     }
 
-    let query = db.select().from(frameworks);
+    let query = db.select().from(frameworks) as any;
 
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      query = query.where(and(...conditions)) as any;
     }
 
     if (filters.limit) {
-      query = query.limit(filters.limit);
+      query = query.limit(filters.limit) as any;
     }
 
     if (filters.offset) {
-      query = query.offset(filters.offset);
+      query = query.offset(filters.offset) as any;
     }
 
     return await query.orderBy(asc(frameworks.order), asc(frameworks.name));

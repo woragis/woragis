@@ -38,7 +38,7 @@ export class BlogTagRepository {
 
   async delete(id: string): Promise<boolean> {
     const result = await db.delete(blogTags).where(eq(blogTags.id, id));
-    return result.rowCount > 0;
+    return (result as any).rowCount > 0;
   }
 
   async search(
@@ -67,17 +67,17 @@ export class BlogTagRepository {
       .select()
       .from(blogTags)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .orderBy(asc(blogTags.order), asc(blogTags.name));
+      .orderBy(asc(blogTags.order), asc(blogTags.name)) as any;
 
     if (filters.limit) {
-      query = query.limit(filters.limit);
+      query = query.limit(filters.limit) as any;
     }
 
     if (filters.offset) {
-      query = query.offset(filters.offset);
+      query = query.offset(filters.offset) as any;
     }
 
-    return query;
+    return await query;
   }
 
   async getVisibleTags(): Promise<(typeof blogTags.$inferSelect)[]> {

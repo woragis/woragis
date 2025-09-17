@@ -205,18 +205,20 @@ export class TestimonialRepository {
     let query = db.select().from(testimonials);
 
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      query = query.where(and(...conditions)) as any;
     }
 
-    if (filters.limit) {
-      query = query.limit(filters.limit);
+    query = query.orderBy(asc(testimonials.order)) as any;
+
+    if (filters.limit !== undefined) {
+      query = query.limit(filters.limit) as any;
     }
 
-    if (filters.offset) {
-      query = query.offset(filters.offset);
+    if (filters.offset !== undefined) {
+      query = query.offset(filters.offset) as any;
     }
 
-    return await query.orderBy(asc(testimonials.order));
+    return await query;
   }
 
   // Statistics
