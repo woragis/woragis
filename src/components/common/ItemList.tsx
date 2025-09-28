@@ -10,7 +10,7 @@ import {
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { Edit, Trash2, Eye, EyeOff } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 interface ListItem {
   id: string;
