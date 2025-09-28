@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Section,
@@ -19,7 +20,7 @@ import {
   TargetIcon,
 } from "../../ui";
 import { Project } from "@/types/projects";
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, Eye } from "lucide-react";
 import { usePublicFeaturedProjects } from "@/hooks/usePublicProjects";
 
 export const Projects: React.FC = () => {
@@ -122,29 +123,29 @@ export const Projects: React.FC = () => {
               const IconComponent = projectIcons[index % projectIcons.length];
 
               return (
-                <Card
-                  key={project.id}
-                  variant="modern"
-                  className="flex flex-col overflow-hidden hover-lift hover-glow"
-                >
-                  <div className="aspect-video glass-morphism flex items-center justify-center text-6xl relative overflow-hidden">
-                    {project.image.startsWith("http") ? (
-                      <Image
-                        src={project.image}
-                        alt={project.title}
-                        fill
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-indigo-600 dark:text-indigo-400 font-bold">
-                        {project.image}
-                      </span>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-indigo-600/20 to-transparent"></div>
-                    <div className="absolute top-2 right-2">
-                      <IconComponent className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                <Link key={project.id} href={`/projects/${project.id}`}>
+                  <Card
+                    variant="modern"
+                    className="flex flex-col overflow-hidden hover-lift hover-glow cursor-pointer"
+                  >
+                    <div className="aspect-video glass-morphism flex items-center justify-center text-6xl relative overflow-hidden">
+                      {project.image.startsWith("http") ? (
+                        <Image
+                          src={project.image}
+                          alt={project.title}
+                          fill
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-indigo-600 dark:text-indigo-400 font-bold">
+                          {project.image}
+                        </span>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-indigo-600/20 to-transparent"></div>
+                      <div className="absolute top-2 right-2">
+                        <IconComponent className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                      </div>
                     </div>
-                  </div>
 
                   <div className="p-6 flex flex-col flex-grow">
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
@@ -176,14 +177,26 @@ export const Projects: React.FC = () => {
                     </div>
 
                     <div className="flex gap-2">
+                      <Link href={`/projects/${project.id}`} className="flex-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          {t("projects.viewDetails")}
+                        </Button>
+                      </Link>
                       {project.githubUrl && (
                         <Button
                           variant="outline"
                           size="sm"
                           className="flex-1"
-                          onClick={() =>
-                            window.open(project.githubUrl!, "_blank")
-                          }
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.open(project.githubUrl!, "_blank");
+                          }}
                         >
                           <Github className="w-4 h-4 mr-2" />
                           {t("projects.code")}
@@ -194,9 +207,11 @@ export const Projects: React.FC = () => {
                           variant="modern"
                           size="sm"
                           className="flex-1"
-                          onClick={() =>
-                            window.open(project.liveUrl!, "_blank")
-                          }
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.open(project.liveUrl!, "_blank");
+                          }}
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
                           {t("projects.live")}
@@ -204,7 +219,8 @@ export const Projects: React.FC = () => {
                       )}
                     </div>
                   </div>
-                </Card>
+                  </Card>
+                </Link>
               );
             })}
           </div>

@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Project } from "@/types/projects";
 import { Section, Container, Card, Button, EmptyState } from "../../ui";
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, Eye } from "lucide-react";
 import { usePublicProjects } from "@/hooks/usePublicProjects";
 
 export const ProjectsPage: React.FC = () => {
@@ -96,14 +97,12 @@ export const ProjectsPage: React.FC = () => {
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {currentProjects.map((project) => {
-                const technologies = JSON.parse(project.technologies || "[]");
-
                 return (
-                  <Card
-                    key={project.id}
-                    hover
-                    className="flex flex-col overflow-hidden"
-                  >
+                  <Link key={project.id} href={`/projects/${project.id}`}>
+                    <Card
+                      hover
+                      className="flex flex-col overflow-hidden cursor-pointer"
+                    >
                     <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center text-6xl">
                       {project.image.startsWith("http") ? (
                         <Image
@@ -128,33 +127,49 @@ export const ProjectsPage: React.FC = () => {
 
                       <div className="mb-4">
                         <div className="flex flex-wrap gap-2">
-                          {technologies
-                            .slice(0, 4)
-                            .map((tech: string, index: number) => (
+                          {project.frameworks
+                            ?.slice(0, 4)
+                            .map((framework) => (
                               <span
-                                key={index}
-                                className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full"
+                                key={framework.id}
+                                className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full flex items-center gap-1"
+                                style={{ backgroundColor: framework.color ? `${framework.color}20` : undefined }}
                               >
-                                {tech}
+                                {framework.icon && (
+                                  <span className="text-xs">{framework.icon}</span>
+                                )}
+                                {framework.name}
                               </span>
                             ))}
-                          {technologies.length > 4 && (
+                          {project.frameworks && project.frameworks.length > 4 && (
                             <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                              +{technologies.length - 4} more
+                              +{project.frameworks.length - 4} more
                             </span>
                           )}
                         </div>
                       </div>
 
                       <div className="flex gap-2">
+                        <Link href={`/projects/${project.id}`} className="flex-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </Button>
+                        </Link>
                         {project.githubUrl && (
                           <Button
                             variant="outline"
                             size="sm"
                             className="flex-1"
-                            onClick={() =>
-                              window.open(project.githubUrl!, "_blank")
-                            }
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.open(project.githubUrl!, "_blank");
+                            }}
                           >
                             <Github className="w-4 h-4 mr-2" />
                             Code
@@ -164,9 +179,11 @@ export const ProjectsPage: React.FC = () => {
                           <Button
                             size="sm"
                             className="flex-1"
-                            onClick={() =>
-                              window.open(project.liveUrl!, "_blank")
-                            }
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.open(project.liveUrl!, "_blank");
+                            }}
                           >
                             <ExternalLink className="w-4 h-4 mr-2" />
                             Live
@@ -174,7 +191,8 @@ export const ProjectsPage: React.FC = () => {
                         )}
                       </div>
                     </div>
-                  </Card>
+                    </Card>
+                  </Link>
                 );
               })}
             </div>
