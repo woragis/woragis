@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { Navigation, Footer } from "@/components/pages/home";
 import { ClientOnly } from "@/components/ClientOnly";
-import { QueryClientProviderWrapper } from "@/components/QueryClientProvider";
+import { QueryClientProviderWrapper } from "@/lib/clients/queryClient";
 
 const inter = Inter({
   variable: "--font-inter",
