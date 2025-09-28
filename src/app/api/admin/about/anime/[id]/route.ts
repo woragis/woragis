@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { animeService } from "@/server/services";
-import { requireAdmin } from "@/lib/auth-middleware";
+import { requireAdmin } from "@/lib/auth";
 
 export const GET = requireAdmin(async (request: NextRequest, user) => {
   try {

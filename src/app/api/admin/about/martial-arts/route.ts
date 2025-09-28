@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling, handleAuthError } from "@/utils/response-helpers";
-import { authMiddleware } from "@/lib/auth-middleware";
+import { authMiddleware } from "@/lib/auth";
 import { martialArtsService } from "@/server/services";
 import { handleServiceResult } from "@/utils/response-helpers";
 import { type NewMartialArt } from "@/server/db/schemas/about/martial-arts";

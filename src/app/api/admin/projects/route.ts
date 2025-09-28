@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { projectService } from "@/server/services";
-import { requireAuth, type AuthenticatedUser } from "@/lib/auth-middleware";
+import { requireAuth, type AuthenticatedUser } from "@/lib/auth";
 import { handleServiceResult } from "@/utils/response-helpers";
 import type { NewProject, ProjectFilters } from "@/types";
 

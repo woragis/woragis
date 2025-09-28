@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { blogTagService } from "@/server/services";
-import { authMiddleware } from "@/lib/auth-middleware";
+import { authMiddleware } from "@/lib/auth";
 import {
   handleServiceResult,
   withErrorHandling,
