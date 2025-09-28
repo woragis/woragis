@@ -3,7 +3,7 @@
 import React from "react";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { FilterTabs } from "@/components/ui/FilterTabs";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 interface FilterOption {
   value: string;
