@@ -1,28 +1,27 @@
+// Main library exports - organized by functionality
+
 // API Client and Services
-export * from "./api";
+export * from './clients';
+export * from './api';
 
 // Authentication
-export { authService, AuthService } from "./auth-service";
-export { useAuthStore, useAuth, useAuthActions } from "../stores/auth-store";
-export type {
-  User,
-  AuthTokens,
-  LoginCredentials,
-  RegisterData,
-  AuthState,
-} from "../stores/auth-store";
+export * from './auth';
+export { useAuthStore, useAuth, useAuthActions } from '../stores/auth-store';
 
-// Interceptors
-export {
-  authRequestInterceptor,
-  authResponseInterceptor,
-  authErrorInterceptor,
-  tokenRefreshInterceptor,
-  networkErrorInterceptor,
-  requestLoggingInterceptor,
-  responseLoggingInterceptor,
-  errorLoggingInterceptor,
-} from "./auth-interceptors";
+// Configuration
+export * from './config';
 
-// Initialize API client
-export { initializeApiClient } from "./api-init";
+// Utilities
+export * from './utils';
+
+// Types
+export * from './types';
+
+// Constants
+export * from './constants';
+
+// Validators
+export * from './validators';
+
+// Middleware
+export * from './middleware';

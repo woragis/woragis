@@ -1,11 +1,11 @@
 // Legacy API utility - bridges old hooks with new API client
-import { apiClient } from "./api-client";
+import { apiClient } from "./clients/apiClient";
 
 // Re-export the API client as the default export for backward compatibility
 export default apiClient;
 
 // Also export named exports for convenience
-export { apiClient } from "./api-client";
+export { apiClient } from "./clients/apiClient";
 export {
   projectApi,
   languageApi,
@@ -14,8 +14,6 @@ export {
 } from "./api-service";
 export { blogApi } from "./api/blog";
 export { blogTagApi } from "./api/blog-tags";
-export { projectTagApi } from "./api/project-tags";
-export { testimonialTagApi } from "./api/testimonial-tags";
 export { experienceApi } from "./api/experience";
 export { testimonialApi } from "./api/testimonials";
 export {

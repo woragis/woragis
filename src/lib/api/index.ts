@@ -1,22 +1,26 @@
-// Export all API modules
-export { apiClient, ApiClient } from "./client";
-export type {
-  ApiClientConfig,
-  RequestInterceptor,
-  ResponseInterceptor,
-  ErrorInterceptor,
-} from "./client";
+// Legacy API utility - bridges old hooks with new API client
+export { default } from './api';
 
-export { projectApi } from "./projects";
-export { frameworkApi } from "./frameworks";
-export { settingsApi } from "./settings";
-export { blogApi } from "./blog";
-export { experienceApi } from "./experience";
-export { testimonialApi } from "./testimonials";
-export { authApi } from "./auth";
-export { blogTagApi } from "./blog-tags";
+// API Services
 export {
-  biographyApi,
+  projectApi,
+  languageApi,
+  frameworkApi,
+  settingsApi,
+} from './api-service';
+
+// Blog API
+export { blogApi } from './blog';
+export { blogTagApi } from './blog-tags';
+
+// Experience API
+export { experienceApi } from './experience';
+
+// Testimonials API
+export { testimonialApi } from './testimonials';
+
+// About API
+export {
   musicGenreApi,
   lastListenedSongApi,
   animeApi,
@@ -24,11 +28,4 @@ export {
   politicalViewApi,
   youtuberApi,
   gameApi,
-  instrumentsApi,
-  martialArtsApi,
-  languagesApi,
-  hobbiesApi,
-} from "./about";
-
-// Re-export the main client as default for backward compatibility
-export { apiClient as default } from "./client";
+} from './about';

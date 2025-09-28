@@ -1,4 +1,4 @@
-import { apiClient } from "../api-client";
+import { apiClient } from "../clients/apiClient";
 import type { ApiResponse } from "@/types";
 import type {
   BlogTag,

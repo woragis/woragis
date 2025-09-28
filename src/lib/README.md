@@ -1,197 +1,285 @@
-# API Client & Authentication System
+# Library Structure
 
-This directory contains the API client, authentication system, and related utilities for the portfolio application.
+This directory contains the core library functionality for the portfolio application, organized into logical modules for better maintainability and separation of concerns.
 
-## Architecture
+## 📁 Directory Structure
 
 ```
-API Routes → Services → Repositories → Database
-     ↑
-API Client (with interceptors)
-     ↑
-React Components (using hooks)
+src/lib/
+├── index.ts                 # Main barrel export
+├── README.md               # This documentation
+├── clients/                # HTTP clients
+│   ├── index.ts
+│   ├── apiClient.ts        # API client (camelCase)
+│   └── queryClient.ts      # Query client provider (camelCase)
+├── auth/                   # Authentication
+│   ├── index.ts
+│   ├── auth-service.ts     # Authentication service
+│   ├── auth-middleware.ts  # Authentication middleware
+│   ├── auth-interceptors.ts # Authentication interceptors
+│   └── api-init.ts         # API client initialization
+├── api/                    # API routes & services
+│   ├── index.ts
+│   ├── api.ts             # Legacy API utility
+│   ├── api-service.ts     # API service classes
+│   ├── blog/              # Blog API routes
+│   ├── blog-tags.ts       # Blog tags API
+│   ├── experience.ts      # Experience API
+│   ├── testimonials.ts    # Testimonials API
+│   └── about/             # About API routes
+├── config/                 # Configuration
+│   ├── index.ts
+│   ├── env.ts             # Environment configuration
+│   ├── server-startup.ts  # Server startup utilities
+│   ├── startup-validation.ts # Startup validation
+│   └── connection-tests.ts # Connection testing
+├── utils/                  # Pure utilities
+│   ├── index.ts
+│   ├── utils.ts           # General utilities (cn function)
+│   ├── storage-utils.ts   # Storage utilities
+│   ├── errorHandling.ts   # Error handling utilities
+│   ├── dateTime.ts        # Date and time utilities
+│   ├── stringUtils.ts     # String manipulation utilities
+│   ├── logger.ts          # Logging utilities
+│   ├── performance.ts     # Performance monitoring
+│   └── validation.ts      # Validation utilities
+├── types/                  # Shared types
+│   └── index.ts
+├── constants/              # Application constants
+│   └── index.ts
+├── validators/             # Validation schemas
+│   └── index.ts
+└── middleware/             # Reusable middleware
+    └── index.ts
 ```
 
-## Components
+## 🚀 Usage
 
-### API Client (`api-client.ts`)
-
-- Axios-based HTTP client with interceptors
-- Automatic request/response transformation
-- Error handling and logging
-- Support for file uploads and downloads
-
-### Authentication Store (`../stores/auth-store.ts`)
-
-- Zustand-based state management
-- Persistent storage with localStorage
-- User session management
-- Token refresh handling
-
-### Authentication Service (`auth-service.ts`)
-
-- Centralized authentication operations
-- Login, logout, registration
-- Token refresh and validation
-- Password reset functionality
-
-### API Services (`api-service.ts`)
-
-- Service classes for each domain (projects, categories, etc.)
-- Type-safe API calls
-- Consistent error handling
-- Query parameter building
-
-### Authentication Interceptors (`auth-interceptors.ts`)
-
-- Automatic token injection
-- Token refresh on expiration
-- Error handling for auth failures
-- Network error management
-
-### React Hooks (`../hooks/use-api.ts`)
-
-- React Query integration
-- Optimistic updates
-- Cache invalidation
-- Loading and error states
-
-## Usage
-
-### Basic API Calls
+### Importing from the Library
 
 ```typescript
-import { projectApi } from "@/lib/api-service";
+// Import everything from a specific module
+import { authService, AuthService } from '@/lib/auth';
+import { env } from '@/lib/config';
+import { cn, formatDate, logger } from '@/lib/utils';
 
-// Get all projects
-const response = await projectApi.getAllProjects();
-if (response.success) {
-  console.log(response.data);
-}
+// Import specific items
+import { apiClient } from '@/lib/clients';
+import { projectApi } from '@/lib/api';
+import { API_ENDPOINTS } from '@/lib/constants';
+
+// Import from main index (recommended for most cases)
+import { authService, env, cn, projectApi } from '@/lib';
 ```
 
-### Using React Hooks
+### API Client Usage
 
 ```typescript
-import { useProjects, useCreateProject } from "@/hooks/use-api";
+import { apiClient } from '@/lib/clients';
 
-function ProjectsList() {
-  const { data: projects, isLoading, error } = useProjects();
-  const createProject = useCreateProject();
-
-  const handleCreate = async (projectData) => {
-    await createProject.mutateAsync(projectData);
-  };
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  return (
-    <div>
-      {projects?.map((project) => (
-        <div key={project.id}>{project.title}</div>
-      ))}
-    </div>
-  );
-}
+// Make API calls
+const response = await apiClient.get('/projects');
+const newProject = await apiClient.post('/admin/projects', projectData);
 ```
 
 ### Authentication
 
 ```typescript
-import { useAuth, useAuthActions } from "@/stores/auth-store";
+import { authService } from '@/lib/auth';
 
-function LoginComponent() {
-  const { user, isAuthenticated, error } = useAuth();
-  const { login, logout } = useAuthActions();
+// Login user
+const { user, tokens } = await authService.login(credentials);
 
-  const handleLogin = async (credentials) => {
-    try {
-      await login(credentials);
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
-  };
+// Get current user
+const currentUser = await authService.getCurrentUser(accessToken);
+```
 
-  if (isAuthenticated) {
-    return <div>Welcome, {user?.name}!</div>;
-  }
+### Utilities
 
-  return <LoginForm onSubmit={handleLogin} />;
+```typescript
+import { 
+  cn, 
+  formatDate, 
+  slugify, 
+  logger, 
+  PerformanceMonitor 
+} from '@/lib/utils';
+
+// Class name utility
+const className = cn('base-class', { 'active': isActive });
+
+// Date formatting
+const formatted = formatDate(new Date(), 'long');
+
+// String utilities
+const slug = slugify('My Awesome Title');
+
+// Logging
+logger.info('User logged in', { userId: user.id });
+
+// Performance monitoring
+PerformanceMonitor.measure('api-call', () => {
+  // Your code here
+});
+```
+
+### Validation
+
+```typescript
+import { validateEmail, validatePassword } from '@/lib/utils';
+import { loginSchema } from '@/lib/validators';
+
+// Simple validation
+const isValid = validateEmail('user@example.com');
+
+// Schema validation
+const result = loginSchema.parse(loginData);
+```
+
+### Constants
+
+```typescript
+import { API_ENDPOINTS, HTTP_STATUS } from '@/lib/constants';
+
+// Use predefined endpoints
+const response = await apiClient.get(API_ENDPOINTS.PROJECTS.BASE);
+
+// Use status codes
+if (response.status === HTTP_STATUS.OK) {
+  // Handle success
 }
 ```
 
-## Features
-
-### Automatic Token Management
-
-- Tokens are automatically added to requests
-- Expired tokens are refreshed automatically
-- Failed refresh attempts log out the user
-
-### Error Handling
-
-- Consistent error response format
-- Network error detection
-- Automatic retry for transient failures
-
-### Type Safety
-
-- Full TypeScript support
-- Generated types from API responses
-- Compile-time error checking
-
-### Caching
-
-- React Query integration
-- Automatic cache invalidation
-- Optimistic updates
-
-### Development Tools
-
-- Request/response logging in development
-- Error tracking and debugging
-- Performance monitoring
-
-## Configuration
+## 🔧 Configuration
 
 ### Environment Variables
 
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
+```typescript
+import { env } from '@/lib/config';
+
+// Access environment variables
+const dbUrl = env.DATABASE_URL;
+const apiUrl = env.NEXT_PUBLIC_API_URL;
 ```
 
-### API Client Configuration
+### Server Startup
 
 ```typescript
-import { apiClient } from "@/lib/api-client";
+import { validateStartup } from '@/lib/config';
 
-// Add custom interceptors
-apiClient.addRequestInterceptor(customRequestInterceptor);
-apiClient.addResponseInterceptor(customResponseInterceptor);
-apiClient.addErrorInterceptor(customErrorInterceptor);
+// Validate environment and connections
+await validateStartup();
 ```
 
-## Security
+## 🛡️ Security
 
-- JWT tokens stored securely in localStorage
-- Automatic token refresh prevents session expiration
-- CSRF protection through same-origin requests
-- Input validation and sanitization
-- Rate limiting support
-
-## Testing
-
-The API client and services are designed to be easily testable:
+### Authentication Middleware
 
 ```typescript
-// Mock the API client for testing
-jest.mock("@/lib/api-client", () => ({
+import { authMiddleware } from '@/lib/auth';
+
+// Protect routes
+app.use('/admin', authMiddleware);
+```
+
+### Security Headers
+
+```typescript
+import { securityHeaders } from '@/lib/middleware';
+
+// Add security headers
+app.use(securityHeaders);
+```
+
+## 📊 Performance
+
+### Monitoring
+
+```typescript
+import { PerformanceMonitor } from '@/lib/utils';
+
+// Measure function execution time
+const result = PerformanceMonitor.measure('expensive-operation', () => {
+  return expensiveFunction();
+});
+```
+
+### Logging
+
+```typescript
+import { logger, LogLevel } from '@/lib/utils';
+
+// Set log level
+logger.setLevel(LogLevel.DEBUG);
+
+// Log with context
+logger.error('Database connection failed', { 
+  error: error.message,
+  retryCount: 3 
+});
+```
+
+## 🧪 Testing
+
+The library is designed to be easily testable:
+
+```typescript
+// Mock the API client
+jest.mock('@/lib/clients', () => ({
   apiClient: {
     get: jest.fn(),
     post: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn(),
+  },
+}));
+
+// Mock utilities
+jest.mock('@/lib/utils', () => ({
+  cn: jest.fn((...args) => args.join(' ')),
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
   },
 }));
 ```
+
+## 🔄 Migration Guide
+
+If you're updating from the old structure:
+
+1. **Old imports** → **New imports**:
+   ```typescript
+   // Old
+   import { apiClient } from '@/lib/api-client';
+   import { env } from '@/lib/env';
+   import { cn } from '@/lib/utils';
+   
+   // New
+   import { apiClient } from '@/lib/clients';
+   import { env } from '@/lib/config';
+   import { cn } from '@/lib/utils/utils';
+   ```
+
+2. **Use barrel exports** when possible:
+   ```typescript
+   // Recommended
+   import { apiClient, env, cn } from '@/lib';
+   ```
+
+## 📝 Best Practices
+
+1. **Use barrel exports** for cleaner imports
+2. **Import from specific modules** when you need only a few items
+3. **Use constants** instead of hardcoded strings
+4. **Validate inputs** using the validation utilities
+5. **Monitor performance** in production code
+6. **Log appropriately** with context information
+7. **Handle errors** using the error handling utilities
+
+## 🚀 Future Enhancements
+
+- [ ] Add more validation schemas
+- [ ] Implement caching utilities
+- [ ] Add more performance monitoring tools
+- [ ] Create testing utilities
+- [ ] Add internationalization utilities
+- [ ] Implement rate limiting utilities
