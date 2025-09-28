@@ -8,7 +8,7 @@ import {
   useUpdateFramework,
 } from "@/hooks/useFrameworks";
 import { Modal } from "@/components/ui";
-import { FrameworkForm } from "@/components/pages/admin/FrameworkForm";
+import { FrameworkForm } from "@/components/pages/admin/frameworks";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import type {
   FrameworkFilters,

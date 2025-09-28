@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   useExperience,
   useDeleteExperience,
@@ -9,19 +9,21 @@ import {
   useUpdateExperience,
 } from "@/hooks/useExperience";
 import { ExperienceFormData, Experience } from "@/types";
-import { ExperienceForm } from "@/components/pages/experience";
+import { ExperienceForm } from "@/components/pages/admin/experience";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
+import { CreateEditModal } from "@/components/common";
+import { useAuth } from "@/stores/auth-store";
 
 export default function ExperienceAdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [editingExperience, setEditingExperience] = useState<Experience | null>(
-    null
-  );
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedExperience, setSelectedExperience] =
-    useState<Experience | null>(null);
+  const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
+  const [createFormData, setCreateFormData] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState<any>(null);
 
+  const { user } = useAuth();
   const { data: experiences, isLoading, error } = useExperience();
   const deleteExperience = useDeleteExperience();
   const toggleVisible = useToggleExperienceVisible();
@@ -54,32 +56,52 @@ export default function ExperienceAdminPage() {
     await toggleVisible.mutateAsync(id);
   };
 
-  const handleEdit = (experience: Experience) => {
-    setEditingExperience(experience);
-    setShowForm(true);
-  };
-
-  const handleAddNew = () => {
-    setEditingExperience(null);
-    setShowForm(true);
-  };
-
-  const handleFormSubmit = async (data: ExperienceFormData) => {
+  // Create experience
+  const handleCreateExperience = useCallback(async (experienceData: ExperienceFormData) => {
     try {
-      if (editingExperience) {
-        await updateExperience.mutateAsync({
-          id: editingExperience.id || "",
-          data,
-        });
-      } else {
-        await createExperience.mutateAsync(data);
-      }
-      setShowForm(false);
-      setEditingExperience(null);
+      await createExperience.mutateAsync(experienceData);
+      setIsCreateModalOpen(false);
+      setCreateFormData(null);
     } catch (error) {
-      console.error("Error saving experience:", error);
+      console.error("Failed to create experience:", error);
     }
+  }, [createExperience]);
+
+  const handleCreateSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (createFormData) {
+      handleCreateExperience(createFormData);
+    }
+  }, [createFormData]);
+
+  // Edit experience
+  const handleEditExperience = (experience: Experience) => {
+    setSelectedExperience(experience);
+    setIsEditModalOpen(true);
   };
+
+  const handleUpdateExperience = useCallback(async (experienceData: ExperienceFormData) => {
+    if (!selectedExperience) return;
+
+    try {
+      await updateExperience.mutateAsync({
+        id: selectedExperience.id || "",
+        data: experienceData,
+      });
+      setIsEditModalOpen(false);
+      setSelectedExperience(null);
+      setEditFormData(null);
+    } catch (error) {
+      console.error("Failed to update experience:", error);
+    }
+  }, [selectedExperience, updateExperience]);
+
+  const handleEditSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (editFormData && selectedExperience) {
+      handleUpdateExperience(editFormData);
+    }
+  }, [editFormData, selectedExperience]);
 
   const filteredExperiences =
     experiences?.filter(
@@ -98,7 +120,7 @@ export default function ExperienceAdminPage() {
           Experience
         </h1>
         <button
-          onClick={handleAddNew}
+          onClick={() => setIsCreateModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
           Add Experience
@@ -189,7 +211,7 @@ export default function ExperienceAdminPage() {
                     {experience.visible ? "Visible" : "Hidden"}
                   </button>
                   <button
-                    onClick={() => handleEdit(experience)}
+                    onClick={() => handleEditExperience(experience)}
                     className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm"
                   >
                     Edit
@@ -207,33 +229,67 @@ export default function ExperienceAdminPage() {
         </ul>
       </div>
 
-      {/* Experience Form Modal */}
-      {showForm && (
+      {/* Create Experience Modal */}
+      <CreateEditModal
+        isOpen={isCreateModalOpen}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setCreateFormData(null);
+        }}
+        isEdit={false}
+        itemName="Experience"
+        size="lg"
+        onSubmit={handleCreateSubmit}
+        onCancel={() => {
+          setIsCreateModalOpen(false);
+          setCreateFormData(null);
+        }}
+        isLoading={createExperience.isPending}
+        maxHeight="90vh"
+      >
         <ExperienceForm
-          experience={
-            editingExperience
-              ? {
-                  title: editingExperience.title,
-                  company: editingExperience.company,
-                  period: editingExperience.period,
-                  location: editingExperience.location,
-                  description: editingExperience.description,
-                  achievements: editingExperience.achievements || [],
-                  technologies: editingExperience.technologies || [],
-                  icon: editingExperience.icon,
-                  order: editingExperience.order,
-                  visible: editingExperience.visible,
-                }
-              : null
-          }
-          onClose={() => {
-            setShowForm(false);
-            setEditingExperience(null);
-          }}
-          onSubmit={handleFormSubmit}
-          isLoading={createExperience.isPending || updateExperience.isPending}
+          userId={user?.id || ""}
+          onSubmit={handleCreateSubmit}
+          onCancel={() => setIsCreateModalOpen(false)}
+          isLoading={createExperience.isPending}
+          onFormDataChange={setCreateFormData}
         />
-      )}
+      </CreateEditModal>
+
+      {/* Edit Experience Modal */}
+      <CreateEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedExperience(null);
+          setEditFormData(null);
+        }}
+        isEdit={true}
+        itemName="Experience"
+        size="lg"
+        onSubmit={handleEditSubmit}
+        onCancel={() => {
+          setIsEditModalOpen(false);
+          setSelectedExperience(null);
+          setEditFormData(null);
+        }}
+        isLoading={updateExperience.isPending}
+        maxHeight="90vh"
+      >
+        {selectedExperience && (
+          <ExperienceForm
+            experience={selectedExperience}
+            userId={user?.id || ""}
+            onSubmit={handleEditSubmit}
+            onCancel={() => {
+              setIsEditModalOpen(false);
+              setSelectedExperience(null);
+            }}
+            isLoading={updateExperience.isPending}
+            onFormDataChange={setEditFormData}
+          />
+        )}
+      </CreateEditModal>
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal

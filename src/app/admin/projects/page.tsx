@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import {
   useProjects,
@@ -10,11 +10,11 @@ import {
   useToggleProjectVisibility,
   useToggleProjectFeatured,
 } from "@/hooks/useProjects";
-import { Modal, Button } from "@/components/ui";
-import { ProjectForm } from "@/components/pages/admin/ProjectForm";
+import { Button } from "@/components/ui";
+import { ProjectForm } from "@/components/pages/admin/projects";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
+import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
-import { Tag } from "lucide-react";
 import type { ProjectFilters, Project, NewProject } from "@/types";
 
 export default function ProjectsAdminPage() {
@@ -26,6 +26,8 @@ export default function ProjectsAdminPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [createFormData, setCreateFormData] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
   const { data: projects, isLoading, error } = useProjects(filters);
@@ -41,14 +43,22 @@ export default function ProjectsAdminPage() {
   };
 
   // Create project
-  const handleCreateProject = async (projectData: NewProject) => {
+  const handleCreateProject = useCallback(async (projectData: NewProject) => {
     try {
       await createProject.mutateAsync(projectData);
       setIsCreateModalOpen(false);
+      setCreateFormData(null);
     } catch (error) {
       console.error("Failed to create project:", error);
     }
-  };
+  }, [createProject]);
+
+  const handleCreateSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (createFormData) {
+      handleCreateProject(createFormData);
+    }
+  }, [createFormData]);
 
   // Edit project
   const handleEditProject = (project: Project) => {
@@ -56,7 +66,7 @@ export default function ProjectsAdminPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateProject = async (projectData: NewProject) => {
+  const handleUpdateProject = useCallback(async (projectData: NewProject) => {
     if (!selectedProject) return;
 
     try {
@@ -66,10 +76,18 @@ export default function ProjectsAdminPage() {
       });
       setIsEditModalOpen(false);
       setSelectedProject(null);
+      setEditFormData(null);
     } catch (error) {
       console.error("Failed to update project:", error);
     }
-  };
+  }, [selectedProject, updateProject]);
+
+  const handleEditSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (editFormData && selectedProject) {
+      handleUpdateProject(editFormData);
+    }
+  }, [editFormData, selectedProject]);
 
   // Delete project
   const handleDeleteProject = (project: Project) => {
@@ -107,14 +125,6 @@ export default function ProjectsAdminPage() {
           Projects
         </h1>
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() => window.open("/admin/projects/tags", "_blank")}
-            className="flex items-center gap-2"
-          >
-            <Tag className="w-4 h-4" />
-            Manage Tags
-          </Button>
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
@@ -209,11 +219,6 @@ export default function ProjectsAdminPage() {
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       {project.description}
                     </p>
-                    <div className="mt-1">
-                      <span className="text-xs text-gray-400 dark:text-gray-500">
-                        Technologies: {project.technologies}
-                      </span>
-                    </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -257,43 +262,66 @@ export default function ProjectsAdminPage() {
       </div>
 
       {/* Create Project Modal */}
-      <Modal
+      <CreateEditModal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Create New Project"
-        size="lg"
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setCreateFormData(null);
+        }}
+        isEdit={false}
+        itemName="Project"
+        size="xl"
+        onSubmit={handleCreateSubmit}
+        onCancel={() => {
+          setIsCreateModalOpen(false);
+          setCreateFormData(null);
+        }}
+        isLoading={createProject.isPending}
+        maxHeight="95vh"
       >
         <ProjectForm
           userId={user?.id || ""}
-          onSubmit={handleCreateProject}
+          onSubmit={handleCreateSubmit}
           onCancel={() => setIsCreateModalOpen(false)}
           isLoading={createProject.isPending}
+          onFormDataChange={setCreateFormData}
         />
-      </Modal>
+      </CreateEditModal>
 
       {/* Edit Project Modal */}
-      <Modal
+      <CreateEditModal
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false);
           setSelectedProject(null);
+          setEditFormData(null);
         }}
-        title="Edit Project"
-        size="lg"
+        isEdit={true}
+        itemName="Project"
+        size="xl"
+        onSubmit={handleEditSubmit}
+        onCancel={() => {
+          setIsEditModalOpen(false);
+          setSelectedProject(null);
+          setEditFormData(null);
+        }}
+        isLoading={updateProject.isPending}
+        maxHeight="95vh"
       >
         {selectedProject && (
           <ProjectForm
             project={selectedProject}
             userId={user?.id || ""}
-            onSubmit={handleUpdateProject}
+            onSubmit={handleEditSubmit}
             onCancel={() => {
               setIsEditModalOpen(false);
               setSelectedProject(null);
             }}
             isLoading={updateProject.isPending}
+            onFormDataChange={setEditFormData}
           />
         )}
-      </Modal>
+      </CreateEditModal>
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal

@@ -8,16 +8,17 @@ import {
   useUpdateTestimonial,
   useDeleteTestimonial,
 } from "@/hooks/useTestimonials";
-import { useTestimonialTags } from "@/hooks/useTestimonialTags";
 import {
   Section,
   Container,
   Card,
   Button,
   EmptyState,
-  Modal,
 } from "@/components/ui";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
+import { TestimonialForm } from "@/components/pages/admin/testimonials";
+import { CreateEditModal } from "@/components/common";
+import { useAuth } from "@/stores/auth-store";
 import {
   Plus,
   Search,
@@ -27,7 +28,6 @@ import {
   EyeOff,
   Star,
   StarOff,
-  Tag,
   X,
 } from "lucide-react";
 import type {
@@ -35,36 +35,22 @@ import type {
   TestimonialFilters,
   TestimonialFormData,
 } from "@/types";
-import type { TestimonialTag } from "@/types/testimonial-tags";
 
 export default function TestimonialsPage() {
   const [filters, setFilters] = useState<TestimonialFilters>({});
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingTestimonial, setEditingTestimonial] =
-    useState<Testimonial | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedTestimonial, setSelectedTestimonial] =
-    useState<Testimonial | null>(null);
-  const [formData, setFormData] = useState<TestimonialFormData>({
-    name: "",
-    position: "",
-    company: "",
-    content: "",
-    avatar: "",
-    rating: 5,
-    featured: true,
-    order: 0,
-    visible: true,
-    public: true,
-  });
-  const [selectedTags, setSelectedTags] = useState<TestimonialTag[]>([]);
+  const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
+  const [createSubmitFn, setCreateSubmitFn] = useState<(() => void) | null>(null);
+  const [editSubmitFn, setEditSubmitFn] = useState<(() => void) | null>(null);
 
+  const { user } = useAuth();
   const {
     data: testimonials = [],
     isLoading,
     error,
   } = useTestimonials(filters);
-  const { data: availableTags = [] } = useTestimonialTags({ visible: true });
   const createTestimonial = useCreateTestimonial();
   const updateTestimonial = useUpdateTestimonial();
   const deleteTestimonial = useDeleteTestimonial();
@@ -74,69 +60,48 @@ export default function TestimonialsPage() {
     // Search is handled by the filters state
   };
 
-  const handleCreate = () => {
-    setEditingTestimonial(null);
-    setFormData({
-      name: "",
-      position: "",
-      company: "",
-      content: "",
-      avatar: "",
-      rating: 5,
-      featured: true,
-      order: 0,
-      visible: true,
-      public: true,
-    });
-    setSelectedTags([]);
-    setIsFormOpen(true);
-  };
-
-  const handleEdit = (testimonial: Testimonial) => {
-    setEditingTestimonial(testimonial);
-    setFormData({
-      name: testimonial.name,
-      position: testimonial.position,
-      company: testimonial.company,
-      content: testimonial.content,
-      avatar: testimonial.avatar || "",
-      rating: testimonial.rating,
-      featured: testimonial.featured || false,
-      order: testimonial.order,
-      visible: testimonial.visible || true,
-      public: testimonial.public || true,
-    });
-    // TODO: Load existing tags for this testimonial
-    setSelectedTags([]);
-    setIsFormOpen(true);
-  };
-
-  const handleAddTag = (tag: TestimonialTag) => {
-    if (!selectedTags.find((t) => t.id === tag.id)) {
-      setSelectedTags([...selectedTags, tag]);
+  // Create testimonial
+  const handleCreateTestimonial = async (testimonialData: any) => {
+    try {
+      await createTestimonial.mutateAsync(testimonialData);
+      setIsCreateModalOpen(false);
+      setCreateSubmitFn(null);
+    } catch (error) {
+      console.error("Failed to create testimonial:", error);
     }
   };
 
-  const handleRemoveTag = (tagId: string) => {
-    setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId));
+  const handleCreateSubmit = () => {
+    if (createSubmitFn) {
+      createSubmitFn();
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Edit testimonial
+  const handleEditTestimonial = (testimonial: Testimonial) => {
+    setSelectedTestimonial(testimonial);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateTestimonial = async (testimonialData: any) => {
+    if (!selectedTestimonial) return;
 
     try {
-      if (editingTestimonial) {
-        await updateTestimonial.mutateAsync({
-          id: editingTestimonial.id,
-          testimonial: formData,
-        });
-      } else {
-        await createTestimonial.mutateAsync(formData as any);
-      }
-      setIsFormOpen(false);
-      setEditingTestimonial(null);
+      await updateTestimonial.mutateAsync({
+        id: selectedTestimonial.id,
+        testimonial: testimonialData,
+      });
+      setIsEditModalOpen(false);
+      setSelectedTestimonial(null);
+      setEditSubmitFn(null);
     } catch (error) {
-      console.error("Error saving testimonial:", error);
+      console.error("Failed to update testimonial:", error);
+    }
+  };
+
+  const handleEditSubmit = () => {
+    if (editSubmitFn) {
+      editSubmitFn();
     }
   };
 
@@ -216,16 +181,6 @@ export default function TestimonialsPage() {
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
             Manage client testimonials and reviews
           </p>
-          <div className="flex justify-center gap-4">
-            <Button
-              variant="outline"
-              onClick={() => window.open("/admin/testimonials/tags", "_blank")}
-              className="flex items-center gap-2"
-            >
-              <Tag className="w-4 h-4" />
-              Manage Tags
-            </Button>
-          </div>
         </div>
 
         {/* Search and Filter */}
@@ -278,7 +233,7 @@ export default function TestimonialsPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
-            <Button onClick={handleCreate}>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Testimonial
             </Button>
@@ -291,7 +246,7 @@ export default function TestimonialsPage() {
             title="No Testimonials Found"
             description="No testimonials match your current filters. Try adjusting your search criteria or add a new testimonial."
             actionLabel="Add Testimonial"
-            onAction={handleCreate}
+            onAction={() => setIsCreateModalOpen(true)}
           />
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -327,7 +282,7 @@ export default function TestimonialsPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleEdit(testimonial)}
+                        onClick={() => handleEditTestimonial(testimonial)}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -392,253 +347,67 @@ export default function TestimonialsPage() {
           </div>
         )}
 
-        {/* Form Modal */}
-        {isFormOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  {editingTestimonial
-                    ? "Edit Testimonial"
-                    : "Add New Testimonial"}
-                </h2>
+        {/* Create Testimonial Modal */}
+        <CreateEditModal
+          isOpen={isCreateModalOpen}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            setCreateSubmitFn(null);
+          }}
+          isEdit={false}
+          itemName="Testimonial"
+          size="lg"
+          onSubmit={handleCreateSubmit}
+          onCancel={() => {
+            setIsCreateModalOpen(false);
+            setCreateSubmitFn(null);
+          }}
+          isLoading={createTestimonial.isPending}
+          maxHeight="90vh"
+        >
+          <TestimonialForm
+            userId={user?.id || ""}
+            onSubmit={handleCreateTestimonial}
+            onCancel={() => setIsCreateModalOpen(false)}
+            isLoading={createTestimonial.isPending}
+            onFormReady={setCreateSubmitFn}
+          />
+        </CreateEditModal>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Position *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.position}
-                        onChange={(e) =>
-                          setFormData({ ...formData, position: e.target.value })
-                        }
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Company *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.company}
-                      onChange={(e) =>
-                        setFormData({ ...formData, company: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Testimonial Content *
-                    </label>
-                    <textarea
-                      required
-                      rows={4}
-                      value={formData.content}
-                      onChange={(e) =>
-                        setFormData({ ...formData, content: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Avatar URL
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.avatar}
-                      onChange={(e) =>
-                        setFormData({ ...formData, avatar: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                    />
-                  </div>
-
-                  {/* Testimonial Tags */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Testimonial Tags
-                    </label>
-
-                    {/* Selected Tags */}
-                    {selectedTags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {selectedTags.map((tag) => (
-                          <span
-                            key={tag.id}
-                            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white"
-                            style={{ backgroundColor: tag.color || "#F59E0B" }}
-                          >
-                            {tag.name}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveTag(tag.id)}
-                              className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Available Tags */}
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Available tags:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {availableTags
-                          .filter(
-                            (tag: TestimonialTag) =>
-                              !selectedTags.find((t) => t.id === tag.id)
-                          )
-                          .map((tag: TestimonialTag) => (
-                            <button
-                              key={tag.id}
-                              type="button"
-                              onClick={() => handleAddTag(tag)}
-                              className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                            >
-                              <div
-                                className="w-2 h-2 rounded-full"
-                                style={{
-                                  backgroundColor: tag.color || "#F59E0B",
-                                }}
-                              />
-                              {tag.name}
-                            </button>
-                          ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Rating
-                      </label>
-                      <select
-                        value={formData.rating}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            rating: parseInt(e.target.value),
-                          })
-                        }
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                      >
-                        <option value={1}>1 Star</option>
-                        <option value={2}>2 Stars</option>
-                        <option value={3}>3 Stars</option>
-                        <option value={4}>4 Stars</option>
-                        <option value={5}>5 Stars</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Order
-                      </label>
-                      <input
-                        type="number"
-                        value={formData.order}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            order: parseInt(e.target.value),
-                          })
-                        }
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.featured}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            featured: e.target.checked,
-                          })
-                        }
-                        className="mr-2"
-                      />
-                      Featured
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.visible}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            visible: e.target.checked,
-                          })
-                        }
-                        className="mr-2"
-                      />
-                      Visible
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.public}
-                        onChange={(e) =>
-                          setFormData({ ...formData, public: e.target.checked })
-                        }
-                        className="mr-2"
-                      />
-                      Public
-                    </label>
-                  </div>
-
-                  <div className="flex justify-end space-x-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsFormOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">
-                      {editingTestimonial
-                        ? "Update Testimonial"
-                        : "Create Testimonial"}
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </Card>
-          </div>
-        )}
+        {/* Edit Testimonial Modal */}
+        <CreateEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedTestimonial(null);
+            setEditSubmitFn(null);
+          }}
+          isEdit={true}
+          itemName="Testimonial"
+          size="lg"
+          onSubmit={handleEditSubmit}
+          onCancel={() => {
+            setIsEditModalOpen(false);
+            setSelectedTestimonial(null);
+            setEditSubmitFn(null);
+          }}
+          isLoading={updateTestimonial.isPending}
+          maxHeight="90vh"
+        >
+          {selectedTestimonial && (
+            <TestimonialForm
+              testimonial={selectedTestimonial}
+              userId={user?.id || ""}
+              onSubmit={handleUpdateTestimonial}
+              onCancel={() => {
+                setIsEditModalOpen(false);
+                setSelectedTestimonial(null);
+              }}
+              isLoading={updateTestimonial.isPending}
+              onFormReady={setEditSubmitFn}
+            />
+          )}
+        </CreateEditModal>
 
         {/* Delete Confirmation Modal */}
         <DeleteConfirmationModal

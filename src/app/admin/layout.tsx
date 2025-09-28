@@ -1,4 +1,4 @@
-import { getServerAuth } from "@/lib/auth-middleware";
+import { getServerAuth } from "@/lib/auth";
 import { AdminLayoutClient } from "./AdminLayoutClient";
 import { AuthProvider } from "@/contexts/AuthProvider";
 

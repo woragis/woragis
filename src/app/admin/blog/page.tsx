@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Image from "next/image";
 import { useBlogPosts } from "@/hooks/useBlog";
 import {
@@ -15,9 +15,11 @@ import {
   Card,
   Button,
   EmptyState,
-  Modal,
 } from "@/components/ui";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
+import { BlogForm } from "@/components/pages/admin/blog";
+import { CreateEditModal } from "@/components/common";
+import { useAuth } from "@/stores/auth-store";
 import {
   Plus,
   Search,
@@ -38,28 +40,14 @@ import type { BlogTag } from "@/types/blog-tags";
 
 export default function BlogPage() {
   const [filters, setFilters] = useState<BlogPostFilters>({});
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingBlogPost, setEditingBlogPost] = useState<BlogPost | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedBlogPost, setSelectedBlogPost] = useState<BlogPost | null>(
-    null
-  );
-  const [formData, setFormData] = useState<BlogPostFormData>({
-    title: "",
-    slug: "",
-    excerpt: "",
-    content: "",
-    featuredImage: "",
-    readingTime: 0,
-    featured: false,
-    published: false,
-    publishedAt: undefined,
-    order: 0,
-    visible: true,
-    public: true,
-  });
-  const [selectedTags, setSelectedTags] = useState<BlogTag[]>([]);
+  const [selectedBlogPost, setSelectedBlogPost] = useState<BlogPost | null>(null);
+  const [createFormData, setCreateFormData] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState<any>(null);
 
+  const { user } = useAuth();
   const { data: blogPosts = [], isLoading, error } = useBlogPosts(filters);
   const { data: availableTags = [] } = useBlogTags({ visible: true });
   const createBlogPost = useCreateBlogPost();
@@ -71,82 +59,52 @@ export default function BlogPage() {
     // Search is handled by the filters state
   };
 
-  const handleCreate = () => {
-    setEditingBlogPost(null);
-    setFormData({
-      title: "",
-      slug: "",
-      excerpt: "",
-      content: "",
-      featuredImage: "",
-      readingTime: 0,
-      featured: false,
-      published: false,
-      publishedAt: undefined,
-      order: 0,
-      visible: true,
-      public: true,
-    });
-    setSelectedTags([]);
-    setIsFormOpen(true);
-  };
-
-  const handleEdit = (blogPost: BlogPost) => {
-    setEditingBlogPost(blogPost);
-    setFormData({
-      title: blogPost.title,
-      slug: blogPost.slug,
-      excerpt: blogPost.excerpt,
-      content: blogPost.content,
-      featuredImage: blogPost.featuredImage || "",
-      readingTime: blogPost.readingTime || 0,
-      featured: blogPost.featured || false,
-      published: blogPost.published || false,
-      publishedAt: blogPost.publishedAt
-        ? new Date(blogPost.publishedAt)
-        : undefined,
-      order: blogPost.order,
-      visible: blogPost.visible || true,
-      public: blogPost.public || true,
-    });
-    // TODO: Load existing tags for this blog post
-    setSelectedTags([]);
-    setIsFormOpen(true);
-  };
-
-  const handleAddTag = (tag: BlogTag) => {
-    if (!selectedTags.find((t) => t.id === tag.id)) {
-      setSelectedTags([...selectedTags, tag]);
+  // Create blog post
+  const handleCreateBlogPost = useCallback(async (blogPostData: any) => {
+    try {
+      await createBlogPost.mutateAsync(blogPostData);
+      setIsCreateModalOpen(false);
+      setCreateFormData(null);
+    } catch (error) {
+      console.error("Failed to create blog post:", error);
     }
-  };
+  }, [createBlogPost]);
 
-  const handleRemoveTag = (tagId: string) => {
-    setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreateSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
+    if (createFormData) {
+      handleCreateBlogPost(createFormData);
+    }
+  }, [createFormData]);
+
+  // Edit blog post
+  const handleEditBlogPost = (blogPost: BlogPost) => {
+    setSelectedBlogPost(blogPost);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateBlogPost = useCallback(async (blogPostData: any) => {
+    if (!selectedBlogPost) return;
 
     try {
-      const submitData = {
-        ...formData,
-        publishedAt: formData.publishedAt || null,
-      };
-
-      if (editingBlogPost) {
-        await updateBlogPost.mutateAsync({
-          id: editingBlogPost.id,
-          blogPost: submitData,
-        });
-      } else {
-        await createBlogPost.mutateAsync(submitData);
-      }
-      setIsFormOpen(false);
-      setEditingBlogPost(null);
+      await updateBlogPost.mutateAsync({
+        id: selectedBlogPost.id,
+        blogPost: blogPostData,
+      });
+      setIsEditModalOpen(false);
+      setSelectedBlogPost(null);
+      setEditFormData(null);
     } catch (error) {
-      console.error("Error saving blog post:", error);
+      console.error("Failed to update blog post:", error);
     }
-  };
+  }, [selectedBlogPost, updateBlogPost]);
+
+  const handleEditSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (editFormData && selectedBlogPost) {
+      handleUpdateBlogPost(editFormData);
+    }
+  }, [editFormData, selectedBlogPost]);
 
   const handleDelete = (blogPost: BlogPost) => {
     setSelectedBlogPost(blogPost);
@@ -305,7 +263,7 @@ export default function BlogPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
-            <Button onClick={handleCreate}>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Blog Post
             </Button>
@@ -318,7 +276,7 @@ export default function BlogPage() {
             title="No Blog Posts Found"
             description="No blog posts match your current filters. Try adjusting your search criteria or add a new blog post."
             actionLabel="Add Blog Post"
-            onAction={handleCreate}
+            onAction={() => setIsCreateModalOpen(true)}
           />
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -348,7 +306,7 @@ export default function BlogPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleEdit(post)}
+                      onClick={() => handleEditBlogPost(post)}
                       className="bg-white dark:bg-gray-800"
                     >
                       <Edit className="w-4 h-4" />
@@ -435,280 +393,67 @@ export default function BlogPage() {
           </div>
         )}
 
-        {/* Form Modal */}
-        {isFormOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  {editingBlogPost ? "Edit Blog Post" : "Add New Blog Post"}
-                </h2>
+        {/* Create Blog Post Modal */}
+        <CreateEditModal
+          isOpen={isCreateModalOpen}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setCreateFormData(null);
+        }}
+          isEdit={false}
+          itemName="Blog Post"
+          size="xl"
+          onSubmit={handleCreateSubmit}
+          onCancel={() => {
+            setIsCreateModalOpen(false);
+            setCreateFormData(null);
+          }}
+          isLoading={createBlogPost.isPending}
+          maxHeight="95vh"
+        >
+          <BlogForm
+            userId={user?.id || ""}
+            onSubmit={handleCreateSubmit}
+            onCancel={() => setIsCreateModalOpen(false)}
+            isLoading={createBlogPost.isPending}
+            onFormDataChange={setCreateFormData}
+          />
+        </CreateEditModal>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Title *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.title}
-                        onChange={(e) => {
-                          setFormData({ ...formData, title: e.target.value });
-                          // Auto-generate slug from title
-                          if (!editingBlogPost) {
-                            const slug = e.target.value
-                              .toLowerCase()
-                              .replace(/[^a-z0-9 -]/g, "")
-                              .replace(/\s+/g, "-")
-                              .replace(/-+/g, "-")
-                              .trim();
-                            setFormData((prev) => ({ ...prev, slug }));
-                          }
-                        }}
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Slug *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.slug}
-                        onChange={(e) =>
-                          setFormData({ ...formData, slug: e.target.value })
-                        }
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Excerpt *
-                    </label>
-                    <textarea
-                      required
-                      rows={3}
-                      value={formData.excerpt}
-                      onChange={(e) =>
-                        setFormData({ ...formData, excerpt: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Content *
-                    </label>
-                    <textarea
-                      required
-                      rows={8}
-                      value={formData.content}
-                      onChange={(e) =>
-                        setFormData({ ...formData, content: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Featured Image URL
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.featuredImage}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          featuredImage: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                    />
-                  </div>
-
-                  {/* Tags Selection */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Tags
-                    </label>
-
-                    {/* Selected Tags */}
-                    {selectedTags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {selectedTags.map((tag) => (
-                          <span
-                            key={tag.id}
-                            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white"
-                            style={{ backgroundColor: tag.color || "#3B82F6" }}
-                          >
-                            {tag.name}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveTag(tag.id)}
-                              className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Available Tags */}
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Available tags:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {availableTags
-                          .filter(
-                            (tag: BlogTag) =>
-                              !selectedTags.find((t) => t.id === tag.id)
-                          )
-                          .map((tag: BlogTag) => (
-                            <button
-                              key={tag.id}
-                              type="button"
-                              onClick={() => handleAddTag(tag)}
-                              className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                            >
-                              <div
-                                className="w-2 h-2 rounded-full"
-                                style={{
-                                  backgroundColor: tag.color || "#3B82F6",
-                                }}
-                              />
-                              {tag.name}
-                            </button>
-                          ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Reading Time (minutes)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={formData.readingTime}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            readingTime: parseInt(e.target.value) || 0,
-                          })
-                        }
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Order
-                      </label>
-                      <input
-                        type="number"
-                        value={formData.order}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            order: parseInt(e.target.value) || 0,
-                          })
-                        }
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-4 gap-6">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.featured}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            featured: e.target.checked,
-                          })
-                        }
-                        className="mr-2"
-                      />
-                      Featured
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.published}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            published: e.target.checked,
-                            publishedAt: e.target.checked
-                              ? new Date()
-                              : undefined,
-                          })
-                        }
-                        className="mr-2"
-                      />
-                      Published
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.visible}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            visible: e.target.checked,
-                          })
-                        }
-                        className="mr-2"
-                      />
-                      Visible
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.public}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            public: e.target.checked,
-                          })
-                        }
-                        className="mr-2"
-                      />
-                      Public
-                    </label>
-                  </div>
-
-                  <div className="flex justify-end space-x-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsFormOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">
-                      {editingBlogPost
-                        ? "Update Blog Post"
-                        : "Create Blog Post"}
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </Card>
-          </div>
-        )}
+        {/* Edit Blog Post Modal */}
+        <CreateEditModal
+          isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedBlogPost(null);
+          setEditFormData(null);
+        }}
+          isEdit={true}
+          itemName="Blog Post"
+          size="xl"
+          onSubmit={handleEditSubmit}
+          onCancel={() => {
+            setIsEditModalOpen(false);
+            setSelectedBlogPost(null);
+            setEditFormData(null);
+          }}
+          isLoading={updateBlogPost.isPending}
+          maxHeight="95vh"
+        >
+          {selectedBlogPost && (
+            <BlogForm
+              blogPost={selectedBlogPost}
+              userId={user?.id || ""}
+              onSubmit={handleEditSubmit}
+              onCancel={() => {
+                setIsEditModalOpen(false);
+                setSelectedBlogPost(null);
+              }}
+              isLoading={updateBlogPost.isPending}
+              onFormDataChange={setEditFormData}
+            />
+          )}
+        </CreateEditModal>
 
         {/* Delete Confirmation Modal */}
         <DeleteConfirmationModal
