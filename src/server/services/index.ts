@@ -8,7 +8,6 @@ import { BlogService } from "./blog.service";
 import { ExperienceService } from "./experience.service";
 import { BlogTagService } from "./blog-tag.service";
 import { ProjectTagService } from "./project-tag.service";
-import { TestimonialTagService } from "./testimonial-tag.service";
 import {
   BiographyService,
   MusicGenreService,
@@ -23,6 +22,7 @@ import {
   LanguagesService,
   HobbiesService,
 } from "./about";
+import { UploadService, getUploadConfig } from "./common";
 
 // Export all services
 export {
@@ -35,7 +35,6 @@ export {
   ExperienceService,
   BlogTagService,
   ProjectTagService,
-  TestimonialTagService,
   BiographyService,
   MusicGenreService,
   LastListenedSongService,
@@ -48,6 +47,7 @@ export {
   MartialArtsService,
   LanguagesService,
   HobbiesService,
+  UploadService,
 };
 
 // Create singleton instances
@@ -60,7 +60,6 @@ export const blogService = new BlogService();
 export const experienceService = new ExperienceService();
 export const blogTagService = new BlogTagService();
 export const projectTagService = new ProjectTagService();
-export const testimonialTagService = new TestimonialTagService();
 
 // Create about service instances
 export const biographyService = new BiographyService();
@@ -75,3 +74,6 @@ export const instrumentsService = new InstrumentsService();
 export const martialArtsService = new MartialArtsService();
 export const languagesService = new LanguagesService();
 export const hobbiesService = new HobbiesService();
+
+// Create common service instances
+export const uploadService = new UploadService(getUploadConfig());

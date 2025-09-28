@@ -13,5 +13,3 @@ export * from "./blog-tags";
 export * from "./blog-post-tags";
 export * from "./project-tags";
 export * from "./project-tag-assignments";
-export * from "./testimonial-tags";
-export * from "./testimonial-tag-assignments";

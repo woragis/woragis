@@ -16,7 +16,6 @@ export { testimonialApi } from "./testimonials";
 export { authApi } from "./auth";
 export { blogTagApi } from "./blog-tags";
 export { projectTagApi } from "./project-tags";
-export { testimonialTagApi } from "./testimonial-tags";
 export {
   biographyApi,
   musicGenreApi,

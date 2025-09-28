@@ -19,7 +19,8 @@ export const projects = pgTable("projects", {
   slug: text("slug").notNull(),
   description: text("description").notNull(),
   longDescription: text("long_description"),
-  technologies: text("technologies").notNull(), // JSON string array
+  content: text("content"), // Markdown content for rich project details
+  videoUrl: text("video_url"), // Video URL for project demos
   image: text("image").notNull(),
   githubUrl: text("github_url"),
   liveUrl: text("live_url"),
