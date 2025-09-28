@@ -80,10 +80,6 @@ export function AdminLayoutClient({
     if (pathname.includes("/tags")) {
       if (pathname.includes("/blog/tags")) {
         setExpandedItems((prev) => new Set([...prev, "Blog"]));
-      } else if (pathname.includes("/projects/tags")) {
-        setExpandedItems((prev) => new Set([...prev, "Projects"]));
-      } else if (pathname.includes("/testimonials/tags")) {
-        setExpandedItems((prev) => new Set([...prev, "Testimonials"]));
       }
     } else if (pathname.includes("/about")) {
       setExpandedItems((prev) => new Set([...prev, "About"]));
@@ -120,9 +116,6 @@ export function AdminLayoutClient({
       name: "Projects",
       href: "/admin/projects",
       icon: FolderOpen,
-      subItems: [
-        { name: "Manage Tags", href: "/admin/projects/tags", icon: Tag },
-      ],
     },
     { name: "Experience", href: "/admin/experience", icon: Briefcase },
     {
@@ -135,9 +128,6 @@ export function AdminLayoutClient({
       name: "Testimonials",
       href: "/admin/testimonials",
       icon: MessageSquare,
-      subItems: [
-        { name: "Manage Tags", href: "/admin/testimonials/tags", icon: Tag },
-      ],
     },
     { name: "Frameworks", href: "/admin/frameworks", icon: Code },
     {
