@@ -11,5 +11,3 @@ export * from "./about";
 // Export tag schemas
 export * from "./blog-tags";
 export * from "./blog-post-tags";
-export * from "./project-tags";
-export * from "./project-tag-assignments";

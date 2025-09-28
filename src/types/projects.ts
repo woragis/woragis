@@ -19,7 +19,6 @@ export interface ProjectWithStats extends Project {
 
 export interface ProjectWithRelations extends Project {
   frameworks?: Framework[];
-  tags?: import("./project-tags").ProjectTag[];
 }
 
 export interface ProjectFilters {

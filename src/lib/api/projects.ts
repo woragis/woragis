@@ -85,12 +85,6 @@ export const projectApi = {
   },
 
   // Project relations
-  async updateProjectTags(
-    projectId: string,
-    tagIds: string[]
-  ): Promise<ApiResponse<void>> {
-    return apiClient.post(`/admin/projects/${projectId}/tags`, { tagIds });
-  },
 
   async updateProjectCategories(
     projectId: string,

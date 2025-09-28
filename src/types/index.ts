@@ -38,7 +38,6 @@ export * from "./about";
 
 // Export tag types
 export * from "./blog-tags";
-export * from "./project-tags";
 
 // Export upload types
 export * from "./upload";

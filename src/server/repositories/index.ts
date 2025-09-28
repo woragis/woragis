@@ -7,7 +7,6 @@ import { TestimonialRepository } from "./testimonial.repository";
 import { BlogRepository } from "./blog.repository";
 import { ExperienceRepository } from "./experience.repository";
 import { BlogTagRepository } from "./blog-tag.repository";
-import { ProjectTagRepository } from "./project-tag.repository";
 import {
   BiographyRepository,
   MusicGenreRepository,
@@ -33,7 +32,6 @@ export {
   BlogRepository,
   ExperienceRepository,
   BlogTagRepository,
-  ProjectTagRepository,
   BiographyRepository,
   MusicGenreRepository,
   LastListenedSongRepository,
@@ -57,7 +55,6 @@ export const testimonialRepository = new TestimonialRepository();
 export const blogRepository = new BlogRepository();
 export const experienceRepository = new ExperienceRepository();
 export const blogTagRepository = new BlogTagRepository();
-export const projectTagRepository = new ProjectTagRepository();
 
 // Create about repository instances
 export const biographyRepository = new BiographyRepository();
