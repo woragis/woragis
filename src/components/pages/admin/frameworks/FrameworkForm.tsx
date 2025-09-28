@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
+import { Code, Palette, Globe, Hash, Eye } from "lucide-react";
 import type { Framework, NewFramework } from "@/types";
-import { useAuth } from "@/stores/auth-store";
 
 interface FrameworkFormProps {
   framework?: Framework;
+  userId: string;
   onSubmit: (framework: NewFramework) => void;
   onCancel: () => void;
   isLoading?: boolean;
@@ -14,11 +15,11 @@ interface FrameworkFormProps {
 
 export const FrameworkForm: React.FC<FrameworkFormProps> = ({
   framework,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
 }) => {
-  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -27,6 +28,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
     color: "#3B82F6",
     website: "",
     version: "",
+    type: "framework" as "framework" | "language",
     order: 0,
     visible: true,
   });
@@ -41,6 +43,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
         color: framework.color || "#3B82F6",
         website: framework.website || "",
         version: framework.version || "",
+        type: framework.type || "framework",
         order: framework.order || 0,
         visible: framework.visible || true,
       });
@@ -82,13 +85,9 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user?.id) {
-      console.error("User not authenticated");
-      return;
-    }
     onSubmit({
       ...formData,
-      userId: user.id,
+      userId,
     });
   };
 
@@ -96,7 +95,8 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Name */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+          <Code className="w-4 h-4 mr-2" />
           Name *
         </label>
         <input
@@ -105,13 +105,15 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
           value={formData.name}
           onChange={handleInputChange}
           required
+          placeholder="e.g., React, JavaScript, Python"
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         />
       </div>
 
       {/* Slug */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+          <Hash className="w-4 h-4 mr-2" />
           Slug *
         </label>
         <input
@@ -124,8 +126,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         />
         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-          URL-friendly version of the name (lowercase, hyphens instead of
-          spaces)
+          URL-friendly version of the name (lowercase, hyphens instead of spaces)
         </p>
       </div>
 
@@ -143,6 +144,23 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
         />
       </div>
 
+      {/* Type Selection */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Type *
+        </label>
+        <select
+          name="type"
+          value={formData.type}
+          onChange={handleInputChange}
+          required
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+          <option value="framework">Framework/Library</option>
+          <option value="language">Programming Language</option>
+        </select>
+      </div>
+
       {/* Icon and Website */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -154,12 +172,13 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
             name="icon"
             value={formData.icon}
             onChange={handleInputChange}
-            placeholder="Icon name or URL"
+            placeholder="e.g., ⚛️ or icon URL"
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+            <Globe className="w-4 h-4 mr-2" />
             Website
           </label>
           <input
@@ -189,7 +208,8 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+            <Palette className="w-4 h-4 mr-2" />
             Color
           </label>
           <input
@@ -202,7 +222,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Order
+            Display Order
           </label>
           <input
             type="number"
@@ -224,7 +244,8 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
           onChange={handleInputChange}
           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
         />
-        <label className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+        <label className="ml-2 block text-sm text-gray-700 dark:text-gray-300 flex items-center">
+          <Eye className="w-4 h-4 mr-1" />
           Visible
         </label>
       </div>

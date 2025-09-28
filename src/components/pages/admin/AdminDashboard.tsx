@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { Project } from "@/types/projects";
-import { ProjectForm } from "./ProjectForm";
-import { ProjectList } from "./ProjectList";
+import { ProjectForm } from "./projects";
+import { ProjectList } from "./projects";
 import { Button, Card } from "@/components/ui";
 import { Plus, Settings, BarChart3 } from "lucide-react";
 import {

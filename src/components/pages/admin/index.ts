@@ -25,5 +25,11 @@ export { MusicSongsForm } from "./MusicSongsForm";
 export { MusicSongsList } from "./MusicSongsList";
 export { MusicGenresForm } from "./MusicGenresForm";
 export { MusicGenresList } from "./MusicGenresList";
-export { ProjectForm } from "./ProjectForm";
 export { DeleteConfirmationModal } from "./DeleteConfirmationModal";
+
+// New organized forms
+export { ProjectForm, ProjectList } from "./projects";
+export { BlogForm } from "./blog";
+export { FrameworkForm } from "./frameworks";
+export { ExperienceForm } from "./experience";
+export { TestimonialForm } from "./testimonials";
