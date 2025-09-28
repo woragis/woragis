@@ -1,21 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button, FileUpload } from "@/components/ui";
 import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
-import { useProjectTags } from "@/hooks/useProjectTags";
 import { useFrameworks } from "@/hooks/useFrameworks";
-import { Tag, X, Video, FileText, Code, Plus, Minus, Upload } from "lucide-react";
+import { X, Video, FileText, Code, Plus, Minus, Upload } from "lucide-react";
 import type { Project, NewProject, ProjectWithFrameworks } from "@/types";
-import type { ProjectTag } from "@/types/project-tags";
 import type { Framework } from "@/types/frameworks";
 
 interface ProjectFormProps {
   project?: ProjectWithFrameworks;
   userId: string;
-  onSubmit: (project: NewProject) => void;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 export const ProjectForm: React.FC<ProjectFormProps> = ({
@@ -24,6 +23,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -42,11 +42,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     public: true,
   });
 
-  const [selectedTags, setSelectedTags] = useState<ProjectTag[]>([]);
   const [selectedFrameworks, setSelectedFrameworks] = useState<Framework[]>([]);
+  const [showFrameworkSection, setShowFrameworkSection] = useState(false);
 
-  const { data: availableTags = [] } = useProjectTags({ visible: true });
-  const { data: availableFrameworks = [] } = useFrameworks({ visible: true });
+  const { data: availableFrameworks = [] } = useFrameworks({ visible: true }, { enabled: showFrameworkSection });
 
   useEffect(() => {
     if (project) {
@@ -131,15 +130,6 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     }));
   };
 
-  const handleAddTag = (tag: ProjectTag) => {
-    if (!selectedTags.find((t) => t.id === tag.id)) {
-      setSelectedTags([...selectedTags, tag]);
-    }
-  };
-
-  const handleRemoveTag = (tagId: string) => {
-    setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId));
-  };
 
   const handleImageUpload = (fileUrl: string) => {
     setFormData(prev => ({
@@ -155,16 +145,25 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Update refs when values change
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+        selectedFrameworks,
+      });
+    }
+  }, [formData, selectedFrameworks, userId, onFormDataChange]);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      ...formData,
-      userId,
-    });
-  };
+    onSubmit(e);
+  }, [onSubmit]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <>
       {/* Title */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -321,10 +320,21 @@ What would you like to add or improve in the future?"
 
       {/* Frameworks & Languages */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-          <Code className="w-4 h-4 mr-2" />
-          Frameworks & Languages
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+            <Code className="w-4 h-4 mr-2" />
+            Frameworks & Languages
+          </label>
+          {!showFrameworkSection && (
+            <button
+              type="button"
+              onClick={() => setShowFrameworkSection(true)}
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+            >
+              Manage Frameworks
+            </button>
+          )}
+        </div>
 
         {/* Selected Frameworks */}
         {selectedFrameworks.length > 0 && (
@@ -356,121 +366,77 @@ What would you like to add or improve in the future?"
           </div>
         )}
 
-        {/* Available Frameworks */}
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Available frameworks & languages:
-          </p>
-          
-          {/* Languages */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Programming Languages
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {availableFrameworks
-                .filter((framework) => framework.type === "language")
-                .filter((framework) => !selectedFrameworks.find((f) => f.id === framework.id))
-                .map((framework) => (
-                  <button
-                    key={framework.id}
-                    type="button"
-                    onClick={() => handleAddFramework(framework)}
-                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                  >
-                    {framework.icon && (
-                      <span className="text-xs">{framework.icon}</span>
-                    )}
-                    {framework.name}
-                    <Plus className="w-3 h-3" />
-                  </button>
-                ))}
-            </div>
-          </div>
-
-          {/* Frameworks */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Frameworks & Libraries
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {availableFrameworks
-                .filter((framework) => framework.type === "framework")
-                .filter((framework) => !selectedFrameworks.find((f) => f.id === framework.id))
-                .map((framework) => (
-                  <button
-                    key={framework.id}
-                    type="button"
-                    onClick={() => handleAddFramework(framework)}
-                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                  >
-                    {framework.icon && (
-                      <span className="text-xs">{framework.icon}</span>
-                    )}
-                    {framework.name}
-                    <Plus className="w-3 h-3" />
-                  </button>
-                ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Project Tags */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Project Tags
-        </label>
-
-        {/* Selected Tags */}
-        {selectedTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {selectedTags.map((tag) => (
-              <span
-                key={tag.id}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white"
-                style={{ backgroundColor: tag.color || "#10B981" }}
+        {/* Available Frameworks - Only show when section is expanded */}
+        {showFrameworkSection && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Available frameworks & languages:
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowFrameworkSection(false)}
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               >
-                {tag.name}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag.id)}
-                  className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
+                Hide
+              </button>
+            </div>
+            
+            {/* Languages */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Programming Languages
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {availableFrameworks
+                  .filter((framework) => framework.type === "language")
+                  .filter((framework) => !selectedFrameworks.find((f) => f.id === framework.id))
+                  .map((framework) => (
+                    <button
+                      key={framework.id}
+                      type="button"
+                      onClick={() => handleAddFramework(framework)}
+                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    >
+                      {framework.icon && (
+                        <span className="text-xs">{framework.icon}</span>
+                      )}
+                      {framework.name}
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  ))}
+              </div>
+            </div>
+
+            {/* Frameworks */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Frameworks & Libraries
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {availableFrameworks
+                  .filter((framework) => framework.type === "framework")
+                  .filter((framework) => !selectedFrameworks.find((f) => f.id === framework.id))
+                  .map((framework) => (
+                    <button
+                      key={framework.id}
+                      type="button"
+                      onClick={() => handleAddFramework(framework)}
+                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    >
+                      {framework.icon && (
+                        <span className="text-xs">{framework.icon}</span>
+                      )}
+                      {framework.name}
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  ))}
+              </div>
+            </div>
           </div>
         )}
-
-        {/* Available Tags */}
-        <div className="space-y-2">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Available tags:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {availableTags
-              .filter(
-                (tag: ProjectTag) => !selectedTags.find((t) => t.id === tag.id)
-              )
-              .map((tag: ProjectTag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => handleAddTag(tag)}
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                >
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: tag.color || "#10B981" }}
-                  />
-                  {tag.name}
-                </button>
-              ))}
-          </div>
-        </div>
       </div>
+
 
       {/* Image Upload */}
       <div>
@@ -595,29 +561,6 @@ What would you like to add or improve in the future?"
           </label>
         </div>
       </div>
-
-      {/* Actions */}
-      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {isLoading
-            ? "Saving..."
-            : project
-            ? "Update Project"
-            : "Create Project"}
-        </Button>
-      </div>
-    </form>
+    </>
   );
 };

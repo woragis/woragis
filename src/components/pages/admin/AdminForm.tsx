@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 interface AdminFormProps {
   children: React.ReactNode;

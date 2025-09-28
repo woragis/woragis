@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button, FileUpload } from "@/components/ui";
 import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
 import { useBlogTags } from "@/hooks/useBlogTags";
@@ -11,9 +11,10 @@ import type { BlogTag } from "@/types/blog-tags";
 interface BlogFormProps {
   blogPost?: BlogPostWithTags;
   userId: string;
-  onSubmit: (blogPost: NewBlogPost) => void;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 export const BlogForm: React.FC<BlogFormProps> = ({
@@ -22,6 +23,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -39,8 +41,9 @@ export const BlogForm: React.FC<BlogFormProps> = ({
   });
 
   const [selectedTags, setSelectedTags] = useState<BlogTag[]>([]);
+  const [showTagSection, setShowTagSection] = useState(false);
 
-  const { data: availableTags = [] } = useBlogTags({ visible: true });
+  const { data: availableTags = [] } = useBlogTags({ visible: true }, { enabled: showTagSection });
 
   useEffect(() => {
     if (blogPost) {
@@ -116,17 +119,26 @@ export const BlogForm: React.FC<BlogFormProps> = ({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Update refs when values change
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        publishedAt: formData.publishedAt ? new Date(formData.publishedAt) : null,
+        userId,
+        selectedTags,
+      });
+    }
+  }, [formData, selectedTags, userId, onFormDataChange]);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      ...formData,
-      publishedAt: formData.publishedAt ? new Date(formData.publishedAt) : null,
-      userId,
-    });
-  };
+    onSubmit(e);
+  }, [onSubmit]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <>
       {/* Title */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -261,9 +273,20 @@ Summarize your key points and provide actionable takeaways."
 
       {/* Blog Tags */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Blog Tags
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Blog Tags
+          </label>
+          {!showTagSection && (
+            <button
+              type="button"
+              onClick={() => setShowTagSection(true)}
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+            >
+              Manage Tags
+            </button>
+          )}
+        </div>
 
         {/* Selected Tags */}
         {selectedTags.length > 0 && (
@@ -287,33 +310,44 @@ Summarize your key points and provide actionable takeaways."
           </div>
         )}
 
-        {/* Available Tags */}
-        <div className="space-y-2">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Available tags:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {availableTags
-              .filter(
-                (tag: BlogTag) => !selectedTags.find((t) => t.id === tag.id)
-              )
-              .map((tag: BlogTag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => handleAddTag(tag)}
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                >
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: tag.color || "#10B981" }}
-                  />
-                  {tag.name}
-                  <Plus className="w-3 h-3" />
-                </button>
-              ))}
+        {/* Available Tags - Only show when section is expanded */}
+        {showTagSection && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Available tags:
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowTagSection(false)}
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                Hide
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {availableTags
+                .filter(
+                  (tag: BlogTag) => !selectedTags.find((t) => t.id === tag.id)
+                )
+                .map((tag: BlogTag) => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => handleAddTag(tag)}
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  >
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: tag.color || "#10B981" }}
+                    />
+                    {tag.name}
+                    <Plus className="w-3 h-3" />
+                  </button>
+                ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Reading Time and Order */}
@@ -417,29 +451,6 @@ Summarize your key points and provide actionable takeaways."
           </label>
         </div>
       </div>
-
-      {/* Actions */}
-      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {isLoading
-            ? "Saving..."
-            : blogPost
-            ? "Update Blog Post"
-            : "Create Blog Post"}
-        </Button>
-      </div>
-    </form>
+    </>
   );
 };

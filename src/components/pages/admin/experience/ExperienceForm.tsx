@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui";
 import { useFrameworks } from "@/hooks/useFrameworks";
 import { Building2, MapPin, Calendar, Code, Plus, X, Briefcase, Award } from "lucide-react";
@@ -10,9 +10,10 @@ import type { Framework } from "@/types/frameworks";
 interface ExperienceFormProps {
   experience?: Experience;
   userId: string;
-  onSubmit: (experience: NewExperience) => void;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 export const ExperienceForm: React.FC<ExperienceFormProps> = ({
@@ -21,6 +22,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -38,8 +40,9 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({
   const [selectedFrameworks, setSelectedFrameworks] = useState<Framework[]>([]);
   const [newAchievement, setNewAchievement] = useState("");
   const [newTechnology, setNewTechnology] = useState("");
+  const [showFrameworkSection, setShowFrameworkSection] = useState(false);
 
-  const { data: availableFrameworks = [] } = useFrameworks({ visible: true });
+  const { data: availableFrameworks = [] } = useFrameworks({ visible: true }, { enabled: showFrameworkSection });
 
   useEffect(() => {
     if (experience) {
@@ -124,16 +127,25 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Update refs when values change
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+        selectedFrameworks,
+      });
+    }
+  }, [formData, selectedFrameworks, userId, onFormDataChange]);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      ...formData,
-      userId,
-    });
-  };
+    onSubmit(e);
+  }, [onSubmit]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <>
       {/* Title and Company */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -270,10 +282,21 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({
 
       {/* Technologies & Frameworks */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-          <Code className="w-4 h-4 mr-2" />
-          Technologies & Frameworks
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+            <Code className="w-4 h-4 mr-2" />
+            Technologies & Frameworks
+          </label>
+          {!showFrameworkSection && (
+            <button
+              type="button"
+              onClick={() => setShowFrameworkSection(true)}
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+            >
+              Manage Frameworks
+            </button>
+          )}
+        </div>
 
         {/* Selected Frameworks */}
         {selectedFrameworks.length > 0 && (
@@ -305,64 +328,75 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({
           </div>
         )}
 
-        {/* Available Frameworks */}
-        <div className="space-y-3 mb-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Available frameworks & languages:
-          </p>
-          
-          {/* Languages */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Programming Languages
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {availableFrameworks
-                .filter((framework) => framework.type === "language")
-                .filter((framework) => !selectedFrameworks.find((f) => f.id === framework.id))
-                .map((framework) => (
-                  <button
-                    key={framework.id}
-                    type="button"
-                    onClick={() => handleAddFramework(framework)}
-                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                  >
-                    {framework.icon && (
-                      <span className="text-xs">{framework.icon}</span>
-                    )}
-                    {framework.name}
-                    <Plus className="w-3 h-3" />
-                  </button>
-                ))}
+        {/* Available Frameworks - Only show when section is expanded */}
+        {showFrameworkSection && (
+          <div className="space-y-3 mb-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Available frameworks & languages:
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowFrameworkSection(false)}
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                Hide
+              </button>
             </div>
-          </div>
+            
+            {/* Languages */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Programming Languages
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {availableFrameworks
+                  .filter((framework) => framework.type === "language")
+                  .filter((framework) => !selectedFrameworks.find((f) => f.id === framework.id))
+                  .map((framework) => (
+                    <button
+                      key={framework.id}
+                      type="button"
+                      onClick={() => handleAddFramework(framework)}
+                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    >
+                      {framework.icon && (
+                        <span className="text-xs">{framework.icon}</span>
+                      )}
+                      {framework.name}
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  ))}
+              </div>
+            </div>
 
-          {/* Frameworks */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Frameworks & Libraries
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {availableFrameworks
-                .filter((framework) => framework.type === "framework")
-                .filter((framework) => !selectedFrameworks.find((f) => f.id === framework.id))
-                .map((framework) => (
-                  <button
-                    key={framework.id}
-                    type="button"
-                    onClick={() => handleAddFramework(framework)}
-                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                  >
-                    {framework.icon && (
-                      <span className="text-xs">{framework.icon}</span>
-                    )}
-                    {framework.name}
-                    <Plus className="w-3 h-3" />
-                  </button>
-                ))}
+            {/* Frameworks */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Frameworks & Libraries
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {availableFrameworks
+                  .filter((framework) => framework.type === "framework")
+                  .filter((framework) => !selectedFrameworks.find((f) => f.id === framework.id))
+                  .map((framework) => (
+                    <button
+                      key={framework.id}
+                      type="button"
+                      onClick={() => handleAddFramework(framework)}
+                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    >
+                      {framework.icon && (
+                        <span className="text-xs">{framework.icon}</span>
+                      )}
+                      {framework.name}
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Custom Technologies */}
         {formData.technologies.filter(tech => !selectedFrameworks.some(f => f.name === tech)).length > 0 && (
@@ -457,29 +491,6 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({
           Visible
         </label>
       </div>
-
-      {/* Actions */}
-      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {isLoading
-            ? "Saving..."
-            : experience
-            ? "Update Experience"
-            : "Create Experience"}
-        </Button>
-      </div>
-    </form>
+    </>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui";
 import { Code, Palette, Globe, Hash, Eye } from "lucide-react";
 import type { Framework, NewFramework } from "@/types";
@@ -11,6 +11,7 @@ interface FrameworkFormProps {
   onSubmit: (framework: NewFramework) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormReady?: (submitFn: () => void) => void;
 }
 
 export const FrameworkForm: React.FC<FrameworkFormProps> = ({
@@ -19,6 +20,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormReady,
 }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -83,16 +85,23 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback((e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     onSubmit({
       ...formData,
       userId,
     });
-  };
+  }, [formData, userId, onSubmit]);
+
+  // Expose submit function to parent
+  useEffect(() => {
+    if (onFormReady) {
+      onFormReady(handleSubmit);
+    }
+  }, [onFormReady, handleSubmit]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-6">
       {/* Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
@@ -250,28 +259,6 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
         </label>
       </div>
 
-      {/* Actions */}
-      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {isLoading
-            ? "Saving..."
-            : framework
-            ? "Update Framework"
-            : "Create Framework"}
-        </Button>
-      </div>
-    </form>
+    </div>
   );
 };

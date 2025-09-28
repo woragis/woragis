@@ -2,7 +2,7 @@
 
 import React from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 interface AdminPageLayoutProps {
   title: string;

@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button, FileUpload } from "@/components/ui";
-import { useTestimonialTags } from "@/hooks/useTestimonialTags";
-import { Tag, X, Plus, Upload, Star, User, Building2, Quote } from "lucide-react";
-import type { Testimonial, NewTestimonial, TestimonialWithTags } from "@/types";
-import type { TestimonialTag } from "@/types/testimonial-tags";
+import { X, Plus, Upload, Star, User, Building2, Quote } from "lucide-react";
+import type { Testimonial, NewTestimonial } from "@/types";
 
 interface TestimonialFormProps {
-  testimonial?: TestimonialWithTags;
+  testimonial?: Testimonial;
   userId: string;
   onSubmit: (testimonial: NewTestimonial) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormReady?: (submitFn: () => void) => void;
 }
 
 export const TestimonialForm: React.FC<TestimonialFormProps> = ({
@@ -21,6 +20,7 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormReady,
 }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -35,9 +35,6 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
     public: true,
   });
 
-  const [selectedTags, setSelectedTags] = useState<TestimonialTag[]>([]);
-
-  const { data: availableTags = [] } = useTestimonialTags({ visible: true });
 
   useEffect(() => {
     if (testimonial) {
@@ -53,11 +50,6 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
         visible: testimonial.visible || true,
         public: testimonial.public || true,
       });
-      
-      // Set selected tags if testimonial has tags relation
-      if (testimonial.tags) {
-        setSelectedTags(testimonial.tags);
-      }
     }
   }, [testimonial]);
 
@@ -73,15 +65,6 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
     }));
   };
 
-  const handleAddTag = (tag: TestimonialTag) => {
-    if (!selectedTags.find((t) => t.id === tag.id)) {
-      setSelectedTags([...selectedTags, tag]);
-    }
-  };
-
-  const handleRemoveTag = (tagId: string) => {
-    setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId));
-  };
 
   const handleAvatarUpload = (fileUrl: string) => {
     setFormData(prev => ({
@@ -90,13 +73,20 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback((e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     onSubmit({
       ...formData,
       userId,
     });
-  };
+  }, [formData, userId, onSubmit]);
+
+  // Expose submit function to parent
+  useEffect(() => {
+    if (onFormReady) {
+      onFormReady(handleSubmit);
+    }
+  }, [onFormReady, handleSubmit]);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -112,7 +102,7 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-6">
       {/* Name and Position */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -244,62 +234,6 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
         </div>
       </div>
 
-      {/* Testimonial Tags */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Testimonial Tags
-        </label>
-
-        {/* Selected Tags */}
-        {selectedTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {selectedTags.map((tag) => (
-              <span
-                key={tag.id}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white"
-                style={{ backgroundColor: tag.color || "#10B981" }}
-              >
-                {tag.name}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag.id)}
-                  className="ml-1 hover:bg-black hover:bg-opacity-20 rounded-full p-0.5"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Available Tags */}
-        <div className="space-y-2">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Available tags:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {availableTags
-              .filter(
-                (tag: TestimonialTag) => !selectedTags.find((t) => t.id === tag.id)
-              )
-              .map((tag: TestimonialTag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => handleAddTag(tag)}
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                >
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: tag.color || "#10B981" }}
-                  />
-                  {tag.name}
-                  <Plus className="w-3 h-3" />
-                </button>
-              ))}
-          </div>
-        </div>
-      </div>
 
       {/* Order */}
       <div>
@@ -359,28 +293,6 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {isLoading
-            ? "Saving..."
-            : testimonial
-            ? "Update Testimonial"
-            : "Create Testimonial"}
-        </Button>
-      </div>
-    </form>
+    </div>
   );
 };
