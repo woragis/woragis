@@ -13,6 +13,7 @@ export { SearchBar } from "./SearchBar";
 export { DataTable, DataTableRow, DataTableCell } from "./DataTable";
 export { PageHeader } from "./PageHeader";
 export { ActionButton } from "./ActionButton";
+export { FileUpload } from "./FileUpload";
 export { ClientOnly } from "../ClientOnly";
 export * from "./ValorantBackground";
 export { ValorantBackground as GamingBackground } from "./ValorantBackground";

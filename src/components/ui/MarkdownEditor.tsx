@@ -5,7 +5,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button } from "./Button";
 import { Card } from "./Card";
-import { Eye, Edit3, Save, X } from "lucide-react";
+import { FileUpload } from "./FileUpload";
+import { Eye, Edit3, Save, X, Image, Upload } from "lucide-react";
 
 interface MarkdownEditorProps {
   value: string;
@@ -14,6 +15,8 @@ interface MarkdownEditorProps {
   className?: string;
   label?: string;
   description?: string;
+  uploadPath?: string;
+  uploadMetadata?: Record<string, any>;
 }
 
 export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
@@ -23,9 +26,12 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   className = "",
   label = "Content",
   description,
+  uploadPath = "general",
+  uploadMetadata = {},
 }) => {
   const [isPreview, setIsPreview] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showImageUpload, setShowImageUpload] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSave = () => {
@@ -46,6 +52,40 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     }
   };
 
+  const insertImageAtCursor = (imageUrl: string, altText: string = "") => {
+    if (!textareaRef.current) return;
+
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    // Create markdown image syntax
+    const imageMarkdown = `![${altText}](${imageUrl})`;
+    
+    // Insert the image markdown at cursor position
+    const newText = text.substring(0, start) + imageMarkdown + text.substring(end);
+    
+    // Update the content
+    onChange(newText);
+    
+    // Set cursor position after the inserted image
+    const newCursorPos = start + imageMarkdown.length;
+    
+    // Use setTimeout to ensure the textarea has updated
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
+  const handleImageUpload = (imageUrl: string, fileInfo: { name: string; size: number; type: string }) => {
+    // Extract filename without extension for alt text
+    const altText = fileInfo.name.replace(/\.[^/.]+$/, "");
+    insertImageAtCursor(imageUrl, altText);
+    setShowImageUpload(false);
+  };
+
   return (
     <div className={`space-y-4 ${className}`}>
       <div className="flex items-center justify-between">
@@ -62,6 +102,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         <div className="flex items-center space-x-2">
           {!isEditing && (
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={() => setIsEditing(true)}
@@ -72,6 +113,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             </Button>
           )}
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => setIsPreview(!isPreview)}
@@ -93,6 +135,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                 </h3>
                 <div className="flex items-center space-x-2">
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={handleCancel}
@@ -102,6 +145,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                     <span>Cancel</span>
                   </Button>
                   <Button
+                    type="button"
                     size="sm"
                     onClick={handleSave}
                     className="flex items-center space-x-1"
@@ -111,7 +155,53 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                   </Button>
                 </div>
               </div>
+              {/* Toolbar */}
+              <div className="mt-3 flex items-center space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowImageUpload(!showImageUpload)}
+                  className="flex items-center space-x-1"
+                >
+                  <Image className="w-4 h-4" alt="Insert Image" />
+                  <span>Insert Image</span>
+                </Button>
+              </div>
             </div>
+            
+            {/* Image Upload Section */}
+            {showImageUpload && (
+              <div className="px-4 pb-4">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Image
+                  </h4>
+                  <FileUpload
+                    accept="image/*,.jpg,.jpeg,.png,.webp,.gif"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                    onUpload={handleImageUpload}
+                    uploadOptions={{
+                      path: uploadPath,
+                      generateUniqueName: true,
+                      filenamePrefix: "markdown_",
+                      metadata: {
+                        ...uploadMetadata,
+                        category: "markdown-image",
+                      },
+                    }}
+                    placeholder="Upload image for markdown content"
+                    showPreview={false}
+                    className="mb-3"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    The image will be inserted at your cursor position in the editor.
+                  </p>
+                </div>
+              </div>
+            )}
+            
             <div className="p-4">
               <textarea
                 ref={textareaRef}
@@ -127,6 +217,9 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                 <p>
                   Supports Markdown syntax including **bold**, *italic*,
                   [links](url), and more
+                </p>
+                <p>
+                  Use the &quot;Insert Image&quot; button above to upload and insert images directly into your content.
                 </p>
               </div>
             </div>
@@ -152,6 +245,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                     Current Content
                   </h3>
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => setIsEditing(true)}
