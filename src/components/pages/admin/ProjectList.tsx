@@ -70,8 +70,6 @@ const SortableProjectItem: React.FC<SortableProjectItemProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const technologies = JSON.parse(project.technologies || "[]");
-
   return (
     <div ref={setNodeRef} style={style} className="relative">
       <Card className={`p-4 ${isDragging ? "shadow-lg" : ""}`}>
@@ -104,17 +102,21 @@ const SortableProjectItem: React.FC<SortableProjectItemProps> = ({
             </p>
 
             <div className="flex flex-wrap gap-1 mb-3">
-              {technologies.slice(0, 3).map((tech: string, index: number) => (
+              {project.frameworks?.slice(0, 3).map((framework) => (
                 <span
-                  key={index}
-                  className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full"
+                  key={framework.id}
+                  className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full flex items-center gap-1"
+                  style={{ backgroundColor: framework.color ? `${framework.color}20` : undefined }}
                 >
-                  {tech}
+                  {framework.icon && (
+                    <span className="text-xs">{framework.icon}</span>
+                  )}
+                  {framework.name}
                 </span>
               ))}
-              {technologies.length > 3 && (
+              {project.frameworks && project.frameworks.length > 3 && (
                 <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                  +{technologies.length - 3} more
+                  +{project.frameworks.length - 3} more
                 </span>
               )}
             </div>
