@@ -5,6 +5,11 @@ import type { Framework } from "@/types";
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 
+// Project with frameworks relation
+export interface ProjectWithFrameworks extends Project {
+  frameworks?: import("./frameworks").Framework[];
+}
+
 // Extended types for specific use cases
 export interface ProjectWithStats extends Project {
   viewCount?: number;
@@ -37,7 +42,9 @@ export interface ProjectFormData {
   slug: string;
   description: string;
   longDescription?: string;
-  technologies: string[];
+  content?: string; // Markdown content for rich project details
+  videoUrl?: string; // Video URL for project demos
+  frameworks: string[]; // Array of framework IDs
   image: string;
   githubUrl?: string;
   liveUrl?: string;

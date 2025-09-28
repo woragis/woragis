@@ -41,6 +41,9 @@ export * from "./blog-tags";
 export * from "./project-tags";
 export * from "./testimonial-tags";
 
+// Export upload types
+export * from "./upload";
+
 // Common types that might be shared across domains
 export interface ApiResponse<T = any> {
   success: boolean;
