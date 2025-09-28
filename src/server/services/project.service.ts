@@ -289,44 +289,6 @@ export class ProjectService extends BaseService {
     }
   }
 
-  // Tag relations
-  async assignTagsToProject(
-    projectId: string,
-    tagIds: string[]
-  ): Promise<ApiResponse<void>> {
-    try {
-      if (!this.validateId(projectId)) {
-        return {
-          success: false,
-          error: "Invalid project ID",
-        };
-      }
-
-      await projectRepository.assignTags(projectId, tagIds);
-      return this.success(undefined, "Tags assigned successfully");
-    } catch (error) {
-      return this.handleError(error, "assignTagsToProject");
-    }
-  }
-
-  async updateProjectTags(
-    projectId: string,
-    tagIds: string[]
-  ): Promise<ApiResponse<void>> {
-    try {
-      if (!this.validateId(projectId)) {
-        return {
-          success: false,
-          error: "Invalid project ID",
-        };
-      }
-
-      await projectRepository.updateTags(projectId, tagIds);
-      return this.success(undefined, "Project tags updated successfully");
-    } catch (error) {
-      return this.handleError(error, "updateProjectTags");
-    }
-  }
 
 
   // Framework relations

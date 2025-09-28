@@ -1,5 +1,5 @@
 import { StorageConfig, StorageType } from "@/types/upload";
-import { env } from "@/lib/env";
+import { env } from "@/lib/config/env";
 
 /**
  * Default upload configuration

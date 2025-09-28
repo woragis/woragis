@@ -2,9 +2,7 @@ import { eq, desc, asc, and, like, sql } from "drizzle-orm";
 import { db } from "../db";
 import {
   projects,
-  projectTagAssignments,
   projectFrameworks,
-  projectTags,
   frameworks,
 } from "../db/schemas";
 import type {
@@ -13,7 +11,6 @@ import type {
   ProjectOrderUpdate,
   ProjectFilters,
   ProjectWithRelations,
-  ProjectTag,
   Framework,
 } from "@/types";
 
@@ -219,14 +216,10 @@ export class ProjectRepository {
     const project = await this.findById(id, userId);
     if (!project) return null;
 
-    const [projectTags, projectFrameworks] = await Promise.all([
-      this.getProjectTags(id),
-      this.getProjectFrameworks(id),
-    ]);
+    const projectFrameworks = await this.getProjectFrameworks(id);
 
     return {
       ...project,
-      tags: projectTags,
       frameworks: projectFrameworks,
     };
   }
@@ -237,38 +230,14 @@ export class ProjectRepository {
     const project = await this.findPublicById(id);
     if (!project) return null;
 
-    const [projectTags, projectFrameworks] = await Promise.all([
-      this.getProjectTags(id),
-      this.getProjectFrameworks(id),
-    ]);
+    const projectFrameworks = await this.getProjectFrameworks(id);
 
     return {
       ...project,
-      tags: projectTags,
       frameworks: projectFrameworks,
     };
   }
 
-  async getProjectTags(projectId: string): Promise<ProjectTag[]> {
-    const result = await db
-      .select({
-        id: projectTags.id,
-        userId: projectTags.userId,
-        name: projectTags.name,
-        slug: projectTags.slug,
-        description: projectTags.description,
-        color: projectTags.color,
-        visible: projectTags.visible,
-        order: projectTags.order,
-        createdAt: projectTags.createdAt,
-        updatedAt: projectTags.updatedAt,
-      })
-      .from(projectTagAssignments)
-      .innerJoin(projectTags, eq(projectTagAssignments.tagId, projectTags.id))
-      .where(eq(projectTagAssignments.projectId, projectId));
-
-    return result;
-  }
 
   async getProjectFrameworks(projectId: string): Promise<Framework[]> {
     const result = await db
@@ -295,38 +264,6 @@ export class ProjectRepository {
     return result as Framework[];
   }
 
-  // Tag relations
-  async assignTags(projectId: string, tagIds: string[]): Promise<void> {
-    if (tagIds.length === 0) return;
-
-    const values = tagIds.map((tagId) => ({
-      projectId,
-      tagId,
-    }));
-
-    await db.insert(projectTagAssignments).values(values);
-  }
-
-  async removeTag(projectId: string, tagId: string): Promise<void> {
-    await db
-      .delete(projectTagAssignments)
-      .where(
-        and(
-          eq(projectTagAssignments.projectId, projectId),
-          eq(projectTagAssignments.tagId, tagId)
-        )
-      );
-  }
-
-  async updateTags(projectId: string, tagIds: string[]): Promise<void> {
-    // Remove existing tags
-    await db
-      .delete(projectTagAssignments)
-      .where(eq(projectTagAssignments.projectId, projectId));
-
-    // Add new tags
-    await this.assignTags(projectId, tagIds);
-  }
 
   // Framework relations
   async assignFrameworks(
