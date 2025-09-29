@@ -2,11 +2,11 @@ import {
   Hero,
   About,
   Skills,
+  Education,
   Projects,
   Experience,
   Testimonials,
   Blog,
-  Certifications,
   GitHubStats,
   Contact,
 } from "@/components/pages/home";
@@ -18,11 +18,11 @@ export default function Home() {
       <Hero />
       <About />
       <Skills />
+      <Education />
       <Experience />
       <Projects />
       <Testimonials />
       <Blog />
-      <Certifications />
       {/* <GitHubStats /> */}
       <Contact />
     </ClientOnly>
