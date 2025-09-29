@@ -6,6 +6,7 @@ import {
   DataTable,
   DataTableRow,
   DataTableCell,
+  StatusBadge,
 } from "@/components/ui";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { Edit, Trash2, Eye, EyeOff } from "lucide-react";
