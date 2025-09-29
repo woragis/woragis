@@ -45,7 +45,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
   const [selectedFrameworks, setSelectedFrameworks] = useState<Framework[]>([]);
   const [showFrameworkSection, setShowFrameworkSection] = useState(false);
 
-  const { data: availableFrameworks = [] } = useFrameworks({ visible: true }, { enabled: showFrameworkSection });
+  const { data: availableFrameworks = [] } = useFrameworks({ visible: true });
 
   useEffect(() => {
     if (project) {

@@ -22,6 +22,7 @@ import type { NewProject } from "@/types/projects";
 export const AdminDashboard: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [formData, setFormData] = useState<NewProject | null>(null);
 
   // Auth hook
   const { user } = useAuth();
@@ -64,8 +65,17 @@ export const AdminDashboard: React.FC = () => {
       }
       setShowForm(false);
       setEditingProject(null);
+      setFormData(null);
     } catch (error) {
       console.error("Error saving project:", error);
+    }
+  };
+
+  // Handle form submission
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData) {
+      handleSaveProject(formData);
     }
   };
 
@@ -135,6 +145,7 @@ export const AdminDashboard: React.FC = () => {
   const handleCancelForm = () => {
     setShowForm(false);
     setEditingProject(null);
+    setFormData(null);
   };
 
   const stats = {
@@ -244,12 +255,13 @@ export const AdminDashboard: React.FC = () => {
             <ProjectForm
               project={editingProject || undefined}
               userId={user?.id || ""}
-              onSubmit={handleSaveProject}
+              onSubmit={handleFormSubmit}
               onCancel={handleCancelForm}
               isLoading={
                 createProjectMutation.isPending ||
                 updateProjectMutation.isPending
               }
+              onFormDataChange={setFormData}
             />
           </div>
         )}

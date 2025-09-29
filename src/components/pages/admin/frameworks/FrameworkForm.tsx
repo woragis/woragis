@@ -30,7 +30,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
     color: "#3B82F6",
     website: "",
     version: "",
-    type: "framework" as "framework" | "language",
+    type: "framework" as "framework" | "language" | "tool",
     order: 0,
     visible: true,
   });
@@ -62,7 +62,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
 
@@ -167,6 +167,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
         >
           <option value="framework">Framework/Library</option>
           <option value="language">Programming Language</option>
+          <option value="tool">Tool/Service</option>
         </select>
       </div>
 

@@ -42,7 +42,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({
   const [newTechnology, setNewTechnology] = useState("");
   const [showFrameworkSection, setShowFrameworkSection] = useState(false);
 
-  const { data: availableFrameworks = [] } = useFrameworks({ visible: true }, { enabled: showFrameworkSection });
+  const { data: availableFrameworks = [] } = useFrameworks({ visible: true });
 
   useEffect(() => {
     if (experience) {

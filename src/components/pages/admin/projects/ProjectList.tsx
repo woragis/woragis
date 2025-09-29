@@ -2,6 +2,12 @@
 
 import React, { useState } from "react";
 import { Project } from "@/types/projects";
+import { Framework } from "@/types";
+
+// Extend Project to include optional frameworks
+type ProjectWithOptionalFrameworks = Project & {
+  frameworks?: Framework[];
+};
 import { Button, Card } from "@/components/ui";
 import {
   Edit,
@@ -31,8 +37,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 interface ProjectListProps {
-  projects: Project[];
-  onEdit: (project: Project) => void;
+  projects: ProjectWithOptionalFrameworks[];
+  onEdit: (project: ProjectWithOptionalFrameworks) => void;
   onDelete: (id: number) => void;
   onToggleVisibility: (id: number) => void;
   onToggleFeatured: (id: number) => void;
@@ -41,8 +47,8 @@ interface ProjectListProps {
 }
 
 interface SortableProjectItemProps {
-  project: Project;
-  onEdit: (project: Project) => void;
+  project: ProjectWithOptionalFrameworks;
+  onEdit: (project: ProjectWithOptionalFrameworks) => void;
   onDelete: (id: number) => void;
   onToggleVisibility: (id: number) => void;
   onToggleFeatured: (id: number) => void;
