@@ -216,6 +216,7 @@ export default function FrameworksAdminPage() {
               <option value="">All Types</option>
               <option value="framework">Frameworks</option>
               <option value="language">Languages</option>
+              <option value="tool">Tools</option>
             </select>
             <select
               value={filters.visible?.toString() || ""}
@@ -258,19 +259,21 @@ export default function FrameworksAdminPage() {
             items={frameworks.map((framework): AdminGridItem => ({
               id: framework.id,
               title: framework.name,
-              description: framework.description,
+              description: framework.description || undefined,
               icon: framework.icon || framework.name.charAt(0).toUpperCase(),
               iconBg: framework.color || "#3B82F6",
               badges: [
                 { 
                   label: framework.type, 
-                  variant: framework.type === "framework" ? "info" as const : "success" as const 
+                  variant: framework.type === "framework" ? "info" as const : 
+                          framework.type === "language" ? "success" as const : 
+                          "warning" as const 
                 },
                 ...(framework.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
               ],
               metadata: [
                 { label: "Slug", value: framework.slug },
-                { label: "Order", value: framework.order.toString() },
+                { label: "Order", value: framework.order?.toString() || "0" },
                 ...(framework.version ? [{ label: "Version", value: `v${framework.version}` }] : []),
                 ...(framework.website ? [{ label: "Website", value: "Available" }] : [])
               ],
@@ -299,19 +302,19 @@ export default function FrameworksAdminPage() {
             items={frameworks.map((framework): AdminListItem => ({
               id: framework.id,
               title: framework.name,
-              description: framework.description,
-              icon: framework.icon || framework.name.charAt(0).toUpperCase(),
-              iconBg: framework.color || "#3B82F6",
+              description: framework.description || undefined,
               badges: [
                 { 
                   label: framework.type, 
-                  variant: framework.type === "framework" ? "info" as const : "success" as const 
+                  variant: framework.type === "framework" ? "info" as const : 
+                          framework.type === "language" ? "success" as const : 
+                          "warning" as const 
                 },
                 ...(framework.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
               ],
               metadata: [
                 { label: "Slug", value: framework.slug },
-                { label: "Order", value: framework.order.toString() },
+                { label: "Order", value: framework.order?.toString() || "0" },
                 ...(framework.version ? [{ label: "Version", value: `v${framework.version}` }] : []),
                 ...(framework.website ? [{ label: "Website", value: "Available" }] : [])
               ],

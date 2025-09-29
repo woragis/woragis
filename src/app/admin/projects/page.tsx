@@ -70,7 +70,7 @@ export default function ProjectsAdminPage() {
     if (createFormData) {
       handleCreateProject(createFormData);
     }
-  }, [createFormData]);
+  }, [createFormData, handleCreateProject]);
 
   // Edit project
   const handleEditProject = (project: Project) => {
@@ -99,7 +99,7 @@ export default function ProjectsAdminPage() {
     if (editFormData && selectedProject) {
       handleUpdateProject(editFormData);
     }
-  }, [editFormData, selectedProject]);
+  }, [editFormData, selectedProject, handleUpdateProject]);
 
   // Delete project
   const handleDeleteProject = (project: Project) => {

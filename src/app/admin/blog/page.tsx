@@ -82,7 +82,7 @@ export default function BlogPage() {
     if (createFormData) {
       handleCreateBlogPost(createFormData);
     }
-  }, [createFormData]);
+  }, [createFormData, handleCreateBlogPost]);
 
   // Edit blog post
   const handleEditBlogPost = (blogPost: BlogPost) => {
@@ -111,7 +111,7 @@ export default function BlogPage() {
     if (editFormData && selectedBlogPost) {
       handleUpdateBlogPost(editFormData);
     }
-  }, [editFormData, selectedBlogPost]);
+  }, [editFormData, selectedBlogPost, handleUpdateBlogPost]);
 
   const handleDelete = (blogPost: BlogPost) => {
     setSelectedBlogPost(blogPost);
@@ -291,8 +291,8 @@ export default function BlogPage() {
             items={blogPosts.map((post): AdminGridItem => ({
               id: post.id,
               title: post.title,
-              description: post.excerpt,
-              image: post.featuredImage,
+              description: post.excerpt || undefined,
+              image: post.featuredImage || undefined,
               imageAlt: post.title,
               badges: [
                 ...(post.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
@@ -330,8 +330,8 @@ export default function BlogPage() {
             items={blogPosts.map((post): AdminListItem => ({
               id: post.id,
               title: post.title,
-              description: post.excerpt,
-              image: post.featuredImage,
+              description: post.excerpt || undefined,
+              image: post.featuredImage || undefined,
               imageAlt: post.title,
               badges: [
                 ...(post.featured ? [{ label: "Featured", variant: "warning" as const }] : []),

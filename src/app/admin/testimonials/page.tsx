@@ -264,7 +264,7 @@ export default function TestimonialsPage() {
               id: testimonial.id,
               title: testimonial.name,
               description: `"${testimonial.content}"`,
-              image: testimonial.avatar,
+              image: testimonial.avatar || undefined,
               imageAlt: testimonial.name,
               badges: [
                 ...(testimonial.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
@@ -302,7 +302,7 @@ export default function TestimonialsPage() {
               id: testimonial.id,
               title: testimonial.name,
               description: `"${testimonial.content}"`,
-              image: testimonial.avatar,
+              image: testimonial.avatar || undefined,
               imageAlt: testimonial.name,
               badges: [
                 ...(testimonial.featured ? [{ label: "Featured", variant: "warning" as const }] : []),

@@ -86,7 +86,7 @@ export default function ExperienceAdminPage() {
     if (createFormData) {
       handleCreateExperience(createFormData);
     }
-  }, [createFormData]);
+  }, [createFormData, handleCreateExperience]);
 
   // Edit experience
   const handleEditExperience = (experience: Experience) => {
@@ -115,7 +115,7 @@ export default function ExperienceAdminPage() {
     if (editFormData && selectedExperience) {
       handleUpdateExperience(editFormData);
     }
-  }, [editFormData, selectedExperience]);
+  }, [editFormData, selectedExperience, handleUpdateExperience]);
 
   const filteredExperiences =
     experiences?.filter(
