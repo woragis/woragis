@@ -56,7 +56,7 @@ export const generateId = (length: number = 8): string => {
 };
 
 export const generateSlug = (title: string, existingSlugs: string[] = []): string => {
-  let baseSlug = slugify(title);
+  const baseSlug = slugify(title);
   let slug = baseSlug;
   let counter = 1;
   

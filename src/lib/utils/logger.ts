@@ -58,5 +58,3 @@ export const logger = new Logger(
   process.env.NODE_ENV === 'development' ? LogLevel.DEBUG : LogLevel.INFO
 );
 
-// Export LogLevel for external use
-export { LogLevel };

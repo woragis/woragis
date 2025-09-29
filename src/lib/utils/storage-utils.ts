@@ -4,7 +4,7 @@
  */
 
 // Re-export all cookie utilities
-export * from '../utils/cookies';
+export * from '../../utils/cookies';
 
 // Re-export all localStorage utilities
-export * from '../utils/localStorage';
+export * from '../../utils/localStorage';
