@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
+import Image from "next/image";
 import { Upload, X, Check, AlertCircle, Loader2, FileText } from "lucide-react";
 import { Button } from "../layout/Button";
 
@@ -268,9 +269,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           </label>
           <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
             {isImage(previewUrl) && (
-              <img
+              <Image
                 src={previewUrl}
                 alt="Preview"
+                width={400}
+                height={192}
                 className="w-full h-48 object-cover"
               />
             )}

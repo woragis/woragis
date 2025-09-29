@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Badge } from "./forms/badge";
@@ -20,7 +21,7 @@ export const ProjectMarkdownRenderer: React.FC<ProjectMarkdownRendererProps> = (
         remarkPlugins={[remarkGfm]}
         components={{
           // Custom styling for code blocks
-          code: ({ node, inline, className, children, ...props }) => {
+          code: ({ node, inline, className, children, ...props }: any) => {
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
               <div className="relative">
@@ -63,12 +64,15 @@ export const ProjectMarkdownRenderer: React.FC<ProjectMarkdownRendererProps> = (
             else if (isRight) alignmentClass = "float-right ml-4 mb-4";
             else if (isCenter) alignmentClass = "mx-auto block";
             
+            const { width, height, ...restProps } = props;
             return (
-              <img
-                src={src}
+              <Image
+                src={typeof src === 'string' ? src : ""}
                 alt={altText.replace(/\[(left|right|center)\]/g, "").trim()}
+                width={800}
+                height={600}
                 className={`rounded-lg shadow-lg max-w-full h-auto ${alignmentClass}`}
-                {...props}
+                {...restProps}
               />
             );
           },

@@ -164,7 +164,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                   onClick={() => setShowImageUpload(!showImageUpload)}
                   className="flex items-center space-x-1"
                 >
-                  <Image className="w-4 h-4" alt="Insert Image" />
+                  <Image className="w-4 h-4" />
                   <span>Insert Image</span>
                 </Button>
               </div>

@@ -15,7 +15,7 @@ export function DisplayToggle({ className = "" }: DisplayToggleProps) {
   return (
     <div className={`flex items-center space-x-1 ${className}`}>
       <Button
-        variant={displayMode === "grid" ? "default" : "outline"}
+        variant={displayMode === "grid" ? "primary" : "outline"}
         size="sm"
         onClick={() => displayMode !== "grid" && toggleDisplayMode()}
         className="p-2"
@@ -24,7 +24,7 @@ export function DisplayToggle({ className = "" }: DisplayToggleProps) {
         <Grid3X3 className="w-4 h-4" />
       </Button>
       <Button
-        variant={displayMode === "list" ? "default" : "outline"}
+        variant={displayMode === "list" ? "primary" : "outline"}
         size="sm"
         onClick={() => displayMode !== "list" && toggleDisplayMode()}
         className="p-2"
