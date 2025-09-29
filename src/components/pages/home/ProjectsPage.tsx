@@ -125,29 +125,6 @@ export const ProjectsPage: React.FC = () => {
                         {project.description}
                       </p>
 
-                      <div className="mb-4">
-                        <div className="flex flex-wrap gap-2">
-                          {project.frameworks
-                            ?.slice(0, 4)
-                            .map((framework) => (
-                              <span
-                                key={framework.id}
-                                className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full flex items-center gap-1"
-                                style={{ backgroundColor: framework.color ? `${framework.color}20` : undefined }}
-                              >
-                                {framework.icon && (
-                                  <span className="text-xs">{framework.icon}</span>
-                                )}
-                                {framework.name}
-                              </span>
-                            ))}
-                          {project.frameworks && project.frameworks.length > 4 && (
-                            <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                              +{project.frameworks.length - 4} more
-                            </span>
-                          )}
-                        </div>
-                      </div>
 
                       <div className="flex gap-2">
                         <Link href={`/projects/${project.id}`} className="flex-1">

@@ -119,7 +119,6 @@ export const Projects: React.FC = () => {
         <Container>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project, index) => {
-              const technologies = JSON.parse(project.technologies || "[]");
               const IconComponent = projectIcons[index % projectIcons.length];
 
               return (
@@ -156,25 +155,6 @@ export const Projects: React.FC = () => {
                       {project.description}
                     </p>
 
-                    <div className="mb-4">
-                      <div className="flex flex-wrap gap-2">
-                        {technologies
-                          .slice(0, 3)
-                          .map((tech: string, techIndex: number) => (
-                            <span
-                              key={techIndex}
-                              className="px-2 py-1 glass-morphism text-indigo-600 dark:text-indigo-400 text-xs font-medium rounded-full border border-indigo-200/50 dark:border-indigo-700/50"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        {technologies.length > 3 && (
-                          <span className="px-2 py-1 glass-morphism text-purple-600 dark:text-purple-400 text-xs font-medium rounded-full border border-purple-200/50 dark:border-purple-700/50">
-                            +{technologies.length - 3} more
-                          </span>
-                        )}
-                      </div>
-                    </div>
 
                     <div className="flex gap-2">
                       <Link href={`/projects/${project.id}`} className="flex-1">
