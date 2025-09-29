@@ -254,8 +254,8 @@ export default function GamesAdminPage() {
             items={games.map((game): AdminGridItem => ({
               id: game.id,
               title: game.title,
-              description: game.description,
-              image: game.coverImage,
+              description: game.description || undefined,
+              image: game.coverImage || undefined,
               imageAlt: game.title,
               icon: <Gamepad2 className="w-6 h-6" />,
               iconBg: "bg-gradient-to-br from-indigo-500 to-purple-600",
@@ -269,8 +269,8 @@ export default function GamesAdminPage() {
                 ...(game.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
               ],
               metadata: [
-                { label: "Platform", value: game.platform },
-                ...(game.rating > 0 ? [{ label: "Rating", value: `${game.rating}/10` }] : []),
+                { label: "Platform", value: game.platform || "Unknown" },
+                ...(game.rating && game.rating > 0 ? [{ label: "Rating", value: `${game.rating}/10` }] : []),
                 ...(game.genre ? [{ label: "Genre", value: game.genre }] : []),
                 ...(game.playtime ? [{ label: "Playtime", value: `${game.playtime}h` }] : []),
                 ...(game.steamUrl ? [{ label: "Steam", value: "Available" }] : [])
@@ -300,11 +300,9 @@ export default function GamesAdminPage() {
             items={games.map((game): AdminListItem => ({
               id: game.id,
               title: game.title,
-              description: game.description,
-              image: game.coverImage,
+              description: game.description || undefined,
+              image: game.coverImage || undefined,
               imageAlt: game.title,
-              icon: <Gamepad2 className="w-6 h-6" />,
-              iconBg: "bg-gradient-to-br from-indigo-500 to-purple-600",
               badges: [
                 { 
                   label: game.category?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown", 
@@ -315,8 +313,8 @@ export default function GamesAdminPage() {
                 ...(game.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
               ],
               metadata: [
-                { label: "Platform", value: game.platform },
-                ...(game.rating > 0 ? [{ label: "Rating", value: `${game.rating}/10` }] : []),
+                { label: "Platform", value: game.platform || "Unknown" },
+                ...(game.rating && game.rating > 0 ? [{ label: "Rating", value: `${game.rating}/10` }] : []),
                 ...(game.genre ? [{ label: "Genre", value: game.genre }] : []),
                 ...(game.playtime ? [{ label: "Playtime", value: `${game.playtime}h` }] : []),
                 ...(game.steamUrl ? [{ label: "Steam", value: "Available" }] : [])

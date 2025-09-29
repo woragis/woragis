@@ -325,8 +325,6 @@ export default function InstrumentsAdminPage() {
               id: instrument.id,
               title: instrument.name,
               description: "Musical Instrument",
-              icon: <Guitar className="w-6 h-6" />,
-              iconBg: "bg-gradient-to-br from-amber-500 to-orange-600",
               badges: [
                 { 
                   label: getKnowledgeLevelLabel(instrument.knowledgeLevel || "beginner"), 

@@ -286,7 +286,7 @@ export default function LastListenedSongsAdminPage() {
                     )}
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                       <Calendar className="w-4 h-4 mr-1" />
-                      Added {new Date(song.createdAt).toLocaleDateString()}
+                      Added {song.createdAt ? new Date(song.createdAt).toLocaleDateString() : 'Unknown'}
                     </div>
                   </div>
 

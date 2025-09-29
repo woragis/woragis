@@ -256,8 +256,8 @@ export default function AnimeAdminPage() {
             items={anime.map((animeItem): AdminGridItem => ({
               id: animeItem.id,
               title: animeItem.title,
-              description: animeItem.description,
-              image: animeItem.coverImage,
+              description: animeItem.description || undefined,
+              image: animeItem.coverImage || undefined,
               imageAlt: animeItem.title,
               icon: <Tv className="w-6 h-6" />,
               iconBg: "bg-gradient-to-br from-pink-500 to-purple-600",
@@ -272,7 +272,7 @@ export default function AnimeAdminPage() {
               ],
               metadata: [
                 ...(animeItem.myAnimeListId ? [{ label: "MAL ID", value: animeItem.myAnimeListId.toString() }] : []),
-                ...(animeItem.rating > 0 ? [{ label: "Rating", value: `${animeItem.rating}/10` }] : []),
+                ...(animeItem.rating && animeItem.rating > 0 ? [{ label: "Rating", value: `${animeItem.rating}/10` }] : []),
                 ...(animeItem.episodes || animeItem.currentEpisode ? [{ 
                   label: "Episodes", 
                   value: animeItem.currentEpisode && animeItem.episodes 
@@ -308,11 +308,9 @@ export default function AnimeAdminPage() {
             items={anime.map((animeItem): AdminListItem => ({
               id: animeItem.id,
               title: animeItem.title,
-              description: animeItem.description,
-              image: animeItem.coverImage,
+              description: animeItem.description || undefined,
+              image: animeItem.coverImage || undefined,
               imageAlt: animeItem.title,
-              icon: <Tv className="w-6 h-6" />,
-              iconBg: "bg-gradient-to-br from-pink-500 to-purple-600",
               badges: [
                 { 
                   label: animeItem.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown", 
@@ -324,7 +322,7 @@ export default function AnimeAdminPage() {
               ],
               metadata: [
                 ...(animeItem.myAnimeListId ? [{ label: "MAL ID", value: animeItem.myAnimeListId.toString() }] : []),
-                ...(animeItem.rating > 0 ? [{ label: "Rating", value: `${animeItem.rating}/10` }] : []),
+                ...(animeItem.rating && animeItem.rating > 0 ? [{ label: "Rating", value: `${animeItem.rating}/10` }] : []),
                 ...(animeItem.episodes || animeItem.currentEpisode ? [{ 
                   label: "Episodes", 
                   value: animeItem.currentEpisode && animeItem.episodes 

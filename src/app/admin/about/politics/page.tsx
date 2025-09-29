@@ -288,7 +288,7 @@ export default function PoliticsAdminPage() {
                     )}
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                       <Calendar className="w-4 h-4 mr-1" />
-                      Added {new Date(politicalView.createdAt).toLocaleDateString()}
+                      Added {politicalView.createdAt ? new Date(politicalView.createdAt).toLocaleDateString() : 'Unknown'}
                     </div>
                   </div>
 

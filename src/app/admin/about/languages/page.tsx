@@ -322,8 +322,6 @@ export default function LanguagesAdminPage() {
               id: language.id,
               title: language.name,
               description: "Language",
-              icon: <Languages className="w-6 h-6" />,
-              iconBg: "bg-gradient-to-br from-teal-500 to-cyan-600",
               badges: [
                 { 
                   label: getProficiencyLabel(language.proficiencyLevel || "beginner"), 

@@ -274,7 +274,7 @@ export default function MusicGenresAdminPage() {
                     )}
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                       <Calendar className="w-4 h-4 mr-1" />
-                      Added {new Date(genre.createdAt).toLocaleDateString()}
+                      Added {genre.createdAt ? new Date(genre.createdAt).toLocaleDateString() : 'Unknown'}
                     </div>
                   </div>
 

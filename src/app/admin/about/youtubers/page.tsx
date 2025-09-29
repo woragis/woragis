@@ -325,7 +325,7 @@ export default function YouTubersAdminPage() {
                     )}
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                       <Calendar className="w-4 h-4 mr-1" />
-                      Added {new Date(youTuber.createdAt).toLocaleDateString()}
+                      Added {youTuber.createdAt ? new Date(youTuber.createdAt).toLocaleDateString() : 'Unknown'}
                     </div>
                   </div>
 
