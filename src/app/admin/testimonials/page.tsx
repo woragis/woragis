@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Image from "next/image";
 import { useTestimonials } from "@/hooks/useTestimonials";
 import {
@@ -42,8 +42,8 @@ export default function TestimonialsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
-  const [createSubmitFn, setCreateSubmitFn] = useState<(() => void) | null>(null);
-  const [editSubmitFn, setEditSubmitFn] = useState<(() => void) | null>(null);
+  const [createFormData, setCreateFormData] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
   const {
@@ -61,21 +61,22 @@ export default function TestimonialsPage() {
   };
 
   // Create testimonial
-  const handleCreateTestimonial = async (testimonialData: any) => {
+  const handleCreateTestimonial = useCallback(async (testimonialData: any) => {
     try {
       await createTestimonial.mutateAsync(testimonialData);
       setIsCreateModalOpen(false);
-      setCreateSubmitFn(null);
+      setCreateFormData(null);
     } catch (error) {
       console.error("Failed to create testimonial:", error);
     }
-  };
+  }, [createTestimonial]);
 
-  const handleCreateSubmit = () => {
-    if (createSubmitFn) {
-      createSubmitFn();
+  const handleCreateSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (createFormData) {
+      handleCreateTestimonial(createFormData);
     }
-  };
+  }, [createFormData, handleCreateTestimonial]);
 
   // Edit testimonial
   const handleEditTestimonial = (testimonial: Testimonial) => {
@@ -83,7 +84,7 @@ export default function TestimonialsPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateTestimonial = async (testimonialData: any) => {
+  const handleUpdateTestimonial = useCallback(async (testimonialData: any) => {
     if (!selectedTestimonial) return;
 
     try {
@@ -93,17 +94,18 @@ export default function TestimonialsPage() {
       });
       setIsEditModalOpen(false);
       setSelectedTestimonial(null);
-      setEditSubmitFn(null);
+      setEditFormData(null);
     } catch (error) {
       console.error("Failed to update testimonial:", error);
     }
-  };
+  }, [selectedTestimonial, updateTestimonial]);
 
-  const handleEditSubmit = () => {
-    if (editSubmitFn) {
-      editSubmitFn();
+  const handleEditSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (editFormData && selectedTestimonial) {
+      handleUpdateTestimonial(editFormData);
     }
-  };
+  }, [editFormData, selectedTestimonial, handleUpdateTestimonial]);
 
   const handleDelete = (testimonial: Testimonial) => {
     setSelectedTestimonial(testimonial);
@@ -352,7 +354,7 @@ export default function TestimonialsPage() {
           isOpen={isCreateModalOpen}
           onClose={() => {
             setIsCreateModalOpen(false);
-            setCreateSubmitFn(null);
+            setCreateFormData(null);
           }}
           isEdit={false}
           itemName="Testimonial"
@@ -360,17 +362,17 @@ export default function TestimonialsPage() {
           onSubmit={handleCreateSubmit}
           onCancel={() => {
             setIsCreateModalOpen(false);
-            setCreateSubmitFn(null);
+            setCreateFormData(null);
           }}
           isLoading={createTestimonial.isPending}
           maxHeight="90vh"
         >
           <TestimonialForm
             userId={user?.id || ""}
-            onSubmit={handleCreateTestimonial}
+            onSubmit={handleCreateSubmit}
             onCancel={() => setIsCreateModalOpen(false)}
             isLoading={createTestimonial.isPending}
-            onFormReady={setCreateSubmitFn}
+            onFormDataChange={setCreateFormData}
           />
         </CreateEditModal>
 
@@ -380,7 +382,7 @@ export default function TestimonialsPage() {
           onClose={() => {
             setIsEditModalOpen(false);
             setSelectedTestimonial(null);
-            setEditSubmitFn(null);
+            setEditFormData(null);
           }}
           isEdit={true}
           itemName="Testimonial"
@@ -389,7 +391,7 @@ export default function TestimonialsPage() {
           onCancel={() => {
             setIsEditModalOpen(false);
             setSelectedTestimonial(null);
-            setEditSubmitFn(null);
+            setEditFormData(null);
           }}
           isLoading={updateTestimonial.isPending}
           maxHeight="90vh"
@@ -398,13 +400,13 @@ export default function TestimonialsPage() {
             <TestimonialForm
               testimonial={selectedTestimonial}
               userId={user?.id || ""}
-              onSubmit={handleUpdateTestimonial}
+              onSubmit={handleEditSubmit}
               onCancel={() => {
                 setIsEditModalOpen(false);
                 setSelectedTestimonial(null);
               }}
               isLoading={updateTestimonial.isPending}
-              onFormReady={setEditSubmitFn}
+              onFormDataChange={setEditFormData}
             />
           )}
         </CreateEditModal>

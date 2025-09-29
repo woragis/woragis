@@ -8,10 +8,10 @@ import type { Framework, NewFramework } from "@/types";
 interface FrameworkFormProps {
   framework?: Framework;
   userId: string;
-  onSubmit: (framework: NewFramework) => void;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
-  onFormReady?: (submitFn: () => void) => void;
+  onFormDataChange?: (data: any) => void;
 }
 
 export const FrameworkForm: React.FC<FrameworkFormProps> = ({
@@ -20,7 +20,7 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false,
-  onFormReady,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -85,20 +85,20 @@ export const FrameworkForm: React.FC<FrameworkFormProps> = ({
     });
   };
 
-  const handleSubmit = useCallback((e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    onSubmit({
-      ...formData,
-      userId,
-    });
-  }, [formData, userId, onSubmit]);
-
-  // Expose submit function to parent
+  // Notify parent of form data changes
   useEffect(() => {
-    if (onFormReady) {
-      onFormReady(handleSubmit);
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
     }
-  }, [onFormReady, handleSubmit]);
+  }, [formData, userId, onFormDataChange]);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(e);
+  }, [onSubmit]);
 
   return (
     <div className="space-y-6">

@@ -8,10 +8,10 @@ import type { Testimonial, NewTestimonial } from "@/types";
 interface TestimonialFormProps {
   testimonial?: Testimonial;
   userId: string;
-  onSubmit: (testimonial: NewTestimonial) => void;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
-  onFormReady?: (submitFn: () => void) => void;
+  onFormDataChange?: (data: any) => void;
 }
 
 export const TestimonialForm: React.FC<TestimonialFormProps> = ({
@@ -20,7 +20,7 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false,
-  onFormReady,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -73,20 +73,20 @@ export const TestimonialForm: React.FC<TestimonialFormProps> = ({
     }));
   };
 
-  const handleSubmit = useCallback((e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    onSubmit({
-      ...formData,
-      userId,
-    });
-  }, [formData, userId, onSubmit]);
-
-  // Expose submit function to parent
+  // Notify parent of form data changes
   useEffect(() => {
-    if (onFormReady) {
-      onFormReady(handleSubmit);
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
     }
-  }, [onFormReady, handleSubmit]);
+  }, [formData, userId, onFormDataChange]);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(e);
+  }, [onSubmit]);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
