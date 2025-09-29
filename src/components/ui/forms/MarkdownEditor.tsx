@@ -3,8 +3,8 @@
 import React, { useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Button } from "./Button";
-import { Card } from "./Card";
+import { Button } from "../layout/Button";
+import { Card } from "../layout/Card";
 import { FileUpload } from "./FileUpload";
 import { Eye, Edit3, Save, X, Image, Upload } from "lucide-react";
 

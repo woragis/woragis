@@ -1,6 +1,6 @@
 import React from "react";
-import { Card } from "./Card";
-import { Button } from "./Button";
+import { Card } from "../layout/Card";
+import { Button } from "../layout/Button";
 
 interface EmptyStateProps {
   title: string;

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback } from "react";
 import { Upload, X, Check, AlertCircle, Loader2, FileText } from "lucide-react";
-import { Button } from "./Button";
+import { Button } from "../layout/Button";
 
 export interface FileUploadProps {
   /** Accepted file types (MIME types or extensions) */

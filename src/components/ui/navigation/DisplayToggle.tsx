@@ -3,7 +3,7 @@
 import React from "react";
 import { useDisplay } from "@/contexts/DisplayContext";
 import { Grid3X3, List } from "lucide-react";
-import { Button } from "./Button";
+import { Button } from "../layout/Button";
 
 interface DisplayToggleProps {
   className?: string;

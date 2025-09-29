@@ -3,7 +3,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Badge } from "./badge";
+import { Badge } from "./forms/badge";
 
 interface ProjectMarkdownRendererProps {
   content: string;
