@@ -8,10 +8,12 @@ import {
   Card,
   Button,
   EmptyState,
+  DisplayToggle,
 } from "@/components/ui";
 import { BooksForm, DeleteConfirmationModal } from "@/components/pages/admin";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
+import { useDisplay } from "@/contexts/DisplayContext";
 import {
   Plus,
   Search,
@@ -52,6 +54,7 @@ export default function BooksAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: books = [], isLoading, error } = useBooks();
   const createBook = useCreateBook();
   const updateBook = useUpdateBook();
@@ -228,6 +231,7 @@ export default function BooksAdminPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
+            <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Book
@@ -235,7 +239,7 @@ export default function BooksAdminPage() {
           </form>
         </Card>
 
-        {/* Books Grid */}
+        {/* Books Display */}
         {books.length === 0 ? (
           <EmptyState
             title="No Books Found"
@@ -243,7 +247,7 @@ export default function BooksAdminPage() {
             actionLabel="Add Book"
             onAction={() => setIsCreateModalOpen(true)}
           />
-        ) : (
+        ) : displayMode === "grid" ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {books.map((book) => (
               <Card key={book.id} hover className="flex flex-col h-full">
@@ -355,6 +359,105 @@ export default function BooksAdminPage() {
                         Hidden
                       </span>
                     )}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {books.map((book) => (
+              <Card key={book.id} hover>
+                <div className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                        {book.coverImage ? (
+                          <Image
+                            src={book.coverImage}
+                            alt={book.title}
+                            width={40}
+                            height={40}
+                            className="w-full h-full rounded-lg object-cover"
+                          />
+                        ) : (
+                          <Book className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                            {book.title}
+                          </h3>
+                          <span className="text-xs text-gray-600 dark:text-gray-400">
+                            by {book.author}
+                          </span>
+                          <span
+                            className={`px-1.5 py-0.5 text-xs rounded-full ${
+                              book.status === "completed"
+                                ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                                : book.status === "reading"
+                                ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                                : book.status === "want_to_read"
+                                ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                                : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                            }`}
+                          >
+                            {book.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                          </span>
+                          {!book.visible && (
+                            <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
+                              Hidden
+                            </span>
+                          )}
+                        </div>
+                        {book.description && (
+                          <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-1">
+                            {book.description}
+                          </p>
+                        )}
+                        <div className="flex items-center space-x-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {book.rating > 0 && (
+                            <div className="flex items-center">
+                              <Star className="w-3 h-3 mr-1" />
+                              {book.rating}/10
+                            </div>
+                          )}
+                          {(book.pages || book.currentPage) && (
+                            <div className="flex items-center">
+                              <Book className="w-3 h-3 mr-1" />
+                              {book.currentPage && book.pages 
+                                ? `${book.currentPage}/${book.pages} pages`
+                                : book.pages 
+                                ? `${book.pages} pages`
+                                : `Page ${book.currentPage}`
+                              }
+                            </div>
+                          )}
+                          {book.isbn && (
+                            <span className="text-xs">ISBN: {book.isbn}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex space-x-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditBook(book)}
+                        className="p-1.5"
+                      >
+                        <Edit className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(book)}
+                        className="text-red-600 hover:text-red-700 p-1.5"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Card>

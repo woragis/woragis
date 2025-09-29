@@ -7,6 +7,7 @@ import {
   Card,
   Button,
   EmptyState,
+  DisplayToggle,
 } from "@/components/ui";
 import {
   useExperience,
@@ -20,6 +21,7 @@ import { ExperienceForm } from "@/components/pages/admin/experience";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
+import { useDisplay } from "@/contexts/DisplayContext";
 import {
   Plus,
   Search,
@@ -44,6 +46,7 @@ export default function ExperienceAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: experiences, isLoading, error } = useExperience();
   const deleteExperience = useDeleteExperience();
   const toggleVisible = useToggleExperienceVisible();
@@ -143,20 +146,55 @@ export default function ExperienceAdminPage() {
             </p>
           </div>
 
+          {/* Search and Filter Skeleton */}
+          <Card className="p-6 mb-8 animate-pulse">
+            <div className="flex flex-wrap gap-4">
+              <div className="flex-1 min-w-64">
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              </div>
+              <div className="h-10 w-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+            </div>
+          </Card>
+
+          {/* Experience Grid Skeleton */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, index) => (
               <Card key={index} className="animate-pulse">
                 <div className="p-6">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-4"></div>
-                    <div className="flex-1">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                  {/* Header with actions */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center">
+                      <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-4"></div>
+                      <div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2 w-28"></div>
+                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
                     </div>
                   </div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+
+                  {/* Description */}
+                  <div className="space-y-2 mb-4">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/5"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                  </div>
+
+                  {/* Meta Info */}
+                  <div className="space-y-2 mb-4">
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/5"></div>
+                  </div>
+
+                  {/* Status badges */}
+                  <div className="flex flex-wrap gap-2">
+                    <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                  </div>
                 </div>
               </Card>
             ))}
@@ -207,6 +245,7 @@ export default function ExperienceAdminPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
+            <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Experience
@@ -214,7 +253,7 @@ export default function ExperienceAdminPage() {
           </form>
         </Card>
 
-        {/* Experience Grid */}
+        {/* Experience Display */}
         {filteredExperiences.length === 0 ? (
           <EmptyState
             title="No Experience Found"
@@ -222,7 +261,7 @@ export default function ExperienceAdminPage() {
             actionLabel="Add Experience"
             onAction={() => setIsCreateModalOpen(true)}
           />
-        ) : (
+        ) : displayMode === "grid" ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredExperiences.map((experience) => (
               <Card key={experience.id} hover className="flex flex-col h-full">
@@ -298,6 +337,76 @@ export default function ExperienceAdminPage() {
                         Hidden
                       </span>
                     )}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filteredExperiences.map((experience) => (
+              <Card key={experience.id} hover>
+                <div className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                        <Briefcase className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                            {experience.title}
+                          </h3>
+                          <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                            {experience.company}
+                          </span>
+                          {!experience.visible && (
+                            <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
+                              <EyeOff className="w-3 h-3 inline mr-1" />
+                              Hidden
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-1">
+                          {experience.description}
+                        </p>
+                        <div className="flex items-center space-x-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          <div className="flex items-center">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            {experience.period}
+                          </div>
+                          <div className="flex items-center">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {experience.location}
+                          </div>
+                          {experience.technologies && experience.technologies.length > 0 && (
+                            <div className="flex items-center">
+                              <Code className="w-3 h-3 mr-1" />
+                              {experience.technologies.slice(0, 2).join(", ")}
+                              {experience.technologies.length > 2 && "..."}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex space-x-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditExperience(experience)}
+                        className="p-1.5"
+                      >
+                        <Edit className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(experience)}
+                        className="text-red-600 hover:text-red-700 p-1.5"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Card>

@@ -1,6 +1,7 @@
 import { getServerAuth } from "@/lib/auth";
 import { AdminLayoutClient } from "./AdminLayoutClient";
 import { AuthProvider } from "@/contexts/AuthProvider";
+import { DisplayProvider } from "@/contexts/DisplayContext";
 
 export default async function AdminLayout({
   children,
@@ -13,21 +14,23 @@ export default async function AdminLayout({
 
   return (
     <AuthProvider>
-      <AdminLayoutClient
-        user={
-          user
-            ? {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                avatar: user.avatar,
-              }
-            : undefined
-        }
-      >
-        {children}
-      </AdminLayoutClient>
+      <DisplayProvider>
+        <AdminLayoutClient
+          user={
+            user
+              ? {
+                  id: user.id,
+                  email: user.email,
+                  name: user.name,
+                  role: user.role,
+                  avatar: user.avatar,
+                }
+              : undefined
+          }
+        >
+          {children}
+        </AdminLayoutClient>
+      </DisplayProvider>
     </AuthProvider>
   );
 }
