@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import Image from "next/image";
 import {
-  Section,
   Container,
   Card,
   Button,
+  AdminList,
   EmptyState,
   DisplayToggle,
 } from "@/components/ui";
@@ -22,21 +21,9 @@ import { ProjectForm } from "@/components/pages/admin/projects";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
-import { useDisplay } from "@/contexts/DisplayContext";
-import {
-  Plus,
-  Search,
-  Edit,
-  Trash2,
-  Code,
-  Eye,
-  EyeOff,
-  Calendar,
-  Hash,
-  Star,
-  StarOff,
-} from "lucide-react";
+import type { AdminListItem } from "@/components/ui/AdminList";
 import type { ProjectFilters, Project, NewProject } from "@/types";
+import { Search, Plus } from "lucide-react";
 
 export default function ProjectsAdminPage() {
   const [filters, setFilters] = useState<ProjectFilters>({});
@@ -51,7 +38,6 @@ export default function ProjectsAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
-  const { displayMode } = useDisplay();
   const { data: projects, isLoading, error } = useProjects(filters);
   const deleteProject = useDeleteProject();
   const createProject = useCreateProject();
@@ -291,180 +277,56 @@ export default function ProjectsAdminPage() {
           </div>
         </Card>
 
-        {/* Projects Display */}
-        {projects?.length === 0 ? (
-          <EmptyState
-            title="No Projects Found"
-            description="No projects match your current filters. Try adjusting your search criteria or add a new project."
-            actionLabel="Add Project"
-            onAction={() => setIsCreateModalOpen(true)}
-          />
-        ) : displayMode === "grid" ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects?.map((project) => (
-              <Card key={project.id} hover className="flex flex-col h-full">
-                <div className="p-6 flex flex-col h-full">
-                  {/* Header with actions */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center">
-                      <Image
-                        className="w-12 h-12 rounded-lg object-cover mr-4"
-                        src={project.image}
-                        alt={project.title}
-                        width={48}
-                        height={48}
-                      />
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {project.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Project
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditProject(project)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDeleteProject(project)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow line-clamp-3">
-                    {project.description}
-                  </p>
-
-                  {/* Meta Info */}
-                  <div className="space-y-2 mb-4">
-                    {project.technologies && project.technologies.length > 0 && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <Code className="w-4 h-4 mr-1" />
-                        {project.technologies.slice(0, 3).join(", ")}
-                        {project.technologies.length > 3 && "..."}
-                      </div>
-                    )}
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      Created {new Date(project.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2">
-                    {project.featured ? (
-                      <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded-full">
-                        <Star className="w-3 h-3 inline mr-1" />
-                        Featured
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        <StarOff className="w-3 h-3 inline mr-1" />
-                        Not Featured
-                      </span>
-                    )}
-                    {project.visible ? (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-                        <Eye className="w-3 h-3 inline mr-1" />
-                        Visible
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        <EyeOff className="w-3 h-3 inline mr-1" />
-                        Hidden
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {projects?.map((project) => (
-              <Card key={project.id} hover>
-                <div className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Image
-                        className="w-10 h-10 rounded-lg object-cover"
-                        src={project.image}
-                        alt={project.title}
-                        width={40}
-                        height={40}
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
-                            {project.title}
-                          </h3>
-                          {project.featured && (
-                            <span className="px-1.5 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded-full">
-                              <Star className="w-3 h-3 inline mr-1" />
-                              Featured
-                            </span>
-                          )}
-                          {!project.visible && (
-                            <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                              <EyeOff className="w-3 h-3 inline mr-1" />
-                              Hidden
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-1">
-                          {project.description}
-                        </p>
-                        <div className="flex items-center space-x-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          {project.technologies && project.technologies.length > 0 && (
-                            <div className="flex items-center">
-                              <Code className="w-3 h-3 mr-1" />
-                              {project.technologies.slice(0, 2).join(", ")}
-                              {project.technologies.length > 2 && "..."}
-                            </div>
-                          )}
-                          <div className="flex items-center">
-                            <Calendar className="w-3 h-3 mr-1" />
-                            {new Date(project.createdAt).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex space-x-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditProject(project)}
-                        className="p-1.5"
-                      >
-                        <Edit className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDeleteProject(project)}
-                        className="text-red-600 hover:text-red-700 p-1.5"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+        {/* Projects List */}
+        <AdminList
+          items={projects?.map((project): AdminListItem => ({
+            id: project.id,
+            title: project.title,
+            description: project.description,
+            image: project.image,
+            imageAlt: project.title,
+            badges: [
+              ...(project.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
+              ...(!project.visible ? [{ label: "Hidden", variant: "error" as const }] : [])
+            ],
+            metadata: [
+              { label: "Created", value: project.createdAt ? new Date(project.createdAt).toLocaleDateString() : "Unknown" }
+            ],
+            toggleActions: [
+              {
+                label: project.visible ? "Visible" : "Hidden",
+                isActive: project.visible || false,
+                onClick: () => handleToggleVisibility(project.id),
+                activeVariant: "success",
+                inactiveVariant: "error"
+              },
+              {
+                label: project.featured ? "Featured" : "Not Featured",
+                isActive: project.featured || false,
+                onClick: () => handleToggleFeatured(project.id),
+                activeVariant: "warning",
+                inactiveVariant: "default"
+              }
+            ],
+            actions: [
+              {
+                label: "Edit",
+                onClick: () => handleEditProject(project),
+                variant: "link"
+              },
+              {
+                label: "Delete",
+                onClick: () => handleDeleteProject(project),
+                variant: "link"
+              }
+            ]
+          })) || []}
+          emptyMessage="No projects found"
+          emptyAction={{
+            label: "Add Project",
+            onClick: () => setIsCreateModalOpen(true)
+          }}
+        />
 
       {/* Create Project Modal */}
       <CreateEditModal

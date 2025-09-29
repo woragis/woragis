@@ -15,6 +15,7 @@ export { DataTable, DataTableRow, DataTableCell } from "./DataTable";
 export { PageHeader } from "./PageHeader";
 export { ActionButton } from "./ActionButton";
 export { FileUpload } from "./FileUpload";
+export { AdminList } from "./AdminList";
 export { ClientOnly } from "../ClientOnly";
 export * from "./ValorantBackground";
 export { ValorantBackground as GamingBackground } from "./ValorantBackground";

@@ -1,30 +1,21 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import Image from "next/image";
 import {
-  Section,
   Container,
   Card,
   Button,
+  AdminList,
   EmptyState,
   DisplayToggle,
 } from "@/components/ui";
 import { BooksForm, DeleteConfirmationModal } from "@/components/pages/admin";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
-import { useDisplay } from "@/contexts/DisplayContext";
+import type { AdminListItem } from "@/components/ui/AdminList";
 import {
   Plus,
   Search,
-  Edit,
-  Trash2,
-  Book,
-  Eye,
-  EyeOff,
-  Star,
-  Calendar,
-  Hash,
 } from "lucide-react";
 import {
   useBooks,
@@ -54,7 +45,6 @@ export default function BooksAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
-  const { displayMode } = useDisplay();
   const { data: books = [], isLoading, error } = useBooks();
   const createBook = useCreateBook();
   const updateBook = useUpdateBook();
@@ -239,231 +229,53 @@ export default function BooksAdminPage() {
           </form>
         </Card>
 
-        {/* Books Display */}
-        {books.length === 0 ? (
-          <EmptyState
-            title="No Books Found"
-            description="No books match your current filters. Try adjusting your search criteria or add a new book."
-            actionLabel="Add Book"
-            onAction={() => setIsCreateModalOpen(true)}
-          />
-        ) : displayMode === "grid" ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {books.map((book) => (
-              <Card key={book.id} hover className="flex flex-col h-full">
-                <div className="p-6 flex flex-col h-full">
-                  {/* Header with actions */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
-                        {book.coverImage ? (
-                          <Image
-                            src={book.coverImage}
-                            alt={book.title}
-                            width={48}
-                            height={48}
-                            className="w-full h-full rounded-lg object-cover"
-                          />
-                        ) : (
-                          <Book className="w-6 h-6" />
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {book.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          by {book.author}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditBook(book)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(book)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  {book.description && (
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow line-clamp-3">
-                      {book.description}
-                    </p>
-                  )}
-
-                  {/* Meta Info */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center">
-                        <Hash className="w-4 h-4 mr-1" />
-                        {book.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                      </div>
-                      {book.rating > 0 && (
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 mr-1" />
-                          {book.rating}/10
-                        </div>
-                      )}
-                    </div>
-                    {(book.pages || book.currentPage) && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <Book className="w-4 h-4 mr-1" />
-                        {book.currentPage && book.pages 
-                          ? `${book.currentPage}/${book.pages} pages`
-                          : book.pages 
-                          ? `${book.pages} pages`
-                          : `Page ${book.currentPage}`
-                        }
-                      </div>
-                    )}
-                    {book.isbn && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <span className="text-xs">ISBN: {book.isbn}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        book.status === "completed"
-                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                          : book.status === "reading"
-                          ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
-                          : book.status === "want_to_read"
-                          ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                          : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                      }`}
-                    >
-                      {book.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                    </span>
-                    {book.visible ? (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-                        Visible
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        Hidden
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {books.map((book) => (
-              <Card key={book.id} hover>
-                <div className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                        {book.coverImage ? (
-                          <Image
-                            src={book.coverImage}
-                            alt={book.title}
-                            width={40}
-                            height={40}
-                            className="w-full h-full rounded-lg object-cover"
-                          />
-                        ) : (
-                          <Book className="w-5 h-5" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
-                            {book.title}
-                          </h3>
-                          <span className="text-xs text-gray-600 dark:text-gray-400">
-                            by {book.author}
-                          </span>
-                          <span
-                            className={`px-1.5 py-0.5 text-xs rounded-full ${
-                              book.status === "completed"
-                                ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                                : book.status === "reading"
-                                ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
-                                : book.status === "want_to_read"
-                                ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                                : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                            }`}
-                          >
-                            {book.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                          </span>
-                          {!book.visible && (
-                            <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                              Hidden
-                            </span>
-                          )}
-                        </div>
-                        {book.description && (
-                          <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-1">
-                            {book.description}
-                          </p>
-                        )}
-                        <div className="flex items-center space-x-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          {book.rating > 0 && (
-                            <div className="flex items-center">
-                              <Star className="w-3 h-3 mr-1" />
-                              {book.rating}/10
-                            </div>
-                          )}
-                          {(book.pages || book.currentPage) && (
-                            <div className="flex items-center">
-                              <Book className="w-3 h-3 mr-1" />
-                              {book.currentPage && book.pages 
-                                ? `${book.currentPage}/${book.pages} pages`
-                                : book.pages 
-                                ? `${book.pages} pages`
-                                : `Page ${book.currentPage}`
-                              }
-                            </div>
-                          )}
-                          {book.isbn && (
-                            <span className="text-xs">ISBN: {book.isbn}</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex space-x-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditBook(book)}
-                        className="p-1.5"
-                      >
-                        <Edit className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(book)}
-                        className="text-red-600 hover:text-red-700 p-1.5"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+        {/* Books List */}
+        <AdminList
+          items={books.map((book): AdminListItem => ({
+            id: book.id,
+            title: book.title,
+            description: `${book.author}${book.description ? ` - ${book.description}` : ""}`,
+            image: book.coverImage || "/api/placeholder/40/40",
+            imageAlt: book.title,
+            badges: !book.visible ? [{ label: "Hidden", variant: "error" }] : undefined,
+            metadata: [
+              {
+                label: "Status",
+                value: book.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown"
+              },
+              ...(book.pages ? [{ label: "Pages", value: book.pages.toString() }] : []),
+              ...(book.currentPage ? [{ label: "Current", value: book.currentPage.toString() }] : []),
+              ...(book.rating ? [{ label: "Rating", value: `${book.rating}/10` }] : []),
+              ...(book.isbn ? [{ label: "ISBN", value: book.isbn }] : [])
+            ],
+            toggleActions: [
+              {
+                label: book.visible ? "Visible" : "Hidden",
+                isActive: book.visible || false,
+                onClick: () => handleToggleVisibility(book.id),
+                activeVariant: "success",
+                inactiveVariant: "error"
+              }
+            ],
+            actions: [
+              {
+                label: "Edit",
+                onClick: () => handleEditBook(book),
+                variant: "link"
+              },
+              {
+                label: "Delete",
+                onClick: () => handleDelete(book),
+                variant: "link"
+              }
+            ]
+          }))}
+          emptyMessage="No books found"
+          emptyAction={{
+            label: "Add Book",
+            onClick: () => setIsCreateModalOpen(true)
+          }}
+        />
 
         {/* Create Book Modal */}
         <CreateEditModal
