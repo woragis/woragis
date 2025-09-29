@@ -95,7 +95,7 @@ if (env.NODE_ENV === "production") {
 /**
  * Test database connection on startup
  */
-export async function testDatabaseConnection(): Promise<boolean> {
+async function testDatabaseConnection(): Promise<boolean> {
   try {
     const { testDatabaseConnection } = await import("./connection-tests");
     const result = await testDatabaseConnection();
@@ -116,7 +116,7 @@ export async function testDatabaseConnection(): Promise<boolean> {
 /**
  * Test Redis connection on startup
  */
-export async function testRedisConnection(): Promise<boolean> {
+async function testRedisConnection(): Promise<boolean> {
   try {
     const { testRedisConnection } = await import("./connection-tests");
     const result = await testRedisConnection();

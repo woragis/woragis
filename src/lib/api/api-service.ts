@@ -334,6 +334,16 @@ export class SettingsApiService {
     return apiClient.post("/admin/settings/site-title", { title });
   }
 
+  // Public Settings
+  async getPublicSettings(): Promise<ApiResponse<{
+    biography: any;
+    social: any;
+    contact: any;
+    site: any;
+  }>> {
+    return apiClient.get("/settings/public");
+  }
+
   async getSiteDescription(): Promise<ApiResponse<string>> {
     return apiClient.get("/admin/settings/site-description");
   }
