@@ -184,12 +184,13 @@ export class ProjectRepository {
       );
     }
 
-    if (filters.technologies && filters.technologies.length > 0) {
-      // This would need a more complex query for JSON array search
-      // For now, we'll implement a simple text search
-      const techFilter = filters.technologies.join("|");
-      conditions.push(like(projects.technologies, `%${techFilter}%`));
-    }
+    // TODO: Implement technologies filter with frameworks relation
+    // if (filters.technologies && filters.technologies.length > 0) {
+    //   // This would need a more complex query for JSON array search
+    //   // For now, we'll implement a simple text search
+    //   const techFilter = filters.technologies.join("|");
+    //   conditions.push(like(projects.technologies, `%${techFilter}%`));
+    // }
 
     let query = db.select().from(projects) as any;
 

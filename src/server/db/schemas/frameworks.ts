@@ -11,10 +11,11 @@ import { relations } from "drizzle-orm";
 import { projects } from "./projects";
 import { users } from "./auth";
 
-// Enum for framework/language type
+// Enum for framework/language/tool type
 export const frameworkTypeEnum = pgEnum("framework_type", [
   "framework",
   "language",
+  "tool",
 ]);
 
 export const frameworks = pgTable("frameworks", {

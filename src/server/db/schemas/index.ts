@@ -3,6 +3,7 @@ export * from "./auth";
 export * from "./projects";
 export * from "./settings";
 export * from "./frameworks"; // Now includes both frameworks and languages
+export * from "./education";
 export * from "./testimonials";
 export * from "./blog";
 export * from "./experience";
