@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { ProjectWithRelations } from "@/types";
 import { Card, Container, Button, Badge } from "@/components/ui";
 import { ProjectMarkdownRenderer } from "@/components/ui/ProjectMarkdownRenderer";
@@ -42,9 +43,11 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
               {/* Project Image */}
               <div className="lg:w-1/3">
                 <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden">
-                  <img
+                  <Image
                     src={project.image}
                     alt={project.title}
+                    width={800}
+                    height={450}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -113,14 +116,14 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                   <div className="flex items-center space-x-1">
                     <Calendar className="w-4 h-4" />
                     <span>
-                      Created: {new Date(project.createdAt).toLocaleDateString()}
+                      Created: {project.createdAt ? new Date(project.createdAt).toLocaleDateString() : 'Unknown'}
                     </span>
                   </div>
                   {project.updatedAt && (
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-4 h-4" />
                       <span>
-                        Updated: {new Date(project.updatedAt).toLocaleDateString()}
+                        Updated: {project.updatedAt ? new Date(project.updatedAt).toLocaleDateString() : 'Unknown'}
                       </span>
                     </div>
                   )}
