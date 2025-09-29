@@ -31,6 +31,7 @@ export type {
   ProjectLanguageAssignRequest,
   ProjectLanguageRemoveRequest
 } from "./frameworks";
+export * from "./education";
 export * from "./testimonials";
 export * from "./blog";
 export * from "./experience";
