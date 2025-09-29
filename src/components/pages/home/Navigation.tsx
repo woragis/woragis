@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
-import { Button } from "@/components/ui/Button";
+import { ThemeToggle, LanguageSwitcher, Button } from "@/components/ui";
 import { CodeIcon } from "@/components/ui/AbstractIcons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";

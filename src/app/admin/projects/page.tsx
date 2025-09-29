@@ -6,6 +6,7 @@ import {
   Card,
   Button,
   AdminList,
+  AdminGrid,
   EmptyState,
   DisplayToggle,
 } from "@/components/ui";
@@ -21,7 +22,9 @@ import { ProjectForm } from "@/components/pages/admin/projects";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
-import type { AdminListItem } from "@/components/ui/AdminList";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
 import type { ProjectFilters, Project, NewProject } from "@/types";
 import { Search, Plus } from "lucide-react";
 
@@ -38,6 +41,7 @@ export default function ProjectsAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: projects, isLoading, error } = useProjects(filters);
   const deleteProject = useDeleteProject();
   const createProject = useCreateProject();
@@ -277,56 +281,116 @@ export default function ProjectsAdminPage() {
           </div>
         </Card>
 
-        {/* Projects List */}
-        <AdminList
-          items={projects?.map((project): AdminListItem => ({
-            id: project.id,
-            title: project.title,
-            description: project.description,
-            image: project.image,
-            imageAlt: project.title,
-            badges: [
-              ...(project.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
-              ...(!project.visible ? [{ label: "Hidden", variant: "error" as const }] : [])
-            ],
-            metadata: [
-              { label: "Created", value: project.createdAt ? new Date(project.createdAt).toLocaleDateString() : "Unknown" }
-            ],
-            toggleActions: [
-              {
-                label: project.visible ? "Visible" : "Hidden",
-                isActive: project.visible || false,
-                onClick: () => handleToggleVisibility(project.id),
-                activeVariant: "success",
-                inactiveVariant: "error"
-              },
-              {
-                label: project.featured ? "Featured" : "Not Featured",
-                isActive: project.featured || false,
-                onClick: () => handleToggleFeatured(project.id),
-                activeVariant: "warning",
-                inactiveVariant: "default"
-              }
-            ],
-            actions: [
-              {
-                label: "Edit",
-                onClick: () => handleEditProject(project),
-                variant: "link"
-              },
-              {
-                label: "Delete",
-                onClick: () => handleDeleteProject(project),
-                variant: "link"
-              }
-            ]
-          })) || []}
-          emptyMessage="No projects found"
-          emptyAction={{
-            label: "Add Project",
-            onClick: () => setIsCreateModalOpen(true)
-          }}
-        />
+        {/* Projects Display */}
+        {projects?.length === 0 ? (
+          <EmptyState
+            title="No Projects Found"
+            description="No projects match your current filters. Try adjusting your search criteria or add a new project."
+            actionLabel="Add Project"
+            onAction={() => setIsCreateModalOpen(true)}
+          />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={projects?.map((project): AdminGridItem => ({
+              id: project.id,
+              title: project.title,
+              description: project.description,
+              image: project.image,
+              imageAlt: project.title,
+              badges: [
+                ...(project.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
+                ...(!project.visible ? [{ label: "Hidden", variant: "error" as const }] : [])
+              ],
+              metadata: [
+                { label: "Created", value: project.createdAt ? new Date(project.createdAt).toLocaleDateString() : "Unknown" }
+              ],
+              toggleActions: [
+                {
+                  label: project.visible ? "Visible" : "Hidden",
+                  isActive: project.visible || false,
+                  onClick: () => handleToggleVisibility(project.id),
+                  activeVariant: "success",
+                  inactiveVariant: "error"
+                },
+                {
+                  label: project.featured ? "Featured" : "Not Featured",
+                  isActive: project.featured || false,
+                  onClick: () => handleToggleFeatured(project.id),
+                  activeVariant: "warning",
+                  inactiveVariant: "default"
+                }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditProject(project),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDeleteProject(project),
+                  variant: "link"
+                }
+              ]
+            })) || []}
+            emptyMessage="No projects found"
+            emptyAction={{
+              label: "Add Project",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
+        ) : (
+          <AdminList
+            items={projects?.map((project): AdminListItem => ({
+              id: project.id,
+              title: project.title,
+              description: project.description,
+              image: project.image,
+              imageAlt: project.title,
+              badges: [
+                ...(project.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
+                ...(!project.visible ? [{ label: "Hidden", variant: "error" as const }] : [])
+              ],
+              metadata: [
+                { label: "Created", value: project.createdAt ? new Date(project.createdAt).toLocaleDateString() : "Unknown" }
+              ],
+              toggleActions: [
+                {
+                  label: project.visible ? "Visible" : "Hidden",
+                  isActive: project.visible || false,
+                  onClick: () => handleToggleVisibility(project.id),
+                  activeVariant: "success",
+                  inactiveVariant: "error"
+                },
+                {
+                  label: project.featured ? "Featured" : "Not Featured",
+                  isActive: project.featured || false,
+                  onClick: () => handleToggleFeatured(project.id),
+                  activeVariant: "warning",
+                  inactiveVariant: "default"
+                }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditProject(project),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDeleteProject(project),
+                  variant: "link"
+                }
+              ]
+            })) || []}
+            emptyMessage="No projects found"
+            emptyAction={{
+              label: "Add Project",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
+        )}
 
       {/* Create Project Modal */}
       <CreateEditModal

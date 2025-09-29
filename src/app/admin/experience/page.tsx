@@ -6,6 +6,7 @@ import {
   Card,
   Button,
   AdminList,
+  AdminGrid,
   EmptyState,
   DisplayToggle,
 } from "@/components/ui";
@@ -21,8 +22,10 @@ import { ExperienceForm } from "@/components/pages/admin/experience";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
-import type { AdminListItem } from "@/components/ui/AdminList";
-import { Search, Plus } from "lucide-react";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
+import { Search, Plus, Briefcase } from "lucide-react";
 
 export default function ExperienceAdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +37,7 @@ export default function ExperienceAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: experiences, isLoading, error } = useExperience();
   const deleteExperience = useDeleteExperience();
   const toggleVisible = useToggleExperienceVisible();
@@ -240,51 +244,108 @@ export default function ExperienceAdminPage() {
           </form>
         </Card>
 
-        {/* Experience List */}
-        <AdminList
-          items={filteredExperiences.map((experience): AdminListItem => ({
-            id: experience.id,
-            title: experience.title,
-            description: `${experience.company} • ${experience.period} • ${experience.location}`,
-            badges: !experience.visible ? [{ label: "Hidden", variant: "error" }] : undefined,
-            metadata: [
-              { label: "Description", value: experience.description },
-              ...(experience.technologies.length > 0 ? [
-                { 
-                  label: "Technologies", 
-                  value: experience.technologies.slice(0, 3).join(", ") + 
-                         (experience.technologies.length > 3 ? ` +${experience.technologies.length - 3} more` : "")
+        {/* Experience Display */}
+        {filteredExperiences.length === 0 ? (
+          <EmptyState
+            title="No Experience Found"
+            description="No experience entries match your current filters. Try adjusting your search criteria or add a new experience entry."
+            actionLabel="Add Experience"
+            onAction={() => setIsCreateModalOpen(true)}
+          />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={filteredExperiences.map((experience): AdminGridItem => ({
+              id: experience.id,
+              title: experience.title,
+              description: `${experience.company} • ${experience.period} • ${experience.location}`,
+              badges: !experience.visible ? [{ label: "Hidden", variant: "error" }] : undefined,
+              metadata: [
+                { label: "Description", value: experience.description },
+                ...(experience.technologies.length > 0 ? [
+                  { 
+                    label: "Technologies", 
+                    value: experience.technologies.slice(0, 3).join(", ") + 
+                           (experience.technologies.length > 3 ? ` +${experience.technologies.length - 3} more` : "")
+                  }
+                ] : [])
+              ],
+              toggleActions: [
+                {
+                  label: experience.visible ? "Visible" : "Hidden",
+                  isActive: experience.visible,
+                  onClick: () => handleToggleVisible(experience.id),
+                  activeVariant: "success",
+                  inactiveVariant: "error"
                 }
-              ] : [])
-            ],
-            toggleActions: [
-              {
-                label: experience.visible ? "Visible" : "Hidden",
-                isActive: experience.visible,
-                onClick: () => handleToggleVisible(experience.id),
-                activeVariant: "success",
-                inactiveVariant: "error"
-              }
-            ],
-            actions: [
-              {
-                label: "Edit",
-                onClick: () => handleEditExperience(experience),
-                variant: "link"
-              },
-              {
-                label: "Delete",
-                onClick: () => handleDelete(experience),
-                variant: "link"
-              }
-            ]
-          }))}
-          emptyMessage="No experience entries found"
-          emptyAction={{
-            label: "Add Experience",
-            onClick: () => setIsCreateModalOpen(true)
-          }}
-        />
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditExperience(experience),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(experience),
+                  variant: "link"
+                }
+              ],
+              icon: <Briefcase className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-blue-500 to-indigo-600"
+            }))}
+            emptyMessage="No experience entries found"
+            emptyAction={{
+              label: "Add Experience",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
+        ) : (
+          <AdminList
+            items={filteredExperiences.map((experience): AdminListItem => ({
+              id: experience.id,
+              title: experience.title,
+              description: `${experience.company} • ${experience.period} • ${experience.location}`,
+              badges: !experience.visible ? [{ label: "Hidden", variant: "error" }] : undefined,
+              metadata: [
+                { label: "Description", value: experience.description },
+                ...(experience.technologies.length > 0 ? [
+                  { 
+                    label: "Technologies", 
+                    value: experience.technologies.slice(0, 3).join(", ") + 
+                           (experience.technologies.length > 3 ? ` +${experience.technologies.length - 3} more` : "")
+                  }
+                ] : [])
+              ],
+              toggleActions: [
+                {
+                  label: experience.visible ? "Visible" : "Hidden",
+                  isActive: experience.visible,
+                  onClick: () => handleToggleVisible(experience.id),
+                  activeVariant: "success",
+                  inactiveVariant: "error"
+                }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditExperience(experience),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(experience),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No experience entries found"
+            emptyAction={{
+              label: "Add Experience",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
+        )}
 
       {/* Create Experience Modal */}
       <CreateEditModal

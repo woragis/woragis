@@ -17,7 +17,7 @@ import {
   ZapIcon,
   TargetIcon,
 } from "../../ui";
-import { Button } from "../../ui/Button";
+import { Button } from "@/components/ui";
 import { ArrowRight, User, Briefcase } from "lucide-react";
 
 export const About: React.FC = () => {

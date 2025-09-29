@@ -2,10 +2,7 @@
 
 import React from "react";
 import { ProjectWithRelations } from "@/types";
-import { Card } from "@/components/ui/Card";
-import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/badge";
+import { Card, Container, Button, Badge } from "@/components/ui";
 import { ProjectMarkdownRenderer } from "@/components/ui/ProjectMarkdownRenderer";
 import {
   ExternalLink,

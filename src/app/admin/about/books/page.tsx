@@ -6,16 +6,20 @@ import {
   Card,
   Button,
   AdminList,
+  AdminGrid,
   EmptyState,
   DisplayToggle,
 } from "@/components/ui";
 import { BooksForm, DeleteConfirmationModal } from "@/components/pages/admin";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
-import type { AdminListItem } from "@/components/ui/AdminList";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
 import {
   Plus,
   Search,
+  Book as BookIcon,
 } from "lucide-react";
 import {
   useBooks,
@@ -45,6 +49,7 @@ export default function BooksAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: books = [], isLoading, error } = useBooks();
   const createBook = useCreateBook();
   const updateBook = useUpdateBook();
@@ -229,53 +234,112 @@ export default function BooksAdminPage() {
           </form>
         </Card>
 
-        {/* Books List */}
-        <AdminList
-          items={books.map((book): AdminListItem => ({
-            id: book.id,
-            title: book.title,
-            description: `${book.author}${book.description ? ` - ${book.description}` : ""}`,
-            image: book.coverImage || "/api/placeholder/40/40",
-            imageAlt: book.title,
-            badges: !book.visible ? [{ label: "Hidden", variant: "error" }] : undefined,
-            metadata: [
-              {
-                label: "Status",
-                value: book.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown"
-              },
-              ...(book.pages ? [{ label: "Pages", value: book.pages.toString() }] : []),
-              ...(book.currentPage ? [{ label: "Current", value: book.currentPage.toString() }] : []),
-              ...(book.rating ? [{ label: "Rating", value: `${book.rating}/10` }] : []),
-              ...(book.isbn ? [{ label: "ISBN", value: book.isbn }] : [])
-            ],
-            toggleActions: [
-              {
-                label: book.visible ? "Visible" : "Hidden",
-                isActive: book.visible || false,
-                onClick: () => handleToggleVisibility(book.id),
-                activeVariant: "success",
-                inactiveVariant: "error"
-              }
-            ],
-            actions: [
-              {
-                label: "Edit",
-                onClick: () => handleEditBook(book),
-                variant: "link"
-              },
-              {
-                label: "Delete",
-                onClick: () => handleDelete(book),
-                variant: "link"
-              }
-            ]
-          }))}
-          emptyMessage="No books found"
-          emptyAction={{
-            label: "Add Book",
-            onClick: () => setIsCreateModalOpen(true)
-          }}
-        />
+        {/* Books Display */}
+        {books.length === 0 ? (
+          <EmptyState
+            title="No Books Found"
+            description="No books match your current filters. Try adjusting your search criteria or add a new book."
+            actionLabel="Add Book"
+            onAction={() => setIsCreateModalOpen(true)}
+          />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={books.map((book): AdminGridItem => ({
+              id: book.id,
+              title: book.title,
+              description: `${book.author}${book.description ? ` - ${book.description}` : ""}`,
+              image: book.coverImage || "/api/placeholder/40/40",
+              imageAlt: book.title,
+              badges: !book.visible ? [{ label: "Hidden", variant: "error" }] : undefined,
+              metadata: [
+                {
+                  label: "Status",
+                  value: book.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown"
+                },
+                ...(book.pages ? [{ label: "Pages", value: book.pages.toString() }] : []),
+                ...(book.currentPage ? [{ label: "Current", value: book.currentPage.toString() }] : []),
+                ...(book.rating ? [{ label: "Rating", value: `${book.rating}/10` }] : []),
+                ...(book.isbn ? [{ label: "ISBN", value: book.isbn }] : [])
+              ],
+              toggleActions: [
+                {
+                  label: book.visible ? "Visible" : "Hidden",
+                  isActive: book.visible || false,
+                  onClick: () => handleToggleVisibility(book.id),
+                  activeVariant: "success",
+                  inactiveVariant: "error"
+                }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditBook(book),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(book),
+                  variant: "link"
+                }
+              ],
+              icon: <BookIcon className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-green-500 to-blue-600"
+            }))}
+            emptyMessage="No books found"
+            emptyAction={{
+              label: "Add Book",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
+        ) : (
+          <AdminList
+            items={books.map((book): AdminListItem => ({
+              id: book.id,
+              title: book.title,
+              description: `${book.author}${book.description ? ` - ${book.description}` : ""}`,
+              image: book.coverImage || "/api/placeholder/40/40",
+              imageAlt: book.title,
+              badges: !book.visible ? [{ label: "Hidden", variant: "error" }] : undefined,
+              metadata: [
+                {
+                  label: "Status",
+                  value: book.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown"
+                },
+                ...(book.pages ? [{ label: "Pages", value: book.pages.toString() }] : []),
+                ...(book.currentPage ? [{ label: "Current", value: book.currentPage.toString() }] : []),
+                ...(book.rating ? [{ label: "Rating", value: `${book.rating}/10` }] : []),
+                ...(book.isbn ? [{ label: "ISBN", value: book.isbn }] : [])
+              ],
+              toggleActions: [
+                {
+                  label: book.visible ? "Visible" : "Hidden",
+                  isActive: book.visible || false,
+                  onClick: () => handleToggleVisibility(book.id),
+                  activeVariant: "success",
+                  inactiveVariant: "error"
+                }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditBook(book),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(book),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No books found"
+            emptyAction={{
+              label: "Add Book",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
+        )}
 
         {/* Create Book Modal */}
         <CreateEditModal
