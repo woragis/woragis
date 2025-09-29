@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button, FileUpload } from "@/components/ui";
-import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
+import { MarkdownEditor } from "@/components/ui";
 import { useFrameworks } from "@/hooks/useFrameworks";
 import { X, Video, FileText, Code, Plus, Minus, Upload } from "lucide-react";
 import type { Project, NewProject, ProjectWithFrameworks } from "@/types";

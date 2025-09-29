@@ -7,6 +7,9 @@ import {
   Card,
   Button,
   EmptyState,
+  AdminList,
+  AdminGrid,
+  DisplayToggle,
 } from "@/components/ui";
 import {
   DeleteConfirmationModal,
@@ -14,7 +17,7 @@ import {
 } from "@/components/pages/admin";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui";
 import {
   Plus,
   Search,
@@ -38,6 +41,9 @@ import {
   NewInstrument,
   KnowledgeLevel,
 } from "@/types/about/instruments";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
 
 export default function InstrumentsAdminPage() {
   const [filters, setFilters] = useState<{ search?: string; level?: KnowledgeLevel }>({});
@@ -50,6 +56,7 @@ export default function InstrumentsAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: instruments = [], isLoading, error } = useInstruments();
   const createInstrument = useCreateInstrument();
   const updateInstrument = useUpdateInstrument();
@@ -255,6 +262,7 @@ export default function InstrumentsAdminPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
+            <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Instrument
@@ -262,7 +270,7 @@ export default function InstrumentsAdminPage() {
           </form>
         </Card>
 
-        {/* Instruments Grid */}
+        {/* Instruments Display */}
         {instruments.length === 0 ? (
           <EmptyState
             title="No Instruments Found"
@@ -270,82 +278,87 @@ export default function InstrumentsAdminPage() {
             actionLabel="Add Instrument"
             onAction={() => setIsCreateModalOpen(true)}
           />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={instruments.map((instrument): AdminGridItem => ({
+              id: instrument.id,
+              title: instrument.name,
+              description: "Musical Instrument",
+              icon: <Guitar className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-amber-500 to-orange-600",
+              badges: [
+                { 
+                  label: getKnowledgeLevelLabel(instrument.knowledgeLevel || "beginner"), 
+                  variant: instrument.knowledgeLevel === "expert" ? "success" as const :
+                           instrument.knowledgeLevel === "advanced" ? "info" as const :
+                           instrument.knowledgeLevel === "intermediate" ? "warning" as const :
+                           instrument.knowledgeLevel === "beginner" ? "warning" as const : "default" as const
+                },
+                ...(instrument.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                { label: "Added", value: new Date(instrument.createdAt).toLocaleDateString() }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditInstrument(instrument),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(instrument),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No instruments found"
+            emptyAction={{
+              label: "Add Instrument",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {instruments.map((instrument) => (
-              <Card key={instrument.id} hover className="flex flex-col h-full">
-                <div className="p-6 flex flex-col h-full">
-                  {/* Header with actions */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
-                        <Guitar className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {instrument.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Musical Instrument
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditInstrument(instrument)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(instrument)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Knowledge Level Badge */}
-                  <div className="mb-4">
-                    <Badge
-                      className={getKnowledgeLevelColor(
-                        instrument.knowledgeLevel || "beginner"
-                      )}
-                    >
-                      {getKnowledgeLevelLabel(
-                        instrument.knowledgeLevel || "beginner"
-                      )}
-                    </Badge>
-                  </div>
-
-                  {/* Meta Info */}
-                  <div className="space-y-2 mb-4 flex-grow">
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      Added {new Date(instrument.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2">
-                    {instrument.visible ? (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-                        Visible
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        Hidden
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <AdminList
+            items={instruments.map((instrument): AdminListItem => ({
+              id: instrument.id,
+              title: instrument.name,
+              description: "Musical Instrument",
+              icon: <Guitar className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-amber-500 to-orange-600",
+              badges: [
+                { 
+                  label: getKnowledgeLevelLabel(instrument.knowledgeLevel || "beginner"), 
+                  variant: instrument.knowledgeLevel === "expert" ? "success" as const :
+                           instrument.knowledgeLevel === "advanced" ? "info" as const :
+                           instrument.knowledgeLevel === "intermediate" ? "warning" as const :
+                           instrument.knowledgeLevel === "beginner" ? "warning" as const : "default" as const
+                },
+                ...(instrument.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                { label: "Added", value: new Date(instrument.createdAt).toLocaleDateString() }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditInstrument(instrument),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(instrument),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No instruments found"
+            emptyAction={{
+              label: "Add Instrument",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
         )}
 
         {/* Create Instrument Modal */}

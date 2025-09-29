@@ -8,6 +8,9 @@ import {
   Card,
   Button,
   EmptyState,
+  AdminList,
+  AdminGrid,
+  DisplayToggle,
 } from "@/components/ui";
 import { AnimeForm, DeleteConfirmationModal } from "@/components/pages/admin";
 import { CreateEditModal } from "@/components/common";
@@ -32,6 +35,9 @@ import {
   useToggleAnimeVisibility,
 } from "@/hooks/about/useAnime";
 import type { Anime, NewAnime, AnimeStatus } from "@/types";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
 
 const statusOptions = [
   { value: "all", label: "All" },
@@ -52,6 +58,7 @@ export default function AnimeAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: anime = [], isLoading, error } = useAnime();
   const createAnime = useCreateAnime();
   const updateAnime = useUpdateAnime();
@@ -228,6 +235,7 @@ export default function AnimeAdminPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
+            <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Anime
@@ -235,7 +243,7 @@ export default function AnimeAdminPage() {
           </form>
         </Card>
 
-        {/* Anime Grid */}
+        {/* Anime Display */}
         {anime.length === 0 ? (
           <EmptyState
             title="No Anime Found"
@@ -243,123 +251,109 @@ export default function AnimeAdminPage() {
             actionLabel="Add Anime"
             onAction={() => setIsCreateModalOpen(true)}
           />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={anime.map((animeItem): AdminGridItem => ({
+              id: animeItem.id,
+              title: animeItem.title,
+              description: animeItem.description,
+              image: animeItem.coverImage,
+              imageAlt: animeItem.title,
+              icon: <Tv className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-pink-500 to-purple-600",
+              badges: [
+                { 
+                  label: animeItem.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown", 
+                  variant: animeItem.status === "completed" ? "success" as const : 
+                           animeItem.status === "watching" ? "info" as const :
+                           animeItem.status === "want_to_watch" ? "warning" as const : "default" as const
+                },
+                ...(animeItem.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                ...(animeItem.myAnimeListId ? [{ label: "MAL ID", value: animeItem.myAnimeListId.toString() }] : []),
+                ...(animeItem.rating > 0 ? [{ label: "Rating", value: `${animeItem.rating}/10` }] : []),
+                ...(animeItem.episodes || animeItem.currentEpisode ? [{ 
+                  label: "Episodes", 
+                  value: animeItem.currentEpisode && animeItem.episodes 
+                    ? `${animeItem.currentEpisode}/${animeItem.episodes}`
+                    : animeItem.episodes 
+                    ? `${animeItem.episodes} episodes`
+                    : `Episode ${animeItem.currentEpisode}`
+                }] : []),
+                ...(animeItem.genres ? [{ label: "Genres", value: animeItem.genres }] : [])
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditAnime(animeItem),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(animeItem),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No anime found"
+            emptyAction={{
+              label: "Add Anime",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {anime.map((animeItem) => (
-              <Card key={animeItem.id} hover className="flex flex-col h-full">
-                <div className="p-6 flex flex-col h-full">
-                  {/* Header with actions */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
-                        {animeItem.coverImage ? (
-                          <Image
-                            src={animeItem.coverImage}
-                            alt={animeItem.title}
-                            width={48}
-                            height={48}
-                            className="w-full h-full rounded-lg object-cover"
-                          />
-                        ) : (
-                          <Tv className="w-6 h-6" />
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {animeItem.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {animeItem.myAnimeListId && `MAL ID: ${animeItem.myAnimeListId}`}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditAnime(animeItem)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(animeItem)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  {animeItem.description && (
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow line-clamp-3">
-                      {animeItem.description}
-                    </p>
-                  )}
-
-                  {/* Meta Info */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center">
-                        <Hash className="w-4 h-4 mr-1" />
-                        {animeItem.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                      </div>
-                      {animeItem.rating > 0 && (
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 mr-1" />
-                          {animeItem.rating}/10
-                        </div>
-                      )}
-                    </div>
-                    {(animeItem.episodes || animeItem.currentEpisode) && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <Tv className="w-4 h-4 mr-1" />
-                        {animeItem.currentEpisode && animeItem.episodes 
-                          ? `Episode ${animeItem.currentEpisode}/${animeItem.episodes}`
-                          : animeItem.episodes 
-                          ? `${animeItem.episodes} episodes`
-                          : `Episode ${animeItem.currentEpisode}`
-                        }
-                      </div>
-                    )}
-                    {animeItem.genres && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <span className="text-xs">Genres: {animeItem.genres}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        animeItem.status === "completed"
-                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                          : animeItem.status === "watching"
-                          ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
-                          : animeItem.status === "want_to_watch"
-                          ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                          : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                      }`}
-                    >
-                      {animeItem.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                    </span>
-                    {animeItem.visible ? (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-                        Visible
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        Hidden
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <AdminList
+            items={anime.map((animeItem): AdminListItem => ({
+              id: animeItem.id,
+              title: animeItem.title,
+              description: animeItem.description,
+              image: animeItem.coverImage,
+              imageAlt: animeItem.title,
+              icon: <Tv className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-pink-500 to-purple-600",
+              badges: [
+                { 
+                  label: animeItem.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown", 
+                  variant: animeItem.status === "completed" ? "success" as const : 
+                           animeItem.status === "watching" ? "info" as const :
+                           animeItem.status === "want_to_watch" ? "warning" as const : "default" as const
+                },
+                ...(animeItem.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                ...(animeItem.myAnimeListId ? [{ label: "MAL ID", value: animeItem.myAnimeListId.toString() }] : []),
+                ...(animeItem.rating > 0 ? [{ label: "Rating", value: `${animeItem.rating}/10` }] : []),
+                ...(animeItem.episodes || animeItem.currentEpisode ? [{ 
+                  label: "Episodes", 
+                  value: animeItem.currentEpisode && animeItem.episodes 
+                    ? `${animeItem.currentEpisode}/${animeItem.episodes}`
+                    : animeItem.episodes 
+                    ? `${animeItem.episodes} episodes`
+                    : `Episode ${animeItem.currentEpisode}`
+                }] : []),
+                ...(animeItem.genres ? [{ label: "Genres", value: animeItem.genres }] : [])
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditAnime(animeItem),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(animeItem),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No anime found"
+            emptyAction={{
+              label: "Add Anime",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
         )}
 
         {/* Create Anime Modal */}

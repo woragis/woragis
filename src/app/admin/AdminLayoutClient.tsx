@@ -5,8 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
-import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LanguageSwitcher, ThemeToggle } from "@/components/ui";
 import { ClientOnly } from "@/components/ClientOnly";
 import { useAuth } from "@/stores/auth-store";
 import {

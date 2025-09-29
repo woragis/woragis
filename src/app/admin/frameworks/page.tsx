@@ -13,6 +13,9 @@ import {
   Card,
   Button,
   EmptyState,
+  AdminList,
+  AdminGrid,
+  DisplayToggle,
 } from "@/components/ui";
 import { FrameworkForm } from "@/components/pages/admin/frameworks";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
@@ -35,6 +38,9 @@ import type {
   Framework,
   FrameworkType,
 } from "@/types";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
 
 export default function FrameworksAdminPage() {
   const [filters, setFilters] = useState<FrameworkFilters>({});
@@ -46,6 +52,7 @@ export default function FrameworksAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: frameworks = [], isLoading, error } = useFrameworks(filters);
   const createFramework = useCreateFramework();
   const updateFramework = useUpdateFramework();
@@ -230,6 +237,7 @@ export default function FrameworksAdminPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
+            <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Framework
@@ -237,7 +245,7 @@ export default function FrameworksAdminPage() {
           </form>
         </Card>
 
-        {/* Frameworks Grid */}
+        {/* Frameworks Display */}
         {frameworks.length === 0 ? (
           <EmptyState
             title="No Frameworks Found"
@@ -245,108 +253,87 @@ export default function FrameworksAdminPage() {
             actionLabel="Add Framework"
             onAction={() => setIsCreateModalOpen(true)}
           />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={frameworks.map((framework): AdminGridItem => ({
+              id: framework.id,
+              title: framework.name,
+              description: framework.description,
+              icon: framework.icon || framework.name.charAt(0).toUpperCase(),
+              iconBg: framework.color || "#3B82F6",
+              badges: [
+                { 
+                  label: framework.type, 
+                  variant: framework.type === "framework" ? "info" as const : "success" as const 
+                },
+                ...(framework.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                { label: "Slug", value: framework.slug },
+                { label: "Order", value: framework.order.toString() },
+                ...(framework.version ? [{ label: "Version", value: `v${framework.version}` }] : []),
+                ...(framework.website ? [{ label: "Website", value: "Available" }] : [])
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditFramework(framework),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(framework),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No frameworks found"
+            emptyAction={{
+              label: "Add Framework",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {frameworks.map((framework) => (
-              <Card key={framework.id} hover className="flex flex-col h-full">
-                <div className="p-6 flex flex-col h-full">
-                  {/* Header with actions */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center">
-                      <div 
-                        className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4"
-                        style={{ backgroundColor: framework.color || "#3B82F6" }}
-                      >
-                        {framework.icon || framework.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {framework.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {framework.slug}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditFramework(framework)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(framework)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  {framework.description && (
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow">
-                      {framework.description}
-                    </p>
-                  )}
-
-                  {/* Meta Info */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center">
-                        <Code className="w-4 h-4 mr-1" />
-                        Order: {framework.order}
-                      </div>
-                      {framework.version && (
-                        <div className="flex items-center">
-                          <span className="text-xs">v{framework.version}</span>
-                        </div>
-                      )}
-                    </div>
-                    {framework.website && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <Globe className="w-4 h-4 mr-1" />
-                        <a
-                          href={framework.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                        >
-                          Website
-                        </a>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        framework.type === "framework"
-                          ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
-                          : "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                      }`}
-                    >
-                      {framework.type}
-                    </span>
-                    {framework.visible ? (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-                        Visible
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        Hidden
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <AdminList
+            items={frameworks.map((framework): AdminListItem => ({
+              id: framework.id,
+              title: framework.name,
+              description: framework.description,
+              icon: framework.icon || framework.name.charAt(0).toUpperCase(),
+              iconBg: framework.color || "#3B82F6",
+              badges: [
+                { 
+                  label: framework.type, 
+                  variant: framework.type === "framework" ? "info" as const : "success" as const 
+                },
+                ...(framework.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                { label: "Slug", value: framework.slug },
+                { label: "Order", value: framework.order.toString() },
+                ...(framework.version ? [{ label: "Version", value: `v${framework.version}` }] : []),
+                ...(framework.website ? [{ label: "Website", value: "Available" }] : [])
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditFramework(framework),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(framework),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No frameworks found"
+            emptyAction={{
+              label: "Add Framework",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
         )}
 
         {/* Create Framework Modal */}

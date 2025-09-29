@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui";
-import { Modal } from "@/components/ui/Modal";
+import { Modal } from "@/components/ui";
 import { AlertTriangle } from "lucide-react";
 
 interface DeleteConfirmationModalProps {

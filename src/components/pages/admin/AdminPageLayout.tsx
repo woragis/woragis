@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { PageHeader } from "@/components/ui";
 import { cn } from "@/lib/utils/utils";
 
 interface AdminPageLayoutProps {

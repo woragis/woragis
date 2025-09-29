@@ -14,7 +14,7 @@ import {
 } from "@/components/pages/admin";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui";
 import {
   Plus,
   Search,

@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { SearchBar } from "@/components/ui/SearchBar";
-import { FilterTabs } from "@/components/ui/FilterTabs";
+import { SearchBar, FilterTabs } from "@/components/ui";
 import { cn } from "@/lib/utils/utils";
 
 interface FilterOption {

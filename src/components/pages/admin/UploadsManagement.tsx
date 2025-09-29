@@ -8,13 +8,7 @@ import {
   Container, 
   EmptyState 
 } from "@/components/ui";
-import { Badge } from "@/components/ui/badge";
-import { SearchBar } from "@/components/ui/SearchBar";
-import { FilterTabs } from "@/components/ui/FilterTabs";
-import { DataTable } from "@/components/ui/DataTable";
-import { Modal } from "@/components/ui/Modal";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { StatusBadge } from "@/components/ui/StatusBadge";
+import { Badge, SearchBar, FilterTabs, DataTable, Modal, PageHeader, StatusBadge } from "@/components/ui";
 import { 
   Trash2, 
   Eye, 

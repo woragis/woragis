@@ -14,9 +14,7 @@ import { usePublicBooks } from "@/hooks/about/useBooks";
 import { usePublicGames } from "@/hooks/about/useGames";
 import { usePublicPoliticalViews } from "@/hooks/about/usePolitics";
 import { usePublicYoutubers } from "@/hooks/about/useYoutubers";
-import { Card } from "@/components/ui/Card";
-import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
+import { Card, Container, Button } from "@/components/ui";
 import {
   Music,
   BookOpen,

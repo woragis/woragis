@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/stores/auth-store";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Card, Button } from "@/components/ui";
 import type { RegisterData } from "@/stores/auth-store";
 
 interface RegisterFormData {

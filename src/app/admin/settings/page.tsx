@@ -11,7 +11,7 @@ import {
   useSiteSettings,
   useUpdateSiteSettings,
 } from "@/hooks/useSettings";
-import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
+import { MarkdownEditor } from "@/components/ui";
 import { 
   Card, 
   Button, 

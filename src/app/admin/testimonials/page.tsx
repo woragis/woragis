@@ -14,6 +14,9 @@ import {
   Card,
   Button,
   EmptyState,
+  AdminList,
+  AdminGrid,
+  DisplayToggle,
 } from "@/components/ui";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import { TestimonialForm } from "@/components/pages/admin/testimonials";
@@ -35,6 +38,9 @@ import type {
   TestimonialFilters,
   TestimonialFormData,
 } from "@/types";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
 
 export default function TestimonialsPage() {
   const [filters, setFilters] = useState<TestimonialFilters>({});
@@ -46,6 +52,7 @@ export default function TestimonialsPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const {
     data: testimonials = [],
     isLoading,
@@ -235,6 +242,7 @@ export default function TestimonialsPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
+            <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Testimonial
@@ -242,7 +250,7 @@ export default function TestimonialsPage() {
           </form>
         </Card>
 
-        {/* Testimonials Grid */}
+        {/* Testimonials Display */}
         {testimonials.length === 0 ? (
           <EmptyState
             title="No Testimonials Found"
@@ -250,103 +258,81 @@ export default function TestimonialsPage() {
             actionLabel="Add Testimonial"
             onAction={() => setIsCreateModalOpen(true)}
           />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={testimonials.map((testimonial): AdminGridItem => ({
+              id: testimonial.id,
+              title: testimonial.name,
+              description: `"${testimonial.content}"`,
+              image: testimonial.avatar,
+              imageAlt: testimonial.name,
+              badges: [
+                ...(testimonial.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
+                ...(testimonial.visible ? [] : [{ label: "Hidden", variant: "error" as const }]),
+                ...(testimonial.public ? [{ label: "Public", variant: "info" as const }] : [])
+              ],
+              metadata: [
+                { label: "Position", value: `${testimonial.position} at ${testimonial.company}` },
+                { label: "Rating", value: `${testimonial.rating}/5` },
+                { label: "Order", value: testimonial.order.toString() }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditTestimonial(testimonial),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(testimonial),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No testimonials found"
+            emptyAction={{
+              label: "Add Testimonial",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial) => (
-              <Card key={testimonial.id} hover className="flex flex-col h-full">
-                <div className="p-6 flex flex-col h-full">
-                  {/* Header with actions */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
-                        {testimonial.avatar ? (
-                          <Image
-                            src={testimonial.avatar}
-                            alt={testimonial.name}
-                            width={48}
-                            height={48}
-                            className="w-full h-full rounded-full object-cover"
-                          />
-                        ) : (
-                          testimonial.name.charAt(0).toUpperCase()
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {testimonial.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {testimonial.position} at {testimonial.company}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditTestimonial(testimonial)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(testimonial)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Rating */}
-                  <div className="flex items-center mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < testimonial.rating
-                            ? "text-yellow-400 fill-current"
-                            : "text-gray-300 dark:text-gray-600"
-                        }`}
-                      />
-                    ))}
-                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                      ({testimonial.rating}/5)
-                    </span>
-                  </div>
-
-                  {/* Content */}
-                  <blockquote className="text-gray-600 dark:text-gray-300 mb-4 flex-grow">
-                    &ldquo;{testimonial.content}&rdquo;
-                  </blockquote>
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2">
-                    {testimonial.featured && (
-                      <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded-full">
-                        Featured
-                      </span>
-                    )}
-                    {testimonial.visible ? (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-                        Visible
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        Hidden
-                      </span>
-                    )}
-                    {testimonial.public && (
-                      <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">
-                        Public
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <AdminList
+            items={testimonials.map((testimonial): AdminListItem => ({
+              id: testimonial.id,
+              title: testimonial.name,
+              description: `"${testimonial.content}"`,
+              image: testimonial.avatar,
+              imageAlt: testimonial.name,
+              badges: [
+                ...(testimonial.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
+                ...(testimonial.visible ? [] : [{ label: "Hidden", variant: "error" as const }]),
+                ...(testimonial.public ? [{ label: "Public", variant: "info" as const }] : [])
+              ],
+              metadata: [
+                { label: "Position", value: `${testimonial.position} at ${testimonial.company}` },
+                { label: "Rating", value: `${testimonial.rating}/5` },
+                { label: "Order", value: testimonial.order.toString() }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditTestimonial(testimonial),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(testimonial),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No testimonials found"
+            emptyAction={{
+              label: "Add Testimonial",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
         )}
 
         {/* Create Testimonial Modal */}

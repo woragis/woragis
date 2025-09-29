@@ -15,6 +15,9 @@ import {
   Card,
   Button,
   EmptyState,
+  AdminList,
+  AdminGrid,
+  DisplayToggle,
 } from "@/components/ui";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import { BlogForm } from "@/components/pages/admin/blog";
@@ -37,6 +40,9 @@ import {
 } from "lucide-react";
 import type { BlogPost, BlogPostFilters, BlogPostFormData } from "@/types";
 import type { BlogTag } from "@/types/blog-tags";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
 
 export default function BlogPage() {
   const [filters, setFilters] = useState<BlogPostFilters>({});
@@ -48,6 +54,7 @@ export default function BlogPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: blogPosts = [], isLoading, error } = useBlogPosts(filters);
   const { data: availableTags = [] } = useBlogTags({ visible: true });
   const createBlogPost = useCreateBlogPost();
@@ -263,6 +270,7 @@ export default function BlogPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
+            <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Blog Post
@@ -270,7 +278,7 @@ export default function BlogPage() {
           </form>
         </Card>
 
-        {/* Blog Posts Grid */}
+        {/* Blog Posts Display */}
         {blogPosts.length === 0 ? (
           <EmptyState
             title="No Blog Posts Found"
@@ -278,119 +286,83 @@ export default function BlogPage() {
             actionLabel="Add Blog Post"
             onAction={() => setIsCreateModalOpen(true)}
           />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={blogPosts.map((post): AdminGridItem => ({
+              id: post.id,
+              title: post.title,
+              description: post.excerpt,
+              image: post.featuredImage,
+              imageAlt: post.title,
+              badges: [
+                ...(post.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
+                ...(post.published ? [{ label: "Published", variant: "success" as const }] : [{ label: "Draft", variant: "default" as const }]),
+                ...(!post.visible ? [{ label: "Hidden", variant: "error" as const }] : []),
+                ...(post.public ? [{ label: "Public", variant: "info" as const }] : [])
+              ],
+              metadata: [
+                { label: "Published", value: formatDate(post.publishedAt || post.createdAt || new Date()) },
+                { label: "Views", value: (post.viewCount || 0).toString() },
+                ...(post.readingTime ? [{ label: "Reading Time", value: `${post.readingTime} min` }] : [])
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditBlogPost(post),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(post),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No blog posts found"
+            emptyAction={{
+              label: "Add Blog Post",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
-              <Card
-                key={post.id}
-                hover
-                className="flex flex-col h-full overflow-hidden"
-              >
-                {/* Featured Image */}
-                <div className="relative h-48 overflow-hidden">
-                  {post.featuredImage ? (
-                    <Image
-                      src={post.featuredImage}
-                      alt={post.title}
-                      fill
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                      <span className="text-white text-4xl font-bold">
-                        {post.title.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                  <div className="absolute top-4 right-4 flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleEditBlogPost(post)}
-                      className="bg-white dark:bg-gray-800"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDelete(post)}
-                      className="bg-white dark:bg-gray-800 text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 flex flex-col flex-grow">
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                    {post.title}
-                  </h3>
-
-                  {/* Excerpt */}
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow line-clamp-3">
-                    {post.excerpt}
-                  </p>
-
-                  {/* Meta Info */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {formatDate(
-                          post.publishedAt || post.createdAt || new Date()
-                        )}
-                      </div>
-                      <div className="flex items-center">
-                        <Eye className="w-4 h-4 mr-1" />
-                        {post.viewCount || 0}
-                      </div>
-                    </div>
-                    {post.readingTime && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <Clock className="w-4 h-4 mr-1" />
-                        {post.readingTime} min read
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2">
-                    {post.featured && (
-                      <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded-full">
-                        Featured
-                      </span>
-                    )}
-                    {post.published ? (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-                        Published
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        Draft
-                      </span>
-                    )}
-                    {post.visible ? (
-                      <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">
-                        Visible
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded-full">
-                        Hidden
-                      </span>
-                    )}
-                    {post.public && (
-                      <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs rounded-full">
-                        Public
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <AdminList
+            items={blogPosts.map((post): AdminListItem => ({
+              id: post.id,
+              title: post.title,
+              description: post.excerpt,
+              image: post.featuredImage,
+              imageAlt: post.title,
+              badges: [
+                ...(post.featured ? [{ label: "Featured", variant: "warning" as const }] : []),
+                ...(post.published ? [{ label: "Published", variant: "success" as const }] : [{ label: "Draft", variant: "default" as const }]),
+                ...(!post.visible ? [{ label: "Hidden", variant: "error" as const }] : []),
+                ...(post.public ? [{ label: "Public", variant: "info" as const }] : [])
+              ],
+              metadata: [
+                { label: "Published", value: formatDate(post.publishedAt || post.createdAt || new Date()) },
+                { label: "Views", value: (post.viewCount || 0).toString() },
+                ...(post.readingTime ? [{ label: "Reading Time", value: `${post.readingTime} min` }] : [])
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditBlogPost(post),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(post),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No blog posts found"
+            emptyAction={{
+              label: "Add Blog Post",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
         )}
 
         {/* Create Blog Post Modal */}

@@ -7,6 +7,9 @@ import {
   Card,
   Button,
   EmptyState,
+  AdminList,
+  AdminGrid,
+  DisplayToggle,
 } from "@/components/ui";
 import {
   DeleteConfirmationModal,
@@ -14,7 +17,7 @@ import {
 } from "@/components/pages/admin";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui";
 import {
   Plus,
   Search,
@@ -34,6 +37,9 @@ import {
   useToggleLanguageVisibility,
 } from "@/hooks/about/useLanguages";
 import { Language, NewLanguage, Proficiency } from "@/types/about/languages";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
 
 export default function LanguagesAdminPage() {
   const [filters, setFilters] = useState<{ search?: string; proficiency?: Proficiency }>({});
@@ -47,6 +53,7 @@ export default function LanguagesAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: languages = [], isLoading, error } = useLanguages();
   const createLanguage = useCreateLanguage();
   const updateLanguage = useUpdateLanguage();
@@ -252,6 +259,7 @@ export default function LanguagesAdminPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
+            <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Language
@@ -259,7 +267,7 @@ export default function LanguagesAdminPage() {
           </form>
         </Card>
 
-        {/* Languages Grid */}
+        {/* Languages Display */}
         {languages.length === 0 ? (
           <EmptyState
             title="No Languages Found"
@@ -267,82 +275,87 @@ export default function LanguagesAdminPage() {
             actionLabel="Add Language"
             onAction={() => setIsCreateModalOpen(true)}
           />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={languages.map((language): AdminGridItem => ({
+              id: language.id,
+              title: language.name,
+              description: "Language",
+              icon: <Languages className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-teal-500 to-cyan-600",
+              badges: [
+                { 
+                  label: getProficiencyLabel(language.proficiencyLevel || "beginner"), 
+                  variant: language.proficiencyLevel === "native" ? "info" as const :
+                           language.proficiencyLevel === "advanced" ? "success" as const :
+                           language.proficiencyLevel === "intermediate" ? "info" as const :
+                           language.proficiencyLevel === "beginner" ? "warning" as const : "default" as const
+                },
+                ...(language.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                { label: "Added", value: new Date(language.createdAt).toLocaleDateString() }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditLanguage(language),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(language),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No languages found"
+            emptyAction={{
+              label: "Add Language",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {languages.map((language) => (
-              <Card key={language.id} hover className="flex flex-col h-full">
-                <div className="p-6 flex flex-col h-full">
-                  {/* Header with actions */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
-                        <Languages className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {language.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Language
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditLanguage(language)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(language)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Proficiency Level Badge */}
-                  <div className="mb-4">
-                    <Badge
-                      className={getProficiencyColor(
-                        language.proficiencyLevel || "beginner"
-                      )}
-                    >
-                      {getProficiencyLabel(
-                        language.proficiencyLevel || "beginner"
-                      )}
-                    </Badge>
-                  </div>
-
-                  {/* Meta Info */}
-                  <div className="space-y-2 mb-4 flex-grow">
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      Added {new Date(language.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2">
-                    {language.visible ? (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-                        Visible
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        Hidden
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <AdminList
+            items={languages.map((language): AdminListItem => ({
+              id: language.id,
+              title: language.name,
+              description: "Language",
+              icon: <Languages className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-teal-500 to-cyan-600",
+              badges: [
+                { 
+                  label: getProficiencyLabel(language.proficiencyLevel || "beginner"), 
+                  variant: language.proficiencyLevel === "native" ? "info" as const :
+                           language.proficiencyLevel === "advanced" ? "success" as const :
+                           language.proficiencyLevel === "intermediate" ? "info" as const :
+                           language.proficiencyLevel === "beginner" ? "warning" as const : "default" as const
+                },
+                ...(language.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                { label: "Added", value: new Date(language.createdAt).toLocaleDateString() }
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditLanguage(language),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(language),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No languages found"
+            emptyAction={{
+              label: "Add Language",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
         )}
 
         {/* Create Language Modal */}

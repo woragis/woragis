@@ -8,6 +8,9 @@ import {
   Card,
   Button,
   EmptyState,
+  AdminList,
+  AdminGrid,
+  DisplayToggle,
 } from "@/components/ui";
 import { GamesForm, DeleteConfirmationModal } from "@/components/pages/admin";
 import { CreateEditModal } from "@/components/common";
@@ -32,6 +35,9 @@ import {
   useToggleGameVisibility,
 } from "@/hooks/about/useGames";
 import type { Game, NewGame, GameCategory } from "@/types";
+import type { AdminListItem } from "@/components/ui/admin/AdminList";
+import type { AdminGridItem } from "@/components/ui/admin/AdminGrid";
+import { useDisplay } from "@/contexts/DisplayContext";
 
 const categoryOptions = [
   { value: "all", label: "All" },
@@ -50,6 +56,7 @@ export default function GamesAdminPage() {
   const [editFormData, setEditFormData] = useState<any>(null);
 
   const { user } = useAuth();
+  const { displayMode } = useDisplay();
   const { data: games = [], isLoading, error } = useGames();
   const createGame = useCreateGame();
   const updateGame = useUpdateGame();
@@ -226,6 +233,7 @@ export default function GamesAdminPage() {
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
+            <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add Game
@@ -233,7 +241,7 @@ export default function GamesAdminPage() {
           </form>
         </Card>
 
-        {/* Games Grid */}
+        {/* Games Display */}
         {games.length === 0 ? (
           <EmptyState
             title="No Games Found"
@@ -241,122 +249,97 @@ export default function GamesAdminPage() {
             actionLabel="Add Game"
             onAction={() => setIsCreateModalOpen(true)}
           />
+        ) : displayMode === "grid" ? (
+          <AdminGrid
+            items={games.map((game): AdminGridItem => ({
+              id: game.id,
+              title: game.title,
+              description: game.description,
+              image: game.coverImage,
+              imageAlt: game.title,
+              icon: <Gamepad2 className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-indigo-500 to-purple-600",
+              badges: [
+                { 
+                  label: game.category?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown", 
+                  variant: game.category === "current" ? "success" as const : 
+                           game.category === "childhood" ? "info" as const :
+                           game.category === "planned" ? "warning" as const : "default" as const
+                },
+                ...(game.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                { label: "Platform", value: game.platform },
+                ...(game.rating > 0 ? [{ label: "Rating", value: `${game.rating}/10` }] : []),
+                ...(game.genre ? [{ label: "Genre", value: game.genre }] : []),
+                ...(game.playtime ? [{ label: "Playtime", value: `${game.playtime}h` }] : []),
+                ...(game.steamUrl ? [{ label: "Steam", value: "Available" }] : [])
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditGame(game),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(game),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No games found"
+            emptyAction={{
+              label: "Add Game",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+            columns={3}
+          />
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {games.map((game) => (
-              <Card key={game.id} hover className="flex flex-col h-full">
-                <div className="p-6 flex flex-col h-full">
-                  {/* Header with actions */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
-                        {game.coverImage ? (
-                          <Image
-                            src={game.coverImage}
-                            alt={game.title}
-                            width={48}
-                            height={48}
-                            className="w-full h-full rounded-lg object-cover"
-                          />
-                        ) : (
-                          <Gamepad2 className="w-6 h-6" />
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {game.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {game.platform}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditGame(game)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(game)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  {game.description && (
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow line-clamp-3">
-                      {game.description}
-                    </p>
-                  )}
-
-                  {/* Meta Info */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center">
-                        <Hash className="w-4 h-4 mr-1" />
-                        {game.category?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                      </div>
-                      {game.rating > 0 && (
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 mr-1" />
-                          {game.rating}/10
-                        </div>
-                      )}
-                    </div>
-                    {game.genre && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <span className="text-xs">Genre: {game.genre}</span>
-                      </div>
-                    )}
-                    {game.playtime && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <span className="text-xs">Playtime: {game.playtime}h</span>
-                      </div>
-                    )}
-                    {game.steamUrl && (
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <span className="text-xs">Steam Available</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        game.category === "current"
-                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                          : game.category === "childhood"
-                          ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
-                          : game.category === "planned"
-                          ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                          : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                      }`}
-                    >
-                      {game.category?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                    </span>
-                    {game.visible ? (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-                        Visible
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
-                        Hidden
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <AdminList
+            items={games.map((game): AdminListItem => ({
+              id: game.id,
+              title: game.title,
+              description: game.description,
+              image: game.coverImage,
+              imageAlt: game.title,
+              icon: <Gamepad2 className="w-6 h-6" />,
+              iconBg: "bg-gradient-to-br from-indigo-500 to-purple-600",
+              badges: [
+                { 
+                  label: game.category?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown", 
+                  variant: game.category === "current" ? "success" as const : 
+                           game.category === "childhood" ? "info" as const :
+                           game.category === "planned" ? "warning" as const : "default" as const
+                },
+                ...(game.visible ? [] : [{ label: "Hidden", variant: "error" as const }])
+              ],
+              metadata: [
+                { label: "Platform", value: game.platform },
+                ...(game.rating > 0 ? [{ label: "Rating", value: `${game.rating}/10` }] : []),
+                ...(game.genre ? [{ label: "Genre", value: game.genre }] : []),
+                ...(game.playtime ? [{ label: "Playtime", value: `${game.playtime}h` }] : []),
+                ...(game.steamUrl ? [{ label: "Steam", value: "Available" }] : [])
+              ],
+              actions: [
+                {
+                  label: "Edit",
+                  onClick: () => handleEditGame(game),
+                  variant: "link"
+                },
+                {
+                  label: "Delete",
+                  onClick: () => handleDelete(game),
+                  variant: "link"
+                }
+              ]
+            }))}
+            emptyMessage="No games found"
+            emptyAction={{
+              label: "Add Game",
+              onClick: () => setIsCreateModalOpen(true)
+            }}
+          />
         )}
 
         {/* Create Game Modal */}

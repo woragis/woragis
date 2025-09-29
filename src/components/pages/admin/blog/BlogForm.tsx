@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button, FileUpload } from "@/components/ui";
-import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
+import { MarkdownEditor } from "@/components/ui";
 import { useBlogTags } from "@/hooks/useBlogTags";
 import { Tag, X, FileText, Plus, Upload, Calendar, Eye, Star } from "lucide-react";
 import type { BlogPost, NewBlogPost, BlogPostWithTags } from "@/types";
