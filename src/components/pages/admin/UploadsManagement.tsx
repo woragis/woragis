@@ -2,14 +2,17 @@
 
 import React, { useState, useMemo } from "react";
 import { useUploads, useDeleteUpload, useUploadStats } from "@/hooks/useUploads";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { 
+  Card, 
+  Button, 
+  Container, 
+  EmptyState 
+} from "@/components/ui";
 import { Badge } from "@/components/ui/badge";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { FilterTabs } from "@/components/ui/FilterTabs";
 import { DataTable } from "@/components/ui/DataTable";
 import { Modal } from "@/components/ui/Modal";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { 
@@ -22,7 +25,9 @@ import {
   File,
   HardDrive,
   Database,
-  AlertTriangle
+  AlertTriangle,
+  Search,
+  Filter
 } from "lucide-react";
 import Image from "next/image";
 
@@ -187,54 +192,55 @@ export const UploadsManagement: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 p-6">
-        <PageHeader
-          title="Uploads Management"
-          description="Manage uploaded files and check their usage"
-        />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-            </Card>
-          ))}
-        </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Uploads Management
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Manage uploaded files and check their usage
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i} className="p-6 animate-pulse">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              </Card>
+            ))}
+          </div>
+        </Container>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="space-y-6 p-6">
-        <PageHeader
-          title="Uploads Management"
-          description="Manage uploaded files and check their usage"
-        />
-        <Card className="p-6">
-          <div className="text-center">
-            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Error Loading Uploads
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Failed to load uploads data. Please try again.
-            </p>
-            <Button onClick={() => refetch()}>
-              Retry
-            </Button>
-          </div>
-        </Card>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <EmptyState
+            title="Error Loading Uploads"
+            description="Failed to load uploads data. Please try again."
+            actionLabel="Retry"
+            onAction={() => refetch()}
+          />
+        </Container>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <PageHeader
-        title="Uploads Management"
-        description="Manage uploaded files and check their usage"
-      />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+      <Container>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Uploads Management
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
+            Manage uploaded files and check their usage
+          </p>
+        </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -470,6 +476,7 @@ export const UploadsManagement: React.FC = () => {
           </div>
         )}
       </Modal>
+      </Container>
     </div>
   );
 };

@@ -13,9 +13,11 @@ import type { Anime, NewAnime, AnimeStatus } from "@/types";
 
 interface AnimeFormProps {
   anime?: Anime;
-  onSubmit: (anime: NewAnime) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 const statusOptions: { value: AnimeStatus; label: string }[] = [
@@ -28,9 +30,11 @@ const statusOptions: { value: AnimeStatus; label: string }[] = [
 
 export const AnimeForm: React.FC<AnimeFormProps> = ({
   anime,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewAnime>>({
     title: "",
@@ -84,9 +88,19 @@ export const AnimeForm: React.FC<AnimeFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewAnime);
+    onSubmit(e);
   };
 
   return (

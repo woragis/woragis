@@ -1,16 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import { Modal } from "@/components/ui";
-import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
-import { FilterSection } from "@/components/layout/FilterSection";
-import { ActionButton } from "@/components/ui/ActionButton";
+import React, { useState, useCallback } from "react";
+import {
+  Section,
+  Container,
+  Card,
+  Button,
+  EmptyState,
+} from "@/components/ui";
 import {
   DeleteConfirmationModal,
   LanguagesForm,
 } from "@/components/pages/admin";
+import { CreateEditModal } from "@/components/common";
+import { useAuth } from "@/stores/auth-store";
 import { Badge } from "@/components/ui/badge";
-import { Languages, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Languages,
+  Eye,
+  EyeOff,
+  Calendar,
+  Hash,
+} from "lucide-react";
 import {
   useLanguages,
   useCreateLanguage,
@@ -19,38 +34,47 @@ import {
   useToggleLanguageVisibility,
 } from "@/hooks/about/useLanguages";
 import { Language, NewLanguage, Proficiency } from "@/types/about/languages";
-import { toast } from "sonner";
 
 export default function LanguagesAdminPage() {
+  const [filters, setFilters] = useState<{ search?: string; proficiency?: Proficiency }>({});
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(
     null
   );
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [createFormData, setCreateFormData] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState<any>(null);
 
+  const { user } = useAuth();
   const { data: languages = [], isLoading, error } = useLanguages();
   const createLanguage = useCreateLanguage();
   const updateLanguage = useUpdateLanguage();
   const deleteLanguage = useDeleteLanguage();
   const toggleVisibility = useToggleLanguageVisibility();
 
-  const searchedLanguages =
-    languages?.filter((item: Language) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is handled by the filters state
+  };
 
   // Create language
-  const handleCreateLanguage = async (languageData: NewLanguage) => {
+  const handleCreateLanguage = useCallback(async (languageData: any) => {
     try {
       await createLanguage.mutateAsync(languageData);
       setIsCreateModalOpen(false);
+      setCreateFormData(null);
     } catch (error) {
       console.error("Failed to create language:", error);
     }
-  };
+  }, [createLanguage]);
+
+  const handleCreateSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (createFormData) {
+      handleCreateLanguage(createFormData);
+    }
+  }, [createFormData, handleCreateLanguage]);
 
   // Edit language
   const handleEditLanguage = (languageItem: Language) => {
@@ -58,7 +82,7 @@ export default function LanguagesAdminPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateLanguage = async (languageData: NewLanguage) => {
+  const handleUpdateLanguage = useCallback(async (languageData: any) => {
     if (!selectedLanguage) return;
 
     try {
@@ -68,13 +92,21 @@ export default function LanguagesAdminPage() {
       });
       setIsEditModalOpen(false);
       setSelectedLanguage(null);
+      setEditFormData(null);
     } catch (error) {
       console.error("Failed to update language:", error);
     }
-  };
+  }, [selectedLanguage, updateLanguage]);
+
+  const handleEditSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (editFormData && selectedLanguage) {
+      handleUpdateLanguage(editFormData);
+    }
+  }, [editFormData, selectedLanguage, handleUpdateLanguage]);
 
   // Delete language
-  const handleDeleteLanguage = (languageItem: Language) => {
+  const handleDelete = (languageItem: Language) => {
     setSelectedLanguage(languageItem);
     setIsDeleteModalOpen(true);
   };
@@ -89,11 +121,6 @@ export default function LanguagesAdminPage() {
     } catch (error) {
       console.error("Failed to delete language:", error);
     }
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Search is handled by filtered state
   };
 
   const handleToggleVisibility = async (id: string) => {
@@ -130,154 +157,270 @@ export default function LanguagesAdminPage() {
     }
   };
 
-  if (error) return <div>Error loading languages</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Languages
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Manage your spoken languages and proficiency
+            </p>
+          </div>
 
-  const headerActions = (
-    <ActionButton onClick={() => setIsCreateModalOpen(true)}>
-      Add Language
-    </ActionButton>
-  );
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, index) => (
+              <Card key={index} className="animate-pulse">
+                <div className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-4"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <EmptyState
+            title="Unable to Load Languages"
+            description="There was an error loading the languages. Please try again later."
+          />
+        </Container>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <AdminPageLayout
-        title="Languages List"
-        description="Manage your spoken languages and proficiency"
-        headerActions={headerActions}
-      >
-        {/* Search and Filters */}
-        <FilterSection
-          searchValue={searchTerm}
-          onSearchChange={setSearchTerm}
-          onSearchSubmit={handleSearch}
-          searchPlaceholder="Search languages..."
-          selectedFilter={selectedFilter}
-          onFilterChange={setSelectedFilter}
-        />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+      <Container>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Languages
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
+            Manage your spoken languages and proficiency
+          </p>
+        </div>
 
-        {/* Languages List */}
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-            {searchedLanguages?.map((languageItem: Language) => (
-              <li key={languageItem.id} className="px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
-                        <Languages className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+        {/* Search and Filter */}
+        <Card className="p-6 mb-8">
+          <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-64">
+              <input
+                type="text"
+                placeholder="Search languages..."
+                value={filters.search || ""}
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+              />
+            </div>
+            <select
+              value={filters.proficiency || ""}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  proficiency: e.target.value ? (e.target.value as Proficiency) : undefined,
+                })
+              }
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+            >
+              <option value="">All Proficiency</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+              <option value="native">Native</option>
+            </select>
+            <Button type="submit" variant="outline">
+              <Search className="w-4 h-4 mr-2" />
+              Search
+            </Button>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Language
+            </Button>
+          </form>
+        </Card>
+
+        {/* Languages Grid */}
+        {languages.length === 0 ? (
+          <EmptyState
+            title="No Languages Found"
+            description="No languages match your current filters. Try adjusting your search criteria or add a new language."
+            actionLabel="Add Language"
+            onAction={() => setIsCreateModalOpen(true)}
+          />
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {languages.map((language) => (
+              <Card key={language.id} hover className="flex flex-col h-full">
+                <div className="p-6 flex flex-col h-full">
+                  {/* Header with actions */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
+                        <Languages className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {language.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Language
+                        </p>
                       </div>
                     </div>
-                    <div className="ml-4">
-                      <div className="flex items-center">
-                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                          {languageItem.name}
-                        </h3>
-                        <Badge
-                          className={getProficiencyColor(
-                            languageItem.proficiencyLevel || "beginner"
-                          )}
-                        >
-                          {getProficiencyLabel(
-                            languageItem.proficiencyLevel || "beginner"
-                          )}
-                        </Badge>
-                        {!languageItem.visible && (
-                          <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                            Hidden
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1">
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
-                          Added{" "}
-                          {new Date(
-                            languageItem.createdAt
-                          ).toLocaleDateString()}
-                        </span>
-                      </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditLanguage(language)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(language)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleToggleVisibility(languageItem.id)}
-                      className={`px-3 py-1 text-xs rounded-full ${
-                        languageItem.visible
-                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                          : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                      }`}
+
+                  {/* Proficiency Level Badge */}
+                  <div className="mb-4">
+                    <Badge
+                      className={getProficiencyColor(
+                        language.proficiencyLevel || "beginner"
+                      )}
                     >
-                      {languageItem.visible ? "Visible" : "Hidden"}
-                    </button>
-                    <button
-                      onClick={() => handleEditLanguage(languageItem)}
-                      className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteLanguage(languageItem)}
-                      className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm"
-                    >
-                      Delete
-                    </button>
+                      {getProficiencyLabel(
+                        language.proficiencyLevel || "beginner"
+                      )}
+                    </Badge>
+                  </div>
+
+                  {/* Meta Info */}
+                  <div className="space-y-2 mb-4 flex-grow">
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      Added {new Date(language.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {/* Status badges */}
+                  <div className="flex flex-wrap gap-2">
+                    {language.visible ? (
+                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
+                        Visible
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
+                        Hidden
+                      </span>
+                    )}
                   </div>
                 </div>
-              </li>
+              </Card>
             ))}
-          </ul>
-        </div>
-      </AdminPageLayout>
-
-      {/* Create Language Modal */}
-      <Modal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Add New Language"
-        size="lg"
-      >
-        <LanguagesForm
-          onSubmit={handleCreateLanguage}
-          onCancel={() => setIsCreateModalOpen(false)}
-          isLoading={createLanguage.isPending}
-        />
-      </Modal>
-
-      {/* Edit Language Modal */}
-      <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedLanguage(null);
-        }}
-        title="Edit Language"
-        size="lg"
-      >
-        {selectedLanguage && (
-          <LanguagesForm
-            language={selectedLanguage}
-            onSubmit={handleUpdateLanguage}
-            onCancel={() => {
-              setIsEditModalOpen(false);
-              setSelectedLanguage(null);
-            }}
-            isLoading={updateLanguage.isPending}
-          />
+          </div>
         )}
-      </Modal>
 
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setSelectedLanguage(null);
-        }}
-        onConfirm={handleConfirmDelete}
-        title="Delete Language"
-        message="Are you sure you want to delete this language? This action cannot be undone."
-        itemName={selectedLanguage?.name}
-        isLoading={deleteLanguage.isPending}
-      />
-    </>
+        {/* Create Language Modal */}
+        <CreateEditModal
+          isOpen={isCreateModalOpen}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            setCreateFormData(null);
+          }}
+          isEdit={false}
+          itemName="Language"
+          size="lg"
+          onSubmit={handleCreateSubmit}
+          onCancel={() => {
+            setIsCreateModalOpen(false);
+            setCreateFormData(null);
+          }}
+          isLoading={createLanguage.isPending}
+          maxHeight="90vh"
+        >
+          <LanguagesForm
+            userId={user?.id || ""}
+            onSubmit={handleCreateSubmit}
+            onCancel={() => setIsCreateModalOpen(false)}
+            isLoading={createLanguage.isPending}
+            onFormDataChange={setCreateFormData}
+          />
+        </CreateEditModal>
+
+        {/* Edit Language Modal */}
+        <CreateEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedLanguage(null);
+            setEditFormData(null);
+          }}
+          isEdit={true}
+          itemName="Language"
+          size="lg"
+          onSubmit={handleEditSubmit}
+          onCancel={() => {
+            setIsEditModalOpen(false);
+            setSelectedLanguage(null);
+            setEditFormData(null);
+          }}
+          isLoading={updateLanguage.isPending}
+          maxHeight="90vh"
+        >
+          {selectedLanguage && (
+            <LanguagesForm
+              language={selectedLanguage}
+              userId={user?.id || ""}
+              onSubmit={handleEditSubmit}
+              onCancel={() => {
+                setIsEditModalOpen(false);
+                setSelectedLanguage(null);
+              }}
+              isLoading={updateLanguage.isPending}
+              onFormDataChange={setEditFormData}
+            />
+          )}
+        </CreateEditModal>
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setSelectedLanguage(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          title="Delete Language"
+          message="Are you sure you want to delete this language? This action cannot be undone."
+          itemName={selectedLanguage?.name}
+          isLoading={deleteLanguage.isPending}
+        />
+      </Container>
+    </div>
   );
 }

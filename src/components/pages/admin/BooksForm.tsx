@@ -13,9 +13,11 @@ import type { Book, NewBook, BookStatus } from "@/types";
 
 interface BooksFormProps {
   book?: Book;
-  onSubmit: (book: NewBook) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 const statusOptions: { value: BookStatus; label: string }[] = [
@@ -28,9 +30,11 @@ const statusOptions: { value: BookStatus; label: string }[] = [
 
 export const BooksForm: React.FC<BooksFormProps> = ({
   book,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewBook>>({
     title: "",
@@ -86,9 +90,19 @@ export const BooksForm: React.FC<BooksFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewBook);
+    onSubmit(e);
   };
 
   return (

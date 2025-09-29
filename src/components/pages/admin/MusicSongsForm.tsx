@@ -11,16 +11,20 @@ import type { LastListenedSong, NewLastListenedSong } from "@/types";
 
 interface MusicSongsFormProps {
   song?: LastListenedSong;
-  onSubmit: (song: NewLastListenedSong) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 export const MusicSongsForm: React.FC<MusicSongsFormProps> = ({
   song,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewLastListenedSong>>({
     title: "",
@@ -64,9 +68,19 @@ export const MusicSongsForm: React.FC<MusicSongsFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewLastListenedSong);
+    onSubmit(e);
   };
 
   return (

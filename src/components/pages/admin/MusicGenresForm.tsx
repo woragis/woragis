@@ -12,16 +12,20 @@ import type { MusicGenre, NewMusicGenre } from "@/types";
 
 interface MusicGenresFormProps {
   genre?: MusicGenre;
-  onSubmit: (genre: NewMusicGenre) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 export const MusicGenresForm: React.FC<MusicGenresFormProps> = ({
   genre,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewMusicGenre>>({
     name: "",
@@ -59,9 +63,19 @@ export const MusicGenresForm: React.FC<MusicGenresFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewMusicGenre);
+    onSubmit(e);
   };
 
   return (

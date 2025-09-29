@@ -16,9 +16,11 @@ import type {
 
 interface LanguagesFormProps {
   language?: Language;
-  onSubmit: (language: NewLanguage) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 const proficiencyOptions: { value: Proficiency; label: string }[] = [
@@ -30,9 +32,11 @@ const proficiencyOptions: { value: Proficiency; label: string }[] = [
 
 export const LanguagesForm: React.FC<LanguagesFormProps> = ({
   language,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewLanguage>>({
     name: "",
@@ -66,9 +70,19 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewLanguage);
+    onSubmit(e);
   };
 
   return (

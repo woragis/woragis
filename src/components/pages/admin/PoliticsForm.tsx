@@ -12,16 +12,20 @@ import type { PoliticalView, NewPoliticalView } from "@/types";
 
 interface PoliticsFormProps {
   politicalView?: PoliticalView;
-  onSubmit: (politicalView: NewPoliticalView) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 export const PoliticsForm: React.FC<PoliticsFormProps> = ({
   politicalView,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewPoliticalView>>({
     personName: "",
@@ -71,9 +75,19 @@ export const PoliticsForm: React.FC<PoliticsFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewPoliticalView);
+    onSubmit(e);
   };
 
   return (

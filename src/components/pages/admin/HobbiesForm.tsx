@@ -12,16 +12,20 @@ import type { Hobby, NewHobby } from "@/types/about/hobbies";
 
 interface HobbiesFormProps {
   hobby?: Hobby;
-  onSubmit: (hobby: NewHobby) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 export const HobbiesForm: React.FC<HobbiesFormProps> = ({
   hobby,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewHobby>>({
     name: "",
@@ -53,9 +57,19 @@ export const HobbiesForm: React.FC<HobbiesFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewHobby);
+    onSubmit(e);
   };
 
   return (

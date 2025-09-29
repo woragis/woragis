@@ -16,9 +16,11 @@ import type {
 
 interface MartialArtsFormProps {
   martialArt?: MartialArt;
-  onSubmit: (martialArt: NewMartialArt) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 const knowledgeLevelOptions: { value: KnowledgeLevel; label: string }[] = [
@@ -30,9 +32,11 @@ const knowledgeLevelOptions: { value: KnowledgeLevel; label: string }[] = [
 
 export const MartialArtsForm: React.FC<MartialArtsFormProps> = ({
   martialArt,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewMartialArt>>({
     name: "",
@@ -68,9 +72,19 @@ export const MartialArtsForm: React.FC<MartialArtsFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewMartialArt);
+    onSubmit(e);
   };
 
   return (

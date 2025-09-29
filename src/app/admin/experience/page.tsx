@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
+import {
+  Section,
+  Container,
+  Card,
+  Button,
+  EmptyState,
+} from "@/components/ui";
 import {
   useExperience,
   useDeleteExperience,
@@ -13,6 +20,19 @@ import { ExperienceForm } from "@/components/pages/admin/experience";
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Briefcase,
+  Eye,
+  EyeOff,
+  Calendar,
+  Hash,
+  MapPin,
+  Code,
+} from "lucide-react";
 
 export default function ExperienceAdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -110,124 +130,180 @@ export default function ExperienceAdminPage() {
         exp.company.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading experience entries</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Experience
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Manage your professional experience and career history
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, index) => (
+              <Card key={index} className="animate-pulse">
+                <div className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-4"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <EmptyState
+            title="Unable to Load Experience"
+            description="There was an error loading the experience entries. Please try again later."
+          />
+        </Container>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Experience
-        </h1>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          Add Experience
-        </button>
-      </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+      <Container>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Experience
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
+            Manage your professional experience and career history
+          </p>
+        </div>
 
-      {/* Search */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <form onSubmit={handleSearch} className="flex gap-4">
-          <input
-            type="text"
-            placeholder="Search experience entries..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        {/* Search and Filter */}
+        <Card className="p-6 mb-8">
+          <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-64">
+              <input
+                type="text"
+                placeholder="Search experience entries..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+              />
+            </div>
+            <Button type="submit" variant="outline">
+              <Search className="w-4 h-4 mr-2" />
+              Search
+            </Button>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Experience
+            </Button>
+          </form>
+        </Card>
+
+        {/* Experience Grid */}
+        {filteredExperiences.length === 0 ? (
+          <EmptyState
+            title="No Experience Found"
+            description="No experience entries match your current filters. Try adjusting your search criteria or add a new experience entry."
+            actionLabel="Add Experience"
+            onAction={() => setIsCreateModalOpen(true)}
           />
-          <button
-            type="submit"
-            className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
-          >
-            Search
-          </button>
-        </form>
-      </div>
-
-      {/* Experience Table */}
-      <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {filteredExperiences.map((experience) => (
-            <li key={experience.id} className="px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-xl">
-                      {experience.icon}
-                    </div>
-                  </div>
-                  <div className="ml-4">
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredExperiences.map((experience) => (
+              <Card key={experience.id} hover className="flex flex-col h-full">
+                <div className="p-6 flex flex-col h-full">
+                  {/* Header with actions */}
+                  <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center">
-                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                        {experience.title}
-                      </h3>
-                      {!experience.visible && (
-                        <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                          Hidden
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">
-                      {experience.company}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {experience.period} • {experience.location}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                      {experience.description}
-                    </p>
-                    <div className="mt-2">
-                      <div className="flex flex-wrap gap-1">
-                        {experience.technologies
-                          .slice(0, 3)
-                          .map((tech, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        {experience.technologies.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full">
-                            +{experience.technologies.length - 3} more
-                          </span>
-                        )}
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
+                        <Briefcase className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {experience.title}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {experience.company}
+                        </p>
                       </div>
                     </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditExperience(experience)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(experience)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow line-clamp-3">
+                    {experience.description}
+                  </p>
+
+                  {/* Meta Info */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      {experience.period}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      {experience.location}
+                    </div>
+                    {experience.technologies && experience.technologies.length > 0 && (
+                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <Code className="w-4 h-4 mr-1" />
+                        {experience.technologies.slice(0, 3).join(", ")}
+                        {experience.technologies.length > 3 && "..."}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Status badges */}
+                  <div className="flex flex-wrap gap-2">
+                    {experience.visible ? (
+                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
+                        <Eye className="w-3 h-3 inline mr-1" />
+                        Visible
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
+                        <EyeOff className="w-3 h-3 inline mr-1" />
+                        Hidden
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleToggleVisible(experience.id)}
-                    className={`px-3 py-1 text-xs rounded-full ${
-                      experience.visible
-                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                        : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                    }`}
-                  >
-                    {experience.visible ? "Visible" : "Hidden"}
-                  </button>
-                  <button
-                    onClick={() => handleEditExperience(experience)}
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(experience)}
-                    className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+              </Card>
+            ))}
+          </div>
+        )}
 
       {/* Create Experience Modal */}
       <CreateEditModal
@@ -304,6 +380,7 @@ export default function ExperienceAdminPage() {
         itemName={selectedExperience?.title}
         isLoading={deleteExperience.isPending}
       />
+      </Container>
     </div>
   );
 }

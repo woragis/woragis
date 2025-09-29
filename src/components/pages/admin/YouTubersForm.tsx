@@ -13,9 +13,11 @@ import type { Youtuber, NewYoutuber, YoutuberCategory } from "@/types";
 
 interface YouTubersFormProps {
   youTuber?: Youtuber;
-  onSubmit: (youTuber: NewYoutuber) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 const categoryOptions: { value: YoutuberCategory; label: string }[] = [
@@ -25,9 +27,11 @@ const categoryOptions: { value: YoutuberCategory; label: string }[] = [
 
 export const YouTubersForm: React.FC<YouTubersFormProps> = ({
   youTuber,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewYoutuber>>({
     channelName: "",
@@ -77,9 +81,19 @@ export const YouTubersForm: React.FC<YouTubersFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewYoutuber);
+    onSubmit(e);
   };
 
   return (

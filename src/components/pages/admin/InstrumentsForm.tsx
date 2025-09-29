@@ -16,9 +16,11 @@ import type {
 
 interface InstrumentsFormProps {
   instrument?: Instrument;
-  onSubmit: (instrument: NewInstrument) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 const knowledgeLevelOptions: { value: KnowledgeLevel; label: string }[] = [
@@ -30,9 +32,11 @@ const knowledgeLevelOptions: { value: KnowledgeLevel; label: string }[] = [
 
 export const InstrumentsForm: React.FC<InstrumentsFormProps> = ({
   instrument,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewInstrument>>({
     name: "",
@@ -66,9 +70,19 @@ export const InstrumentsForm: React.FC<InstrumentsFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewInstrument);
+    onSubmit(e);
   };
 
   return (

@@ -13,9 +13,11 @@ import type { Game, NewGame, GameCategory } from "@/types";
 
 interface GamesFormProps {
   game?: Game;
-  onSubmit: (game: NewGame) => void;
+  userId: string;
+  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  onFormDataChange?: (data: any) => void;
 }
 
 const categoryOptions: { value: GameCategory; label: string }[] = [
@@ -26,9 +28,11 @@ const categoryOptions: { value: GameCategory; label: string }[] = [
 
 export const GamesForm: React.FC<GamesFormProps> = ({
   game,
+  userId,
   onSubmit,
   onCancel,
   isLoading = false,
+  onFormDataChange,
 }) => {
   const [formData, setFormData] = useState<Partial<NewGame>>({
     title: "",
@@ -82,9 +86,19 @@ export const GamesForm: React.FC<GamesFormProps> = ({
     }));
   };
 
+  // Notify parent of form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange({
+        ...formData,
+        userId,
+      });
+    }
+  }, [formData, userId, onFormDataChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as NewGame);
+    onSubmit(e);
   };
 
   return (

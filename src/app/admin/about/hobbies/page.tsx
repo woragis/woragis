@@ -1,17 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { Modal } from "@/components/ui";
-import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
-import { FilterSection } from "@/components/layout/FilterSection";
-import { ActionButton } from "@/components/ui/ActionButton";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import React, { useState, useCallback } from "react";
+import {
+  Section,
+  Container,
+  Card,
+  Button,
+  EmptyState,
+} from "@/components/ui";
 import { DeleteConfirmationModal, HobbiesForm } from "@/components/pages/admin";
-import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import { CreateEditModal } from "@/components/common";
+import { useAuth } from "@/stores/auth-store";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Heart,
+  Eye,
+  EyeOff,
+  Calendar,
+  Hash,
+} from "lucide-react";
 import {
   useHobbies,
   useCreateHobby,
@@ -20,38 +30,45 @@ import {
   useToggleHobbyVisibility,
 } from "@/hooks/about/useHobbies";
 import { Hobby, NewHobby } from "@/types/about/hobbies";
-import { toast } from "sonner";
 
 export default function HobbiesAdminPage() {
+  const [filters, setFilters] = useState<{ search?: string }>({});
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedHobby, setSelectedHobby] = useState<Hobby | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [createFormData, setCreateFormData] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState<any>(null);
 
+  const { user } = useAuth();
   const { data: hobbies = [], isLoading, error } = useHobbies();
   const createHobby = useCreateHobby();
   const updateHobby = useUpdateHobby();
   const deleteHobby = useDeleteHobby();
   const toggleVisibility = useToggleHobbyVisibility();
 
-  const searchedHobbies =
-    hobbies?.filter(
-      (item: Hobby) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is handled by the filters state
+  };
 
   // Create hobby
-  const handleCreateHobby = async (hobbyData: NewHobby) => {
+  const handleCreateHobby = useCallback(async (hobbyData: any) => {
     try {
       await createHobby.mutateAsync(hobbyData);
       setIsCreateModalOpen(false);
+      setCreateFormData(null);
     } catch (error) {
       console.error("Failed to create hobby:", error);
     }
-  };
+  }, [createHobby]);
+
+  const handleCreateSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (createFormData) {
+      handleCreateHobby(createFormData);
+    }
+  }, [createFormData, handleCreateHobby]);
 
   // Edit hobby
   const handleEditHobby = (hobbyItem: Hobby) => {
@@ -59,7 +76,7 @@ export default function HobbiesAdminPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateHobby = async (hobbyData: NewHobby) => {
+  const handleUpdateHobby = useCallback(async (hobbyData: any) => {
     if (!selectedHobby) return;
 
     try {
@@ -69,13 +86,21 @@ export default function HobbiesAdminPage() {
       });
       setIsEditModalOpen(false);
       setSelectedHobby(null);
+      setEditFormData(null);
     } catch (error) {
       console.error("Failed to update hobby:", error);
     }
-  };
+  }, [selectedHobby, updateHobby]);
+
+  const handleEditSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (editFormData && selectedHobby) {
+      handleUpdateHobby(editFormData);
+    }
+  }, [editFormData, selectedHobby, handleUpdateHobby]);
 
   // Delete hobby
-  const handleDeleteHobby = (hobbyItem: Hobby) => {
+  const handleDelete = (hobbyItem: Hobby) => {
     setSelectedHobby(hobbyItem);
     setIsDeleteModalOpen(true);
   };
@@ -92,155 +117,252 @@ export default function HobbiesAdminPage() {
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Search is handled by filtered state
-  };
-
   const handleToggleVisibility = async (id: string) => {
     await toggleVisibility.mutateAsync(id);
   };
 
-  if (error) return <div>Error loading hobbies</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Hobbies
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Manage your hobbies and interests
+            </p>
+          </div>
 
-  const headerActions = (
-    <ActionButton onClick={() => setIsCreateModalOpen(true)}>
-      Add Hobby
-    </ActionButton>
-  );
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, index) => (
+              <Card key={index} className="animate-pulse">
+                <div className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-4"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <EmptyState
+            title="Unable to Load Hobbies"
+            description="There was an error loading the hobbies. Please try again later."
+          />
+        </Container>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <AdminPageLayout
-        title="Hobbies List"
-        description="Manage your hobbies and interests"
-        headerActions={headerActions}
-      >
-        {/* Search and Filters */}
-        <FilterSection
-          searchValue={searchTerm}
-          onSearchChange={setSearchTerm}
-          onSearchSubmit={handleSearch}
-          searchPlaceholder="Search hobbies..."
-          selectedFilter={selectedFilter}
-          onFilterChange={setSelectedFilter}
-        />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+      <Container>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Hobbies
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
+            Manage your hobbies and interests
+          </p>
+        </div>
 
-        {/* Hobbies List */}
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-            {searchedHobbies?.map((hobbyItem: Hobby) => (
-              <li key={hobbyItem.id} className="px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                        <Plus className="h-5 w-5 text-green-600 dark:text-green-400" />
+        {/* Search and Filter */}
+        <Card className="p-6 mb-8">
+          <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-64">
+              <input
+                type="text"
+                placeholder="Search hobbies..."
+                value={filters.search || ""}
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+              />
+            </div>
+            <Button type="submit" variant="outline">
+              <Search className="w-4 h-4 mr-2" />
+              Search
+            </Button>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Hobby
+            </Button>
+          </form>
+        </Card>
+
+        {/* Hobbies Grid */}
+        {hobbies.length === 0 ? (
+          <EmptyState
+            title="No Hobbies Found"
+            description="No hobbies match your current filters. Try adjusting your search criteria or add a new hobby."
+            actionLabel="Add Hobby"
+            onAction={() => setIsCreateModalOpen(true)}
+          />
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {hobbies.map((hobby) => (
+              <Card key={hobby.id} hover className="flex flex-col h-full">
+                <div className="p-6 flex flex-col h-full">
+                  {/* Header with actions */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-rose-500 to-pink-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
+                        <Heart className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {hobby.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Hobby
+                        </p>
                       </div>
                     </div>
-                    <div className="ml-4">
-                      <div className="flex items-center">
-                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                          {hobbyItem.name}
-                        </h3>
-                        {!hobbyItem.visible && (
-                          <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                            Hidden
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {hobbyItem.description || "No description"}
-                      </p>
-                      <div className="mt-1">
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
-                          Added{" "}
-                          {new Date(hobbyItem.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditHobby(hobby)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(hobby)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleToggleVisibility(hobbyItem.id)}
-                      className={`px-3 py-1 text-xs rounded-full ${
-                        hobbyItem.visible
-                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                          : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                      }`}
-                    >
-                      {hobbyItem.visible ? "Visible" : "Hidden"}
-                    </button>
-                    <button
-                      onClick={() => handleEditHobby(hobbyItem)}
-                      className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteHobby(hobbyItem)}
-                      className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm"
-                    >
-                      Delete
-                    </button>
+
+                  {/* Description */}
+                  {hobby.description && (
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow line-clamp-3">
+                      {hobby.description}
+                    </p>
+                  )}
+
+                  {/* Meta Info */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      Added {new Date(hobby.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {/* Status badges */}
+                  <div className="flex flex-wrap gap-2">
+                    {hobby.visible ? (
+                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
+                        Visible
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
+                        Hidden
+                      </span>
+                    )}
                   </div>
                 </div>
-              </li>
+              </Card>
             ))}
-          </ul>
-        </div>
-      </AdminPageLayout>
-
-      {/* Create Hobby Modal */}
-      <Modal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Add New Hobby"
-        size="lg"
-      >
-        <HobbiesForm
-          onSubmit={handleCreateHobby}
-          onCancel={() => setIsCreateModalOpen(false)}
-          isLoading={createHobby.isPending}
-        />
-      </Modal>
-
-      {/* Edit Hobby Modal */}
-      <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedHobby(null);
-        }}
-        title="Edit Hobby"
-        size="lg"
-      >
-        {selectedHobby && (
-          <HobbiesForm
-            hobby={selectedHobby}
-            onSubmit={handleUpdateHobby}
-            onCancel={() => {
-              setIsEditModalOpen(false);
-              setSelectedHobby(null);
-            }}
-            isLoading={updateHobby.isPending}
-          />
+          </div>
         )}
-      </Modal>
 
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setSelectedHobby(null);
-        }}
-        onConfirm={handleConfirmDelete}
-        title="Delete Hobby"
-        message="Are you sure you want to delete this hobby? This action cannot be undone."
-        itemName={selectedHobby?.name}
-        isLoading={deleteHobby.isPending}
-      />
-    </>
+        {/* Create Hobby Modal */}
+        <CreateEditModal
+          isOpen={isCreateModalOpen}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            setCreateFormData(null);
+          }}
+          isEdit={false}
+          itemName="Hobby"
+          size="lg"
+          onSubmit={handleCreateSubmit}
+          onCancel={() => {
+            setIsCreateModalOpen(false);
+            setCreateFormData(null);
+          }}
+          isLoading={createHobby.isPending}
+          maxHeight="90vh"
+        >
+          <HobbiesForm
+            userId={user?.id || ""}
+            onSubmit={handleCreateSubmit}
+            onCancel={() => setIsCreateModalOpen(false)}
+            isLoading={createHobby.isPending}
+            onFormDataChange={setCreateFormData}
+          />
+        </CreateEditModal>
+
+        {/* Edit Hobby Modal */}
+        <CreateEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedHobby(null);
+            setEditFormData(null);
+          }}
+          isEdit={true}
+          itemName="Hobby"
+          size="lg"
+          onSubmit={handleEditSubmit}
+          onCancel={() => {
+            setIsEditModalOpen(false);
+            setSelectedHobby(null);
+            setEditFormData(null);
+          }}
+          isLoading={updateHobby.isPending}
+          maxHeight="90vh"
+        >
+          {selectedHobby && (
+            <HobbiesForm
+              hobby={selectedHobby}
+              userId={user?.id || ""}
+              onSubmit={handleEditSubmit}
+              onCancel={() => {
+                setIsEditModalOpen(false);
+                setSelectedHobby(null);
+              }}
+              isLoading={updateHobby.isPending}
+              onFormDataChange={setEditFormData}
+            />
+          )}
+        </CreateEditModal>
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setSelectedHobby(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          title="Delete Hobby"
+          message="Are you sure you want to delete this hobby? This action cannot be undone."
+          itemName={selectedHobby?.name}
+          isLoading={deleteHobby.isPending}
+        />
+      </Container>
+    </div>
   );
 }

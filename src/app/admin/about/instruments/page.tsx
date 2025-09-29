@@ -1,16 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import { Modal } from "@/components/ui";
-import { AdminPageLayout } from "@/components/pages/admin/AdminPageLayout";
-import { FilterSection } from "@/components/layout/FilterSection";
-import { ActionButton } from "@/components/ui/ActionButton";
+import React, { useState, useCallback } from "react";
+import {
+  Section,
+  Container,
+  Card,
+  Button,
+  EmptyState,
+} from "@/components/ui";
 import {
   DeleteConfirmationModal,
   InstrumentsForm,
 } from "@/components/pages/admin";
+import { CreateEditModal } from "@/components/common";
+import { useAuth } from "@/stores/auth-store";
 import { Badge } from "@/components/ui/badge";
-import { Music, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Guitar,
+  Eye,
+  EyeOff,
+  Calendar,
+  Hash,
+} from "lucide-react";
 import {
   useInstruments,
   useCreateInstrument,
@@ -23,37 +38,46 @@ import {
   NewInstrument,
   KnowledgeLevel,
 } from "@/types/about/instruments";
-import { toast } from "sonner";
 
 export default function InstrumentsAdminPage() {
+  const [filters, setFilters] = useState<{ search?: string; level?: KnowledgeLevel }>({});
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedInstrument, setSelectedInstrument] =
     useState<Instrument | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [createFormData, setCreateFormData] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState<any>(null);
 
+  const { user } = useAuth();
   const { data: instruments = [], isLoading, error } = useInstruments();
   const createInstrument = useCreateInstrument();
   const updateInstrument = useUpdateInstrument();
   const deleteInstrument = useDeleteInstrument();
   const toggleVisibility = useToggleInstrumentVisibility();
 
-  const searchedInstruments =
-    instruments?.filter((item: Instrument) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is handled by the filters state
+  };
 
   // Create instrument
-  const handleCreateInstrument = async (instrumentData: NewInstrument) => {
+  const handleCreateInstrument = useCallback(async (instrumentData: any) => {
     try {
       await createInstrument.mutateAsync(instrumentData);
       setIsCreateModalOpen(false);
+      setCreateFormData(null);
     } catch (error) {
       console.error("Failed to create instrument:", error);
     }
-  };
+  }, [createInstrument]);
+
+  const handleCreateSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (createFormData) {
+      handleCreateInstrument(createFormData);
+    }
+  }, [createFormData, handleCreateInstrument]);
 
   // Edit instrument
   const handleEditInstrument = (instrumentItem: Instrument) => {
@@ -61,7 +85,7 @@ export default function InstrumentsAdminPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateInstrument = async (instrumentData: NewInstrument) => {
+  const handleUpdateInstrument = useCallback(async (instrumentData: any) => {
     if (!selectedInstrument) return;
 
     try {
@@ -71,13 +95,21 @@ export default function InstrumentsAdminPage() {
       });
       setIsEditModalOpen(false);
       setSelectedInstrument(null);
+      setEditFormData(null);
     } catch (error) {
       console.error("Failed to update instrument:", error);
     }
-  };
+  }, [selectedInstrument, updateInstrument]);
+
+  const handleEditSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (editFormData && selectedInstrument) {
+      handleUpdateInstrument(editFormData);
+    }
+  }, [editFormData, selectedInstrument, handleUpdateInstrument]);
 
   // Delete instrument
-  const handleDeleteInstrument = (instrumentItem: Instrument) => {
+  const handleDelete = (instrumentItem: Instrument) => {
     setSelectedInstrument(instrumentItem);
     setIsDeleteModalOpen(true);
   };
@@ -92,11 +124,6 @@ export default function InstrumentsAdminPage() {
     } catch (error) {
       console.error("Failed to delete instrument:", error);
     }
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Search is handled by filtered state
   };
 
   const handleToggleVisibility = async (id: string) => {
@@ -133,154 +160,270 @@ export default function InstrumentsAdminPage() {
     }
   };
 
-  if (error) return <div>Error loading instruments</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Instruments
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Manage your musical instruments and learning progress
+            </p>
+          </div>
 
-  const headerActions = (
-    <ActionButton onClick={() => setIsCreateModalOpen(true)}>
-      Add Instrument
-    </ActionButton>
-  );
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, index) => (
+              <Card key={index} className="animate-pulse">
+                <div className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-4"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <Container>
+          <EmptyState
+            title="Unable to Load Instruments"
+            description="There was an error loading the instruments. Please try again later."
+          />
+        </Container>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <AdminPageLayout
-        title="Instruments List"
-        description="Manage your musical instruments and learning progress"
-        headerActions={headerActions}
-      >
-        {/* Search and Filters */}
-        <FilterSection
-          searchValue={searchTerm}
-          onSearchChange={setSearchTerm}
-          onSearchSubmit={handleSearch}
-          searchPlaceholder="Search instruments..."
-          selectedFilter={selectedFilter}
-          onFilterChange={setSelectedFilter}
-        />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+      <Container>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Instruments
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
+            Manage your musical instruments and learning progress
+          </p>
+        </div>
 
-        {/* Instruments List */}
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-            {searchedInstruments?.map((instrumentItem: Instrument) => (
-              <li key={instrumentItem.id} className="px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                        <Music className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+        {/* Search and Filter */}
+        <Card className="p-6 mb-8">
+          <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-64">
+              <input
+                type="text"
+                placeholder="Search instruments..."
+                value={filters.search || ""}
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+              />
+            </div>
+            <select
+              value={filters.level || ""}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  level: e.target.value ? (e.target.value as KnowledgeLevel) : undefined,
+                })
+              }
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+            >
+              <option value="">All Levels</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+              <option value="expert">Expert</option>
+            </select>
+            <Button type="submit" variant="outline">
+              <Search className="w-4 h-4 mr-2" />
+              Search
+            </Button>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Instrument
+            </Button>
+          </form>
+        </Card>
+
+        {/* Instruments Grid */}
+        {instruments.length === 0 ? (
+          <EmptyState
+            title="No Instruments Found"
+            description="No instruments match your current filters. Try adjusting your search criteria or add a new instrument."
+            actionLabel="Add Instrument"
+            onAction={() => setIsCreateModalOpen(true)}
+          />
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {instruments.map((instrument) => (
+              <Card key={instrument.id} hover className="flex flex-col h-full">
+                <div className="p-6 flex flex-col h-full">
+                  {/* Header with actions */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mr-4">
+                        <Guitar className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {instrument.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Musical Instrument
+                        </p>
                       </div>
                     </div>
-                    <div className="ml-4">
-                      <div className="flex items-center">
-                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                          {instrumentItem.name}
-                        </h3>
-                        <Badge
-                          className={getKnowledgeLevelColor(
-                            instrumentItem.knowledgeLevel || "beginner"
-                          )}
-                        >
-                          {getKnowledgeLevelLabel(
-                            instrumentItem.knowledgeLevel || "beginner"
-                          )}
-                        </Badge>
-                        {!instrumentItem.visible && (
-                          <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                            Hidden
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1">
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
-                          Added{" "}
-                          {new Date(
-                            instrumentItem.createdAt
-                          ).toLocaleDateString()}
-                        </span>
-                      </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditInstrument(instrument)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(instrument)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleToggleVisibility(instrumentItem.id)}
-                      className={`px-3 py-1 text-xs rounded-full ${
-                        instrumentItem.visible
-                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                          : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                      }`}
+
+                  {/* Knowledge Level Badge */}
+                  <div className="mb-4">
+                    <Badge
+                      className={getKnowledgeLevelColor(
+                        instrument.knowledgeLevel || "beginner"
+                      )}
                     >
-                      {instrumentItem.visible ? "Visible" : "Hidden"}
-                    </button>
-                    <button
-                      onClick={() => handleEditInstrument(instrumentItem)}
-                      className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteInstrument(instrumentItem)}
-                      className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm"
-                    >
-                      Delete
-                    </button>
+                      {getKnowledgeLevelLabel(
+                        instrument.knowledgeLevel || "beginner"
+                      )}
+                    </Badge>
+                  </div>
+
+                  {/* Meta Info */}
+                  <div className="space-y-2 mb-4 flex-grow">
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      Added {new Date(instrument.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {/* Status badges */}
+                  <div className="flex flex-wrap gap-2">
+                    {instrument.visible ? (
+                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
+                        Visible
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full">
+                        Hidden
+                      </span>
+                    )}
                   </div>
                 </div>
-              </li>
+              </Card>
             ))}
-          </ul>
-        </div>
-      </AdminPageLayout>
-
-      {/* Create Instrument Modal */}
-      <Modal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Add New Instrument"
-        size="lg"
-      >
-        <InstrumentsForm
-          onSubmit={handleCreateInstrument}
-          onCancel={() => setIsCreateModalOpen(false)}
-          isLoading={createInstrument.isPending}
-        />
-      </Modal>
-
-      {/* Edit Instrument Modal */}
-      <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedInstrument(null);
-        }}
-        title="Edit Instrument"
-        size="lg"
-      >
-        {selectedInstrument && (
-          <InstrumentsForm
-            instrument={selectedInstrument}
-            onSubmit={handleUpdateInstrument}
-            onCancel={() => {
-              setIsEditModalOpen(false);
-              setSelectedInstrument(null);
-            }}
-            isLoading={updateInstrument.isPending}
-          />
+          </div>
         )}
-      </Modal>
 
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setSelectedInstrument(null);
-        }}
-        onConfirm={handleConfirmDelete}
-        title="Delete Instrument"
-        message="Are you sure you want to delete this instrument? This action cannot be undone."
-        itemName={selectedInstrument?.name}
-        isLoading={deleteInstrument.isPending}
-      />
-    </>
+        {/* Create Instrument Modal */}
+        <CreateEditModal
+          isOpen={isCreateModalOpen}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            setCreateFormData(null);
+          }}
+          isEdit={false}
+          itemName="Instrument"
+          size="lg"
+          onSubmit={handleCreateSubmit}
+          onCancel={() => {
+            setIsCreateModalOpen(false);
+            setCreateFormData(null);
+          }}
+          isLoading={createInstrument.isPending}
+          maxHeight="90vh"
+        >
+          <InstrumentsForm
+            userId={user?.id || ""}
+            onSubmit={handleCreateSubmit}
+            onCancel={() => setIsCreateModalOpen(false)}
+            isLoading={createInstrument.isPending}
+            onFormDataChange={setCreateFormData}
+          />
+        </CreateEditModal>
+
+        {/* Edit Instrument Modal */}
+        <CreateEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedInstrument(null);
+            setEditFormData(null);
+          }}
+          isEdit={true}
+          itemName="Instrument"
+          size="lg"
+          onSubmit={handleEditSubmit}
+          onCancel={() => {
+            setIsEditModalOpen(false);
+            setSelectedInstrument(null);
+            setEditFormData(null);
+          }}
+          isLoading={updateInstrument.isPending}
+          maxHeight="90vh"
+        >
+          {selectedInstrument && (
+            <InstrumentsForm
+              instrument={selectedInstrument}
+              userId={user?.id || ""}
+              onSubmit={handleEditSubmit}
+              onCancel={() => {
+                setIsEditModalOpen(false);
+                setSelectedInstrument(null);
+              }}
+              isLoading={updateInstrument.isPending}
+              onFormDataChange={setEditFormData}
+            />
+          )}
+        </CreateEditModal>
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setSelectedInstrument(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          title="Delete Instrument"
+          message="Are you sure you want to delete this instrument? This action cannot be undone."
+          itemName={selectedInstrument?.name}
+          isLoading={deleteInstrument.isPending}
+        />
+      </Container>
+    </div>
   );
 }
