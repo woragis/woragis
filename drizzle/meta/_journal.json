@@ -15,6 +15,20 @@
       "when": 1757910664101,
       "tag": "0001_low_screwball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759034225132,
+      "tag": "0002_lumpy_marauders",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1759034693879,
+      "tag": "0003_whole_romulus",
+      "breakpoints": true
     }
   ]
 }
