@@ -35,6 +35,7 @@ import {
   Shield,
   Languages,
   Heart,
+  Upload,
 } from "lucide-react";
 
 interface AdminLayoutClientProps {
@@ -130,6 +131,7 @@ export function AdminLayoutClient({
       icon: MessageSquare,
     },
     { name: "Frameworks", href: "/admin/frameworks", icon: Code },
+    { name: "Uploads", href: "/admin/uploads", icon: Upload },
     {
       name: "About",
       href: "/admin/about",
