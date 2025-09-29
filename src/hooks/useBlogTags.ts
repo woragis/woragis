@@ -24,14 +24,14 @@ const queryKeys = {
 };
 
 // Blog tag hooks
-export const useBlogTags = (filters?: BlogTagFilters) => {
+export const useBlogTags = (filters?: BlogTagFilters, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: queryKeys.blogTags.list(filters || {}),
     queryFn: async () => {
       const response = await blogTagApi.getAllBlogTags(filters || {});
       return response.data || [];
     },
-    enabled: true,
+    enabled: options?.enabled ?? true,
   });
 };
 
