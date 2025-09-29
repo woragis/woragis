@@ -131,8 +131,8 @@ export const UploadsManagement: React.FC = () => {
       label: "Status",
       render: (file: any) => (
         <StatusBadge
-          status={file.isReferenced ? "success" : "warning"}
-          text={file.isReferenced ? "Referenced" : "Orphaned"}
+          variant={file.isReferenced ? "success" : "warning"}
+          status={file.isReferenced ? "Referenced" : "Orphaned"}
         />
       ),
     },
@@ -305,9 +305,12 @@ export const UploadsManagement: React.FC = () => {
           />
         </div>
         <FilterTabs
-          tabs={categories}
-          activeTab={selectedCategory}
-          onTabChange={setSelectedCategory}
+          options={categories.map(cat => ({
+            value: cat,
+            label: cat === "all" ? "All" : cat.replace("/", " / ")
+          }))}
+          selectedValue={selectedCategory}
+          onValueChange={setSelectedCategory}
         />
       </div>
 
@@ -320,12 +323,39 @@ export const UploadsManagement: React.FC = () => {
             description="No files match your current filters"
           />
         ) : (
-          <DataTable
-            data={filteredFiles}
-            columns={columns}
-            searchable={false}
-            sortable={true}
-          />
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  {columns.map((column) => (
+                    <th
+                      key={column.key}
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                    >
+                      {column.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredFiles.map((file, index) => (
+                  <tr
+                    key={file.relativePath}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                  >
+                    {columns.map((column) => (
+                      <td
+                        key={column.key}
+                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
+                      >
+                        {column.render(file)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
 
@@ -352,8 +382,8 @@ export const UploadsManagement: React.FC = () => {
 
             <div className="flex items-center space-x-2">
               <StatusBadge
-                status={selectedFile.isReferenced ? "success" : "warning"}
-                text={selectedFile.isReferenced ? "Referenced in database" : "Not referenced"}
+                variant={selectedFile.isReferenced ? "success" : "warning"}
+                status={selectedFile.isReferenced ? "Referenced in database" : "Not referenced"}
               />
             </div>
 
@@ -429,9 +459,10 @@ export const UploadsManagement: React.FC = () => {
                 Cancel
               </Button>
               <Button
-                variant="destructive"
+                variant="outline"
                 onClick={() => handleDeleteFile(selectedFile)}
                 disabled={deleteUpload.isPending}
+                className="text-red-600 border-red-600 hover:bg-red-50 dark:text-red-400 dark:border-red-400 dark:hover:bg-red-900/20"
               >
                 {deleteUpload.isPending ? "Deleting..." : "Delete"}
               </Button>

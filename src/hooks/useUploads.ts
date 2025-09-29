@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api";
+import { apiClient } from "@/lib/api/api";
 
 export interface UploadFile {
   filename: string;
@@ -36,7 +36,8 @@ export const useUploads = () => {
     queryKey: ["uploads"],
     queryFn: async () => {
       const response = await apiClient.get("/admin/uploads");
-      return response.data;
+      // The API returns { success: true, data: { files: [], stats: {} } }
+      return response.data.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
