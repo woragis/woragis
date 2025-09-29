@@ -1,4 +1,4 @@
-import { apiClient } from "./clients/apiClient";
+import { apiClient } from "../clients/apiClient";
 import type {
   Project,
   NewProject,
