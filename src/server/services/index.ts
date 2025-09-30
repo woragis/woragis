@@ -7,6 +7,7 @@ import { TestimonialService } from "./testimonial.service";
 import { BlogService } from "./blog.service";
 import { ExperienceService } from "./experience.service";
 import { BlogTagService } from "./blog-tag.service";
+import { TranslationService } from "./translation.service";
 import {
   BiographyService,
   MusicGenreService,
@@ -33,6 +34,7 @@ export {
   BlogService,
   ExperienceService,
   BlogTagService,
+  TranslationService,
   BiographyService,
   MusicGenreService,
   LastListenedSongService,
@@ -57,6 +59,7 @@ export const testimonialService = new TestimonialService();
 export const blogService = new BlogService();
 export const experienceService = new ExperienceService();
 export const blogTagService = new BlogTagService();
+export const translationService = new TranslationService();
 
 // Create about service instances
 export const biographyService = new BiographyService();

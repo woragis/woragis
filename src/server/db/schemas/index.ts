@@ -12,3 +12,6 @@ export * from "./about";
 // Export tag schemas
 export * from "./blog-tags";
 export * from "./blog-post-tags";
+
+// Export translation schemas
+export * from "./translations";
