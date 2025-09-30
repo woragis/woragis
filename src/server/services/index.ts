@@ -23,6 +23,14 @@ import {
   HobbiesService,
 } from "./about";
 import { UploadService, getUploadConfig } from "./common";
+import {
+  IdeasService,
+  IdeaNodesService,
+  AiChatsService,
+  ideasService,
+  ideaNodesService,
+  aiChatsService,
+} from "./money";
 
 // Export all services
 export {
@@ -48,6 +56,9 @@ export {
   LanguagesService,
   HobbiesService,
   UploadService,
+  IdeasService,
+  IdeaNodesService,
+  AiChatsService,
 };
 
 // Create singleton instances
@@ -77,3 +88,6 @@ export const hobbiesService = new HobbiesService();
 
 // Create common service instances
 export const uploadService = new UploadService(getUploadConfig());
+
+// Re-export money service instances
+export { ideasService, ideaNodesService, aiChatsService };

@@ -8,6 +8,7 @@ export * from "./testimonials";
 export * from "./blog";
 export * from "./experience";
 export * from "./about";
+export * from "./money";
 
 // Export tag schemas
 export * from "./blog-tags";

@@ -22,6 +22,14 @@ import {
   LanguagesRepository,
   HobbiesRepository,
 } from "./about";
+import {
+  IdeasRepository,
+  IdeaNodesRepository,
+  AiChatsRepository,
+  ideasRepository,
+  ideaNodesRepository,
+  aiChatsRepository,
+} from "./money";
 
 // Export all repositories
 export {
@@ -46,6 +54,9 @@ export {
   MartialArtsRepository,
   LanguagesRepository,
   HobbiesRepository,
+  IdeasRepository,
+  IdeaNodesRepository,
+  AiChatsRepository,
 };
 
 // Create singleton instances
@@ -72,3 +83,6 @@ export const instrumentsRepository = new InstrumentsRepository();
 export const martialArtsRepository = new MartialArtsRepository();
 export const languagesRepository = new LanguagesRepository();
 export const hobbiesRepository = new HobbiesRepository();
+
+// Re-export money repository instances
+export { ideasRepository, ideaNodesRepository, aiChatsRepository };
