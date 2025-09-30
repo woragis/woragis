@@ -8,13 +8,20 @@ import React, {
   ReactNode,
 } from "react";
 import { IntlProvider } from "next-intl";
+import type { SupportedLanguage } from "@/types";
 
-export type Language = "en" | "es" | "pt" | "it" | "fr" | "ja" | "zh" | "ko";
+export type Language = SupportedLanguage;
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
   t: (key: string) => string;
+  getTranslatedContent: <T>(
+    contentType: "blog" | "project" | "experience" | "education" | "testimonial",
+    contentId: string,
+    fallbackToDefault?: boolean
+  ) => Promise<T | null>;
+  isTranslationLoading: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
@@ -61,6 +68,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
   const [language, setLanguageState] = useState<Language>("en");
   const [messages, setMessages] = useState<Record<string, any>>({});
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isTranslationLoading, setIsTranslationLoading] = useState(false);
 
   // Load language from localStorage on mount
   useEffect(() => {
@@ -102,9 +110,40 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
     return typeof value === "string" ? value : key;
   };
 
+  const getTranslatedContent = async <T,>(
+    contentType: "blog" | "project" | "experience" | "education" | "testimonial",
+    contentId: string,
+    fallbackToDefault: boolean = true
+  ): Promise<T | null> => {
+    setIsTranslationLoading(true);
+    try {
+      const response = await fetch(
+        `/api/translations/${contentType}/${contentId}?lang=${language}&fallback=${fallbackToDefault}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch translation: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      setIsTranslationLoading(false);
+      return result.data?.content || null;
+    } catch (error) {
+      console.error("Error fetching translated content:", error);
+      setIsTranslationLoading(false);
+      return null;
+    }
+  };
+
   // Always provide the context, but handle hydration carefully
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ 
+      language, 
+      setLanguage, 
+      t, 
+      getTranslatedContent,
+      isTranslationLoading 
+    }}>
       <IntlProvider messages={messages} locale={language}>
         {children}
       </IntlProvider>
