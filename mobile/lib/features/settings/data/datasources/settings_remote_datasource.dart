@@ -6,12 +6,8 @@ import '../models/setting_model.dart';
 
 abstract class SettingsRemoteDataSource {
   Future<List<SettingEntity>> getSettings({
-    int? page,
-    int? limit,
     String? category,
-    String? search,
-    String? sortBy,
-    String? sortOrder,
+    bool? isPublic,
   });
 
   Future<SettingEntity> getSettingById(String id);
@@ -40,9 +36,23 @@ abstract class SettingsRemoteDataSource {
     required String value,
   });
   Future<void> deleteSetting(String id);
-  Future<void> deleteSettingByKey(String key);
-  Future<List<SettingEntity>> getSettingsByCategory(String category);
-  Future<List<SettingEntity>> getPublicSettings();
+
+  // Bulk operations
+  Future<Map<String, String>> getSettingsAsMap({
+    String? category,
+    bool? isPublic,
+  });
+  Future<void> updateSettingsBulk(Map<String, String> settings);
+
+  // Category-specific settings
+  Future<Map<String, String>> getCoreProfileSettings();
+  Future<Map<String, String>> getSocialMediaSettings();
+  Future<Map<String, String>> getContactSettings();
+  Future<Map<String, String>> getSiteSettings();
+  Future<void> updateCoreProfileSettings(Map<String, String> settings);
+  Future<void> updateSocialMediaSettings(Map<String, String> settings);
+  Future<void> updateContactSettings(Map<String, String> settings);
+  Future<void> updateSiteSettings(Map<String, String> settings);
 }
 
 class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
@@ -56,21 +66,13 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
 
   @override
   Future<List<SettingEntity>> getSettings({
-    int? page,
-    int? limit,
     String? category,
-    String? search,
-    String? sortBy,
-    String? sortOrder,
+    bool? isPublic,
   }) async {
     try {
       final queryParams = <String, String>{};
-      if (page != null) queryParams['page'] = page.toString();
-      if (limit != null) queryParams['limit'] = limit.toString();
       if (category != null) queryParams['category'] = category;
-      if (search != null && search.isNotEmpty) queryParams['search'] = search;
-      if (sortBy != null) queryParams['sortBy'] = sortBy;
-      if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
+      if (isPublic != null) queryParams['isPublic'] = isPublic.toString();
 
       final uri = Uri.parse('$baseUrl/settings').replace(queryParameters: queryParams);
       final response = await client.get(uri);
@@ -312,7 +314,6 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
     }
   }
 
-  @override
   Future<void> deleteSettingByKey(String key) async {
     try {
       final response = await client.delete(Uri.parse('$baseUrl/settings/key/$key'));
@@ -334,23 +335,36 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
     }
   }
 
+  // Bulk operations
   @override
-  Future<List<SettingEntity>> getSettingsByCategory(String category) async {
+  Future<Map<String, String>> getSettingsAsMap({
+    String? category,
+    bool? isPublic,
+  }) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/settings/category/$category'));
+      final settings = await getSettings(category: category, isPublic: isPublic);
+      return Map.fromEntries(
+        settings.map((setting) => MapEntry(setting.key, setting.value)),
+      );
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          final settings = (data['data'] as List)
-              .map((settingJson) => SettingModel.fromJson(settingJson).toEntity())
-              .toList();
-          return settings;
-        } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch settings by category');
-        }
-      } else {
-        throw ServerException('Failed to fetch settings by category with status ${response.statusCode}');
+  @override
+  Future<void> updateSettingsBulk(Map<String, String> settings) async {
+    try {
+      final response = await client.put(
+        Uri.parse('$baseUrl/settings/bulk'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'settings': settings}),
+      );
+
+      if (response.statusCode != 200) {
+        throw ServerException('Failed to update settings bulk with status ${response.statusCode}');
       }
     } on http.ClientException {
       throw NetworkException('Network error occurred');
@@ -362,31 +376,44 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
     }
   }
 
+  // Category-specific settings
   @override
-  Future<List<SettingEntity>> getPublicSettings() async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/settings/public'));
+  Future<Map<String, String>> getCoreProfileSettings() async {
+    return getSettingsAsMap(category: 'core_profile');
+  }
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          final settings = (data['data'] as List)
-              .map((settingJson) => SettingModel.fromJson(settingJson).toEntity())
-              .toList();
-          return settings;
-        } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch public settings');
-        }
-      } else {
-        throw ServerException('Failed to fetch public settings with status ${response.statusCode}');
-      }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+  @override
+  Future<Map<String, String>> getSocialMediaSettings() async {
+    return getSettingsAsMap(category: 'social_media');
+  }
+
+  @override
+  Future<Map<String, String>> getContactSettings() async {
+    return getSettingsAsMap(category: 'contact');
+  }
+
+  @override
+  Future<Map<String, String>> getSiteSettings() async {
+    return getSettingsAsMap(category: 'site');
+  }
+
+  @override
+  Future<void> updateCoreProfileSettings(Map<String, String> settings) async {
+    return updateSettingsBulk(settings);
+  }
+
+  @override
+  Future<void> updateSocialMediaSettings(Map<String, String> settings) async {
+    return updateSettingsBulk(settings);
+  }
+
+  @override
+  Future<void> updateContactSettings(Map<String, String> settings) async {
+    return updateSettingsBulk(settings);
+  }
+
+  @override
+  Future<void> updateSiteSettings(Map<String, String> settings) async {
+    return updateSettingsBulk(settings);
   }
 }
