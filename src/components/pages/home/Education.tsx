@@ -180,7 +180,7 @@ export const Education: React.FC = () => {
                           <div className="space-y-3">
                             {degree.fieldOfStudy && (
                               <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
-                                <span className="font-medium mr-2">Field:</span>
+                                <span className="font-medium mr-2">{t("common.field")}:</span>
                                 {degree.fieldOfStudy}
                               </div>
                             )}
@@ -188,14 +188,14 @@ export const Education: React.FC = () => {
                             {degree.completionDate && (
                               <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
                                 <CalendarIcon className="w-4 h-4 mr-2" />
-                                Completed: {formatDate(degree.completionDate)}
+                                {t("common.completed")}: {formatDate(degree.completionDate)}
                               </div>
                             )}
                             
                             {degree.grade && (
                               <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
                                 <AwardIcon className="w-4 h-4 mr-2" />
-                                Grade: {degree.grade}
+                                {t("common.grade")}: {degree.grade}
                               </div>
                             )}
 
@@ -208,7 +208,7 @@ export const Education: React.FC = () => {
                                   className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors flex items-center"
                                 >
                                   <GlobeIcon className="w-4 h-4 mr-1" />
-                                  Verify Credential
+                                  {t("common.verifyCredential")}
                                 </a>
                               </div>
                             )}
@@ -216,7 +216,7 @@ export const Education: React.FC = () => {
                             {degree.skills && degree.skills.length > 0 && (
                               <div className="pt-2">
                                 <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                  Skills Gained:
+                                  {t("common.skillsGained")}:
                                 </p>
                                 <div className="flex flex-wrap gap-1">
                                   {(Array.isArray(degree.skills) ? degree.skills : (degree.skills ? [degree.skills] : [])).map((skill, skillIndex) => (
@@ -292,13 +292,13 @@ export const Education: React.FC = () => {
                             {cert.completionDate && (
                               <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
                                 <CalendarIcon className="w-4 h-4 mr-2" />
-                                Issued: {formatDate(cert.completionDate)}
+                                {t("common.issued")}: {formatDate(cert.completionDate)}
                               </div>
                             )}
                             
                             {cert.validityPeriod && (
                               <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
-                                <span className="font-medium mr-2">Valid:</span>
+                                <span className="font-medium mr-2">{t("common.valid")}:</span>
                                 {cert.validityPeriod}
                               </div>
                             )}
@@ -312,7 +312,7 @@ export const Education: React.FC = () => {
                                   className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors flex items-center"
                                 >
                                   <GlobeIcon className="w-4 h-4 mr-1" />
-                                  Verify Credential
+                                  {t("common.verifyCredential")}
                                 </a>
                               </div>
                             )}
@@ -320,7 +320,7 @@ export const Education: React.FC = () => {
                             {cert.skills && cert.skills.length > 0 && (
                               <div className="pt-2">
                                 <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                  Skills Gained:
+                                  {t("common.skillsGained")}:
                                 </p>
                                 <div className="flex flex-wrap gap-1">
                                   {(Array.isArray(cert.skills) ? cert.skills : (cert.skills ? [cert.skills] : [])).map((skill, skillIndex) => (

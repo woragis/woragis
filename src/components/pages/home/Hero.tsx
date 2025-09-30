@@ -88,7 +88,7 @@ export const Hero: React.FC = () => {
             >
               <div className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 modern-card overflow-hidden hover-lift transition-all duration-500 hover:scale-105">
                 <Image
-                  src="/api/placeholder/400/400"
+                  src="/api/placeholder/400"
                   alt="Professional headshot"
                   width={400}
                   height={400}
