@@ -13,6 +13,7 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   const limit = searchParams.get("limit");
   const category = searchParams.get("category");
   const tags = searchParams.get("tags");
+  const lang = searchParams.get("lang") || "en";
 
   if (featured === "true") {
     // Use default limit of 3 for featured blog posts if not specified
