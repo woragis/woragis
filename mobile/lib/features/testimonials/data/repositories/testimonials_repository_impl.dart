@@ -19,8 +19,10 @@ class TestimonialsRepositoryImpl implements TestimonialsRepository {
   Future<Either<Failure, List<TestimonialEntity>>> getTestimonials({
     int? page,
     int? limit,
+    bool? featured,
     bool? visible,
     bool? public,
+    int? rating,
     String? search,
     String? sortBy,
     String? sortOrder,
@@ -29,8 +31,10 @@ class TestimonialsRepositoryImpl implements TestimonialsRepository {
       final testimonials = await remoteDataSource.getTestimonials(
         page: page,
         limit: limit,
+        featured: featured,
         visible: visible,
         public: public,
+        rating: rating,
         search: search,
         sortBy: sortBy,
         sortOrder: sortOrder,
@@ -80,31 +84,29 @@ class TestimonialsRepositoryImpl implements TestimonialsRepository {
 
   @override
   Future<Either<Failure, TestimonialEntity>> createTestimonial({
-    required String clientName,
-    required String clientPosition,
-    required String clientCompany,
+    required String name,
+    required String position,
+    required String company,
     required String content,
-    String? clientAvatar,
-    int? rating,
-    String? projectName,
-    String? projectUrl,
+    String? avatar,
+    required int rating,
+    required bool featured,
+    required int order,
     required bool visible,
     required bool public,
-    required int order,
   }) async {
     try {
       final testimonial = await remoteDataSource.createTestimonial(
-        clientName: clientName,
-        clientPosition: clientPosition,
-        clientCompany: clientCompany,
+        name: name,
+        position: position,
+        company: company,
         content: content,
-        clientAvatar: clientAvatar,
+        avatar: avatar,
         rating: rating,
-        projectName: projectName,
-        projectUrl: projectUrl,
+        featured: featured,
+        order: order,
         visible: visible,
         public: public,
-        order: order,
       );
 
       // Cache the new testimonial
@@ -123,32 +125,30 @@ class TestimonialsRepositoryImpl implements TestimonialsRepository {
   @override
   Future<Either<Failure, TestimonialEntity>> updateTestimonial({
     required String id,
-    String? clientName,
-    String? clientPosition,
-    String? clientCompany,
+    String? name,
+    String? position,
+    String? company,
     String? content,
-    String? clientAvatar,
+    String? avatar,
     int? rating,
-    String? projectName,
-    String? projectUrl,
+    bool? featured,
+    int? order,
     bool? visible,
     bool? public,
-    int? order,
   }) async {
     try {
       final testimonial = await remoteDataSource.updateTestimonial(
         id: id,
-        clientName: clientName,
-        clientPosition: clientPosition,
-        clientCompany: clientCompany,
+        name: name,
+        position: position,
+        company: company,
         content: content,
-        clientAvatar: clientAvatar,
+        avatar: avatar,
         rating: rating,
-        projectName: projectName,
-        projectUrl: projectUrl,
+        featured: featured,
+        order: order,
         visible: visible,
         public: public,
-        order: order,
       );
 
       // Update cached testimonial
@@ -195,21 +195,30 @@ class TestimonialsRepositoryImpl implements TestimonialsRepository {
     }
   }
 
+  // Statistics methods
   @override
-  Future<Either<Failure, List<TestimonialEntity>>> getFeaturedTestimonials() async {
+  Future<Either<Failure, void>> incrementViewCount(String testimonialId) async {
     try {
-      final testimonials = await remoteDataSource.getFeaturedTestimonials();
-      return Right(testimonials);
+      await remoteDataSource.incrementViewCount(testimonialId);
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      // Try to get from cache
-      try {
-        final cachedTestimonials = await localDataSource.getCachedFeaturedTestimonials();
-        return Right(cachedTestimonials);
-      } catch (cacheError) {
-        return Left(NetworkFailure(e.message));
-      }
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> incrementLikeCount(String testimonialId) async {
+    try {
+      await remoteDataSource.incrementLikeCount(testimonialId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
