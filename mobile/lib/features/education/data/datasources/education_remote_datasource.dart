@@ -92,7 +92,7 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
       if (institution != null) queryParams['institution'] = institution;
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
-      final uri = Uri.parse('$baseUrl/education').replace(queryParameters: queryParams);
+      final uri = Uri.parse('$baseUrl/admin/education').replace(queryParameters: queryParams);
       final response = await client.get(uri);
 
       if (response.statusCode == 200) {
@@ -121,7 +121,7 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
   @override
   Future<EducationEntity> getEducationById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/education/$id'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/education/$id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -169,7 +169,7 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
   }) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/education'),
+        Uri.parse('$baseUrl/admin/education'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -242,7 +242,7 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
   }) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/education/$id'),
+        Uri.parse('$baseUrl/admin/education/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
@@ -295,7 +295,7 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
   @override
   Future<void> deleteEducation(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/education/$id'));
+      final response = await client.delete(Uri.parse('$baseUrl/admin/education/$id'));
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         if (response.statusCode == 404) {
@@ -318,7 +318,7 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
   Future<void> updateEducationOrder(List<Map<String, dynamic>> educationOrders) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/education/order'),
+        Uri.parse('$baseUrl/admin/education/order'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'educationOrders': educationOrders}),
       );
