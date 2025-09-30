@@ -58,7 +58,17 @@ export { FileUpload } from "./forms/FileUpload";
 export { MarkdownEditor } from "./forms/MarkdownEditor";
 export { Input } from "./forms/input";
 export { Label } from "./forms/label";
-export { Select } from "./forms/select";
+export {
+  Select,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator,
+} from "./forms/select";
 export { Textarea } from "./forms/textarea";
 export { Switch } from "./forms/switch";
 export { Badge } from "./forms/badge";
+export { Checkbox } from "./checkbox";
