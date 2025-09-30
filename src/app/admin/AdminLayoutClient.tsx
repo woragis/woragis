@@ -36,6 +36,9 @@ import {
   Heart,
   Upload,
   Sparkles,
+  Lightbulb,
+  Network,
+  MessagesSquare,
 } from "lucide-react";
 
 interface AdminLayoutClientProps {
@@ -76,7 +79,7 @@ export function AdminLayoutClient({
     }
   }, [isAuthenticated, isInitialized, isLoading, router]);
 
-  // Auto-expand navigation items when on tag management pages or about pages
+  // Auto-expand navigation items when on tag management pages, about pages, or money pages
   useEffect(() => {
     if (pathname.includes("/tags")) {
       if (pathname.includes("/blog/tags")) {
@@ -84,6 +87,8 @@ export function AdminLayoutClient({
       }
     } else if (pathname.includes("/about")) {
       setExpandedItems((prev) => new Set([...prev, "About"]));
+    } else if (pathname.includes("/money")) {
+      setExpandedItems((prev) => new Set([...prev, "Money"]));
     }
   }, [pathname]);
 
@@ -132,6 +137,16 @@ export function AdminLayoutClient({
     },
     { name: "Frameworks", href: "/admin/frameworks", icon: Code },
     { name: "Uploads", href: "/admin/uploads", icon: Upload },
+    {
+      name: "Money",
+      href: "/admin/money/ideas",
+      icon: Lightbulb,
+      subItems: [
+        { name: "Ideas", href: "/admin/money/ideas", icon: Lightbulb },
+        { name: "Idea Canvas", href: "/admin/money/canvas", icon: Network },
+        { name: "AI Chats", href: "/admin/money/chats", icon: MessagesSquare },
+      ],
+    },
     {
       name: "About",
       href: "/admin/about",
