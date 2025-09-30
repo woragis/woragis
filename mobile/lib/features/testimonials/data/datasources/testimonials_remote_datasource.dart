@@ -82,7 +82,7 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
       if (sortBy != null) queryParams['sortBy'] = sortBy;
       if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
 
-      final uri = Uri.parse('$baseUrl/testimonials').replace(queryParameters: queryParams);
+      final uri = Uri.parse('$baseUrl/admin/testimonials').replace(queryParameters: queryParams);
       final response = await client.get(uri);
 
       if (response.statusCode == 200) {
@@ -111,7 +111,7 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   @override
   Future<TestimonialEntity> getTestimonialById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/testimonials/$id'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/testimonials/$id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -150,7 +150,7 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   }) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/testimonials'),
+        Uri.parse('$baseUrl/admin/testimonials'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'name': name,
@@ -205,7 +205,7 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   }) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/testimonials/$id'),
+        Uri.parse('$baseUrl/admin/testimonials/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (name != null) 'name': name,
@@ -249,7 +249,7 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   @override
   Future<void> deleteTestimonial(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/testimonials/$id'));
+      final response = await client.delete(Uri.parse('$baseUrl/admin/testimonials/$id'));
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         if (response.statusCode == 404) {
@@ -272,7 +272,7 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   Future<void> updateTestimonialOrder(List<Map<String, dynamic>> testimonialOrders) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/testimonials/order'),
+        Uri.parse('$baseUrl/admin/testimonials/order'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'testimonialOrders': testimonialOrders}),
       );
@@ -294,7 +294,7 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   Future<void> incrementViewCount(String testimonialId) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/testimonials/$testimonialId/view'),
+        Uri.parse('$baseUrl/admin/testimonials/$testimonialId/view'),
       );
 
       if (response.statusCode != 200) {
@@ -314,7 +314,7 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   Future<void> incrementLikeCount(String testimonialId) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/testimonials/$testimonialId/like'),
+        Uri.parse('$baseUrl/admin/testimonials/$testimonialId/like'),
       );
 
       if (response.statusCode != 200) {
