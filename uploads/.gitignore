@@ -1,3 +1,4 @@
+ai-generated/blog/*
 blog/attachments/*
 blog/images/*
 general/*
@@ -10,6 +11,7 @@ users/resumes/*
 testimonials/avatars/*
 
 
+ai-generated/blog/!.gitkeep
 blog/attachments/!.gitkeep
 blog/images/!.gitkeep
 general/!.gitkeep
