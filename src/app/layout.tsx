@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { Navigation, Footer } from "@/components/pages/home";
 import { ClientOnly } from "@/components/ClientOnly";
 import { QueryClientProviderWrapper } from "@/components/QueryClientProvider";
+import { ChatWidget } from "@/components/ui/chat-widget";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,45 +21,86 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Developer Portfolio | Full-Stack Developer",
+  title: "Woragis | Developer Portfolio",
   description:
-    "Passionate full-stack developer crafting innovative solutions with modern technologies. Specializing in React, Node.js, TypeScript, and cloud technologies. 5+ years of experience building scalable web applications.",
+    "Professional full-stack developer crafting innovative solutions with modern technologies. Specializing in React, Node.js, TypeScript, and cloud technologies. 5+ years of experience building scalable web applications.",
   keywords: [
     "full-stack developer",
     "react developer",
     "typescript",
     "node.js",
     "next.js",
+    "nodejs",
+    "nextjs",
+    "svelte",
+    "sveltekit",
+    "tailwindcss",
+    "tailwind",
+    "shadcn",
+    "shadcn/ui",
+    "tailwindcss",
+    "tailwind",
+    "shadcn",
+    "shadcn/ui",
+    "golang",
+    "go",
+    "rust",
+    "python",
+    "javascript",
+    "typescript",
+    "js",
+    "ts",
+    "react",
+    "reactjs",
+    "react.js",
+    "express",
+    "expressjs",
+    "express.js",
+    "mongodb",
+    "postgresql",
+    "redis",
     "web development",
+    "crypto development",
+    "blockchain development",
+    "blockchain",
+    "blockchain developer",
+    "blockchain developer portfolio",
+    "blockchain development portfolio",
+    "web3",
+    "web3 development",
+    "web3 developer",
+    "web3 development portfolio",
+    "web3 developer portfolio",
     "frontend developer",
     "backend developer",
     "software engineer",
+    "software engineer portfolio",
     "portfolio",
   ],
-  authors: [{ name: "Your Name" }],
-  creator: "Your Name",
-  publisher: "Your Name",
+  authors: [{ name: "Woragis" }],
+  creator: "Woragis",
+  publisher: "Woragis",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://yourportfolio.com"),
+  metadataBase: new URL("https://www.woragis.me"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Developer Portfolio | Full-Stack Developer",
+    title: "Woragis | Developer Portfolio",
     description:
-      "Passionate full-stack developer crafting innovative solutions with modern technologies. Specializing in React, Node.js, TypeScript, and cloud technologies.",
-    url: "https://yourportfolio.com",
-    siteName: "Developer Portfolio",
+      "Professional full-stack developer crafting innovative solutions with modern technologies. Specializing in React, Node.js, TypeScript, and cloud technologies.",
+    url: "https://www.woragis.me",
+    siteName: "Woragis",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Developer Portfolio",
+        alt: "Woragis",
       },
     ],
     locale: "en_US",
@@ -66,9 +108,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Developer Portfolio | Full-Stack Developer",
+    title: "Woragis | Developer Portfolio",
     description:
-      "Passionate full-stack developer crafting innovative solutions with modern technologies.",
+      "Professional full-stack developer crafting innovative solutions with modern technologies.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -83,7 +125,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "your-google-verification-code",
+    google: "woragis-google-verification-code",
   },
 };
 
@@ -131,6 +173,9 @@ export default function RootLayout({
               <main className="min-h-screen">{children}</main>
               <ClientOnly>
                 <Footer />
+              </ClientOnly>
+              <ClientOnly>
+                <ChatWidget />
               </ClientOnly>
             </ThemeProvider>
           </LanguageProvider>
