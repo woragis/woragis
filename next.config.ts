@@ -19,6 +19,13 @@ const nextConfig: NextConfig = {
         perf_hooks: false,
       };
     }
+    
+    // Exclude mobile folder from file watching
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/node_modules/**', '**/mobile/**'],
+    };
+    
     return config;
   },
 
