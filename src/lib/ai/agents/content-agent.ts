@@ -65,6 +65,35 @@ export class ContentAgent {
     }
   }
 
+  // Generate about content
+  async generateAboutContent(params: {
+    category: string;
+    currentInfo: string;
+    goals: string;
+    experienceLevel: string;
+  }) {
+    try {
+      const result = await ContentGenerationService.generateAboutContent({
+        category: params.category,
+        currentInfo: params.currentInfo,
+        goals: params.goals,
+        experienceLevel: params.experienceLevel
+      });
+
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'About content generation failed',
+        metadata: {
+          type: 'about_content',
+          generatedAt: new Date().toISOString(),
+          params
+        }
+      };
+    }
+  }
+
   // Enhance existing content
   async enhanceContent(params: {
     content: string;
