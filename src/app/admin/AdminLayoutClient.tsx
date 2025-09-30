@@ -35,6 +35,7 @@ import {
   Languages,
   Heart,
   Upload,
+  Sparkles,
 } from "lucide-react";
 
 interface AdminLayoutClientProps {
@@ -162,6 +163,7 @@ export function AdminLayoutClient({
         { name: "Hobbies", href: "/admin/about/hobbies", icon: Heart },
       ],
     },
+    { name: "AI Assistant", href: "/admin/ai", icon: Sparkles },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
 
