@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { imageAgent } from '@/lib/ai/agents/image-agent';
 import { validateOpenAIConfig } from '@/lib/ai/config/openai-config';
+import { uploadService } from '@/server/services';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { type, params } = body;
+    const { type, params, saveToUploads = true } = body;
 
     // Validate required fields
     if (!type || !params) {
@@ -62,10 +63,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let finalImageUrl = (result as any).imageUrl;
+    let uploadedFile = null;
+
+    // Download and save the image to uploads if requested
+    if (saveToUploads && finalImageUrl) {
+      try {
+        const uploadResult = await uploadService.uploadFromUrl(
+          finalImageUrl,
+          undefined, // Let it generate filename
+          {
+            path: `ai-generated/${type}`,
+            metadata: {
+              type: 'ai-generated-image',
+              imageType: type,
+              generatedAt: new Date().toISOString(),
+              ...params
+            }
+          }
+        );
+
+        if (uploadResult.success && uploadResult.data) {
+          uploadedFile = uploadResult.data;
+          finalImageUrl = uploadedFile.url;
+        }
+      } catch (error) {
+        console.error('Failed to save AI image to uploads:', error);
+        // Continue with original URL if upload fails
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      imageUrl: (result as any).imageUrl,
-      metadata: result.metadata
+      imageUrl: finalImageUrl,
+      metadata: result.metadata,
+      ...(uploadedFile && {
+        uploadedFile: {
+          filename: uploadedFile.filename,
+          size: uploadedFile.size,
+          path: uploadedFile.path,
+          url: uploadedFile.url
+        }
+      })
     });
 
   } catch (error) {

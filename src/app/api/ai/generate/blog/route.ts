@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { contentAgent } from '@/lib/ai/agents/content-agent';
 import { validateOpenAIConfig } from '@/lib/ai/config/openai-config';
+import { blogService } from '@/server/services';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { topic, audience, tone, length } = body;
+    const { topic, audience, tone, length, userId, autoSave = false } = body;
 
     // Validate required fields
     if (!topic) {
@@ -38,11 +39,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    const response: any = {
       success: true,
       content: (result as any).content,
       metadata: result.metadata
-    });
+    };
+
+    // If autoSave is enabled and userId is provided, create a draft blog post
+    if (autoSave && userId && (result as any).content) {
+      try {
+        const blogData = {
+          title: topic,
+          slug: topic.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'),
+          excerpt: (result as any).content.substring(0, 200) + '...',
+          content: (result as any).content,
+          featured: false,
+          published: false,
+          visible: true,
+          public: false,
+          userId,
+          readingTime: Math.ceil((result as any).content.split(' ').length / 200)
+        };
+
+        const blogResult = await blogService.createBlogPost(blogData, userId);
+        if (blogResult.success) {
+          response.blogPost = blogResult.data;
+          response.autoSaved = true;
+        }
+      } catch (error) {
+        console.error('Auto-save error:', error);
+        // Don't fail the request if auto-save fails
+      }
+    }
+
+    return NextResponse.json(response);
 
   } catch (error) {
     console.error('Blog generation error:', error);
