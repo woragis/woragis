@@ -17,12 +17,14 @@ export { contentAgent } from './agents/content-agent';
 export { imageAgent } from './agents/image-agent';
 export { chatAgent } from './agents/chat-agent';
 export { adminAgent } from './agents/admin-agent';
+export { moneyChatAgent } from './agents/money-chat-agent';
 
 // Import agents for internal use
 import { contentAgent } from './agents/content-agent';
 import { imageAgent } from './agents/image-agent';
 import { chatAgent } from './agents/chat-agent';
 import { adminAgent } from './agents/admin-agent';
+import { moneyChatAgent } from './agents/money-chat-agent';
 
 // Chains
 export { 
