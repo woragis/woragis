@@ -13,6 +13,7 @@
   "nav": {
     "about": "About",
     "skills": "Skills",
+    "education": "Education",
     "experience": "Experience",
     "projects": "Projects",
     "contact": "Contact"
@@ -52,6 +53,18 @@
       "frontend": "Frontend",
       "backend": "Backend",
       "tools": "Tools & Others"
+    }
+  },
+  "education": {
+    "title": "Education & Certifications",
+    "subtitle": "My academic background and professional certifications",
+    "sections": {
+      "degrees": "Degrees",
+      "certificates": "Certifications"
+    },
+    "empty": {
+      "title": "No Education Records",
+      "description": "Education records will appear here once added."
     }
   },
   "projects": {
@@ -100,6 +113,11 @@
         "description": "Get in touch via email",
         "value": "hello@example.com"
       },
+      "phone": {
+        "title": "Phone",
+        "description": "Call me directly",
+        "value": "+1 (555) 123-4567"
+      },
       "linkedin": {
         "title": "LinkedIn",
         "description": "Connect with me professionally",
@@ -114,6 +132,11 @@
         "title": "Twitter",
         "description": "Follow me for updates",
         "value": "@yourusername"
+      },
+      "website": {
+        "title": "Website",
+        "description": "Visit my website",
+        "value": "yourwebsite.com"
       }
     }
   },
@@ -328,6 +351,150 @@
       "apiBoilerplate": {
         "description": "Production-ready Node.js API boilerplate with authentication"
       }
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "update": "Update",
+    "search": "Search",
+    "add": "Add",
+    "remove": "Remove",
+    "submit": "Submit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "field": "Field",
+    "skillsGained": "Skills Gained",
+    "completed": "Completed",
+    "issued": "Issued",
+    "grade": "Grade",
+    "valid": "Valid",
+    "verifyCredential": "Verify Credential",
+    "viewPdf": "View PDF",
+    "visible": "Visible",
+    "hidden": "Hidden",
+    "all": "All",
+    "none": "None",
+    "select": "Select",
+    "upload": "Upload",
+    "download": "Download",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "education": {
+      "title": "Education & Certifications",
+      "subtitle": "Manage your educational background and certifications",
+      "searchPlaceholder": "Search education records...",
+      "allTypes": "All Types",
+      "allDegreeLevels": "All Degree Levels",
+      "allVisibility": "All Visibility",
+      "noEducationFound": "No Education Found",
+      "noEducationDescription": "No education records match your current filters. Try adjusting your search criteria or add a new education record.",
+      "addEducation": "Add Education",
+      "editEducation": "Edit Education",
+      "deleteEducation": "Delete Education",
+      "deleteConfirmation": "Are you sure you want to delete this education record? This action cannot be undone.",
+      "form": {
+        "title": "Title",
+        "titlePlaceholder": "e.g., Bachelor of Computer Science, AWS Certified Solutions Architect",
+        "institution": "Institution",
+        "institutionPlaceholder": "e.g., University of Technology, Amazon Web Services",
+        "type": "Type",
+        "degreeLevel": "Degree Level",
+        "fieldOfStudy": "Field of Study",
+        "fieldOfStudyPlaceholder": "e.g., Computer Science, Business Administration",
+        "certificateId": "Certificate ID",
+        "certificateIdPlaceholder": "Certificate number or ID",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "completionDate": "Completion Date",
+        "grade": "Grade",
+        "gradePlaceholder": "e.g., 3.8 GPA, 85%, A+",
+        "credits": "Credits",
+        "issuer": "Issuer",
+        "issuerPlaceholder": "e.g., Amazon Web Services, Google",
+        "validityPeriod": "Validity Period",
+        "validityPeriodPlaceholder": "e.g., 3 years, Lifetime, Until 2025",
+        "pdfDocument": "PDF Document",
+        "verificationUrl": "Verification URL",
+        "verificationUrlPlaceholder": "https://verify.example.com/certificate/123",
+        "skillsGained": "Skills Gained",
+        "addSkill": "Add a skill",
+        "description": "Description",
+        "descriptionPlaceholder": "Additional details about this education record...",
+        "displayOrder": "Display Order",
+        "visible": "Visible",
+        "uploadSuccess": "✓ PDF uploaded: {filename}",
+        "uploadError": "Failed to upload PDF. Please try again.",
+        "invalidFileType": "Please select a PDF file."
+      },
+      "types": {
+        "degree": "Degree",
+        "certificate": "Certificate"
+      },
+      "degreeLevels": {
+        "bachelor": "Bachelor",
+        "master": "Master",
+        "doctorate": "Doctorate",
+        "associate": "Associate",
+        "diploma": "Diploma"
+      },
+      "visibility": {
+        "visible": "Visible",
+        "hidden": "Hidden"
+      }
+    },
+    "modals": {
+      "create": "Create New {item}",
+      "edit": "Edit {item}",
+      "delete": "Delete {item}",
+      "saving": "Saving...",
+      "loading": "Loading...",
+      "confirmDelete": "Are you sure you want to delete this {item}? This action cannot be undone."
+    },
+    "buttons": {
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "search": "Search",
+      "filter": "Filter",
+      "export": "Export",
+      "import": "Import",
+      "refresh": "Refresh",
+      "view": "View",
+      "hide": "Hide",
+      "show": "Show"
+    },
+    "filters": {
+      "search": "Search",
+      "filter": "Filter",
+      "clear": "Clear Filters",
+      "sortBy": "Sort by",
+      "order": "Order"
+    },
+    "table": {
+      "noData": "No data available",
+      "loading": "Loading...",
+      "error": "Error loading data",
+      "actions": "Actions",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All"
     }
   }
 }
