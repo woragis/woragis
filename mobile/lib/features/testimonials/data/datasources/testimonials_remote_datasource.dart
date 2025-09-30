@@ -8,8 +8,10 @@ abstract class TestimonialsRemoteDataSource {
   Future<List<TestimonialEntity>> getTestimonials({
     int? page,
     int? limit,
+    bool? featured,
     bool? visible,
     bool? public,
+    int? rating,
     String? search,
     String? sortBy,
     String? sortOrder,
@@ -17,35 +19,34 @@ abstract class TestimonialsRemoteDataSource {
 
   Future<TestimonialEntity> getTestimonialById(String id);
   Future<TestimonialEntity> createTestimonial({
-    required String clientName,
-    required String clientPosition,
-    required String clientCompany,
+    required String name,
+    required String position,
+    required String company,
     required String content,
-    String? clientAvatar,
-    int? rating,
-    String? projectName,
-    String? projectUrl,
+    String? avatar,
+    required int rating,
+    required bool featured,
+    required int order,
     required bool visible,
     required bool public,
-    required int order,
   });
   Future<TestimonialEntity> updateTestimonial({
     required String id,
-    String? clientName,
-    String? clientPosition,
-    String? clientCompany,
+    String? name,
+    String? position,
+    String? company,
     String? content,
-    String? clientAvatar,
+    String? avatar,
     int? rating,
-    String? projectName,
-    String? projectUrl,
+    bool? featured,
+    int? order,
     bool? visible,
     bool? public,
-    int? order,
   });
   Future<void> deleteTestimonial(String id);
   Future<void> updateTestimonialOrder(List<Map<String, dynamic>> testimonialOrders);
-  Future<List<TestimonialEntity>> getFeaturedTestimonials();
+  Future<void> incrementViewCount(String testimonialId);
+  Future<void> incrementLikeCount(String testimonialId);
 }
 
 class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
@@ -61,8 +62,10 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   Future<List<TestimonialEntity>> getTestimonials({
     int? page,
     int? limit,
+    bool? featured,
     bool? visible,
     bool? public,
+    int? rating,
     String? search,
     String? sortBy,
     String? sortOrder,
@@ -71,8 +74,10 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
       final queryParams = <String, String>{};
       if (page != null) queryParams['page'] = page.toString();
       if (limit != null) queryParams['limit'] = limit.toString();
+      if (featured != null) queryParams['featured'] = featured.toString();
       if (visible != null) queryParams['visible'] = visible.toString();
       if (public != null) queryParams['public'] = public.toString();
+      if (rating != null) queryParams['rating'] = rating.toString();
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
       if (sortBy != null) queryParams['sortBy'] = sortBy;
       if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
@@ -132,34 +137,32 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
 
   @override
   Future<TestimonialEntity> createTestimonial({
-    required String clientName,
-    required String clientPosition,
-    required String clientCompany,
+    required String name,
+    required String position,
+    required String company,
     required String content,
-    String? clientAvatar,
-    int? rating,
-    String? projectName,
-    String? projectUrl,
+    String? avatar,
+    required int rating,
+    required bool featured,
+    required int order,
     required bool visible,
     required bool public,
-    required int order,
   }) async {
     try {
       final response = await client.post(
         Uri.parse('$baseUrl/testimonials'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'clientName': clientName,
-          'clientPosition': clientPosition,
-          'clientCompany': clientCompany,
+          'name': name,
+          'position': position,
+          'company': company,
           'content': content,
-          if (clientAvatar != null) 'clientAvatar': clientAvatar,
-          if (rating != null) 'rating': rating,
-          if (projectName != null) 'projectName': projectName,
-          if (projectUrl != null) 'projectUrl': projectUrl,
+          if (avatar != null) 'avatar': avatar,
+          'rating': rating,
+          'featured': featured,
+          'order': order,
           'visible': visible,
           'public': public,
-          'order': order,
         }),
       );
 
@@ -189,34 +192,32 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   @override
   Future<TestimonialEntity> updateTestimonial({
     required String id,
-    String? clientName,
-    String? clientPosition,
-    String? clientCompany,
+    String? name,
+    String? position,
+    String? company,
     String? content,
-    String? clientAvatar,
+    String? avatar,
     int? rating,
-    String? projectName,
-    String? projectUrl,
+    bool? featured,
+    int? order,
     bool? visible,
     bool? public,
-    int? order,
   }) async {
     try {
       final response = await client.put(
         Uri.parse('$baseUrl/testimonials/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          if (clientName != null) 'clientName': clientName,
-          if (clientPosition != null) 'clientPosition': clientPosition,
-          if (clientCompany != null) 'clientCompany': clientCompany,
+          if (name != null) 'name': name,
+          if (position != null) 'position': position,
+          if (company != null) 'company': company,
           if (content != null) 'content': content,
-          if (clientAvatar != null) 'clientAvatar': clientAvatar,
+          if (avatar != null) 'avatar': avatar,
           if (rating != null) 'rating': rating,
-          if (projectName != null) 'projectName': projectName,
-          if (projectUrl != null) 'projectUrl': projectUrl,
+          if (featured != null) 'featured': featured,
+          if (order != null) 'order': order,
           if (visible != null) 'visible': visible,
           if (public != null) 'public': public,
-          if (order != null) 'order': order,
         }),
       );
 
@@ -290,22 +291,34 @@ class TestimonialsRemoteDataSourceImpl implements TestimonialsRemoteDataSource {
   }
 
   @override
-  Future<List<TestimonialEntity>> getFeaturedTestimonials() async {
+  Future<void> incrementViewCount(String testimonialId) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/testimonials/featured'));
+      final response = await client.post(
+        Uri.parse('$baseUrl/testimonials/$testimonialId/view'),
+      );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          final testimonials = (data['data'] as List)
-              .map((testimonialJson) => TestimonialModel.fromJson(testimonialJson).toEntity())
-              .toList();
-          return testimonials;
-        } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch featured testimonials');
-        }
-      } else {
-        throw ServerException('Failed to fetch featured testimonials with status ${response.statusCode}');
+      if (response.statusCode != 200) {
+        throw ServerException('Failed to increment view count with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<void> incrementLikeCount(String testimonialId) async {
+    try {
+      final response = await client.post(
+        Uri.parse('$baseUrl/testimonials/$testimonialId/like'),
+      );
+
+      if (response.statusCode != 200) {
+        throw ServerException('Failed to increment like count with status ${response.statusCode}');
       }
     } on http.ClientException {
       throw NetworkException('Network error occurred');
