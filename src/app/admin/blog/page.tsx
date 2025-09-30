@@ -37,6 +37,7 @@ import {
   Clock,
   Tag,
   X,
+  Sparkles,
 } from "lucide-react";
 import type { BlogPost, BlogPostFilters, BlogPostFormData } from "@/types";
 import type { BlogTag } from "@/types/blog-tags";
@@ -200,6 +201,14 @@ export default function BlogPage() {
             >
               <Tag className="w-4 h-4" />
               Manage Tags
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => window.open("/admin/ai", "_blank")}
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              AI Assistant
             </Button>
           </div>
         </div>

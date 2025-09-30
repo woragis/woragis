@@ -21,6 +21,7 @@ import { EducationForm } from "@/components/pages/admin/education/EducationForm"
 import { DeleteConfirmationModal } from "@/components/pages/admin/DeleteConfirmationModal";
 import { CreateEditModal } from "@/components/common";
 import { useAuth } from "@/stores/auth-store";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Plus,
   Search,
@@ -54,6 +55,7 @@ export default function EducationAdminPage() {
 
   const { user } = useAuth();
   const { displayMode } = useDisplay();
+  const { t } = useLanguage();
   const { data: educationData = [], isLoading, error } = useEducation(filters);
   const createEducation = useCreateEducation();
   const updateEducation = useUpdateEducation();
@@ -135,10 +137,10 @@ export default function EducationAdminPage() {
         <Container>
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Education & Certifications
+              {t("admin.education.title")}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              Manage your educational background and certifications
+              {t("admin.education.subtitle")}
             </p>
           </div>
 
@@ -183,10 +185,10 @@ export default function EducationAdminPage() {
       <Container>
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Education & Certifications
+            {t("admin.education.title")}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
-            Manage your educational background and certifications
+            {t("admin.education.subtitle")}
           </p>
         </div>
 
@@ -196,7 +198,7 @@ export default function EducationAdminPage() {
             <div className="flex-1 min-w-64">
               <input
                 type="text"
-                placeholder="Search education records..."
+                placeholder={t("admin.education.searchPlaceholder")}
                 value={filters.search || ""}
                 onChange={(e) =>
                   setFilters({ ...filters, search: e.target.value })
@@ -214,9 +216,9 @@ export default function EducationAdminPage() {
               }
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
             >
-              <option value="">All Types</option>
-              <option value="degree">Degrees</option>
-              <option value="certificate">Certificates</option>
+              <option value="">{t("admin.education.allTypes")}</option>
+              <option value="degree">{t("admin.education.types.degree")}</option>
+              <option value="certificate">{t("admin.education.types.certificate")}</option>
             </select>
             <select
               value={filters.degreeLevel || ""}
@@ -228,12 +230,12 @@ export default function EducationAdminPage() {
               }
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
             >
-              <option value="">All Degree Levels</option>
-              <option value="bachelor">Bachelor</option>
-              <option value="master">Master</option>
-              <option value="doctorate">Doctorate</option>
-              <option value="associate">Associate</option>
-              <option value="diploma">Diploma</option>
+              <option value="">{t("admin.education.allDegreeLevels")}</option>
+              <option value="bachelor">{t("admin.education.degreeLevels.bachelor")}</option>
+              <option value="master">{t("admin.education.degreeLevels.master")}</option>
+              <option value="doctorate">{t("admin.education.degreeLevels.doctorate")}</option>
+              <option value="associate">{t("admin.education.degreeLevels.associate")}</option>
+              <option value="diploma">{t("admin.education.degreeLevels.diploma")}</option>
             </select>
             <select
               value={filters.visible?.toString() || ""}
@@ -247,18 +249,18 @@ export default function EducationAdminPage() {
               }
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
             >
-              <option value="">All Visibility</option>
-              <option value="true">Visible</option>
-              <option value="false">Hidden</option>
+              <option value="">{t("admin.education.allVisibility")}</option>
+              <option value="true">{t("admin.education.visibility.visible")}</option>
+              <option value="false">{t("admin.education.visibility.hidden")}</option>
             </select>
             <Button type="submit" variant="outline">
               <Search className="w-4 h-4 mr-2" />
-              Search
+              {t("common.search")}
             </Button>
             <DisplayToggle />
             <Button onClick={() => setIsCreateModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Add Education
+              {t("admin.education.addEducation")}
             </Button>
           </form>
         </Card>
@@ -266,9 +268,9 @@ export default function EducationAdminPage() {
         {/* Education Display */}
         {educationData.length === 0 ? (
           <EmptyState
-            title="No Education Found"
-            description="No education records match your current filters. Try adjusting your search criteria or add a new education record."
-            actionLabel="Add Education"
+            title={t("admin.education.noEducationFound")}
+            description={t("admin.education.noEducationDescription")}
+            actionLabel={t("admin.education.addEducation")}
             onAction={() => setIsCreateModalOpen(true)}
           />
         ) : displayMode === "grid" ? (
