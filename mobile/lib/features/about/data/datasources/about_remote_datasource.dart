@@ -116,7 +116,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   @override
   Future<AboutCoreEntity> getAboutCore() async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/about/core'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/about/core'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -148,7 +148,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   }) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/about/core'),
+        Uri.parse('$baseUrl/admin/about/core'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (name != null) 'name': name,
@@ -186,7 +186,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   @override
   Future<BiographyEntity> getBiography() async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/about/biography'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/about/biography'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -216,7 +216,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   }) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/about/biography'),
+        Uri.parse('$baseUrl/admin/about/biography'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (featuredBiography != null) 'featuredBiography': featuredBiography,
@@ -265,7 +265,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
       if (status != null) queryParams['status'] = status;
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
-      final uri = Uri.parse('$baseUrl/about/anime').replace(queryParameters: queryParams);
+      final uri = Uri.parse('$baseUrl/admin/about/anime').replace(queryParameters: queryParams);
       final response = await client.get(uri);
 
       if (response.statusCode == 200) {
@@ -294,7 +294,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   @override
   Future<AnimeEntity> getAnimeById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/about/anime/$id'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/about/anime/$id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -337,7 +337,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   }) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/about/anime'),
+        Uri.parse('$baseUrl/admin/about/anime'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -400,7 +400,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   }) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/about/anime/$id'),
+        Uri.parse('$baseUrl/admin/about/anime/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
@@ -448,7 +448,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   @override
   Future<void> deleteAnime(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/about/anime/$id'));
+      final response = await client.delete(Uri.parse('$baseUrl/admin/about/anime/$id'));
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         if (response.statusCode == 404) {
@@ -482,7 +482,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
       if (visible != null) queryParams['visible'] = visible.toString();
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
-      final uri = Uri.parse('$baseUrl/about/music-genres').replace(queryParameters: queryParams);
+      final uri = Uri.parse('$baseUrl/admin/about/music/genres').replace(queryParameters: queryParams);
       final response = await client.get(uri);
 
       if (response.statusCode == 200) {
@@ -511,7 +511,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   @override
   Future<MusicGenreEntity> getMusicGenreById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/about/music-genres/$id'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/about/music/genres/$id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -544,7 +544,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   }) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/about/music-genres'),
+        Uri.parse('$baseUrl/admin/about/music/genres'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'name': name,
@@ -587,7 +587,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   }) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/about/music-genres/$id'),
+        Uri.parse('$baseUrl/admin/about/music/genres/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (name != null) 'name': name,
@@ -625,7 +625,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   @override
   Future<void> deleteMusicGenre(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/about/music-genres/$id'));
+      final response = await client.delete(Uri.parse('$baseUrl/admin/about/music/genres/$id'));
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         if (response.statusCode == 404) {
