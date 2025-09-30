@@ -68,7 +68,7 @@ class ExperienceRemoteDataSourceImpl implements ExperienceRemoteDataSource {
       if (company != null) queryParams['company'] = company;
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
-      final uri = Uri.parse('$baseUrl/experience').replace(queryParameters: queryParams);
+      final uri = Uri.parse('$baseUrl/admin/experience').replace(queryParameters: queryParams);
       final response = await client.get(uri);
 
       if (response.statusCode == 200) {
@@ -97,7 +97,7 @@ class ExperienceRemoteDataSourceImpl implements ExperienceRemoteDataSource {
   @override
   Future<ExperienceEntity> getExperienceById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/experience/$id'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/experience/$id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -136,7 +136,7 @@ class ExperienceRemoteDataSourceImpl implements ExperienceRemoteDataSource {
   }) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/experience'),
+        Uri.parse('$baseUrl/admin/experience'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -191,7 +191,7 @@ class ExperienceRemoteDataSourceImpl implements ExperienceRemoteDataSource {
   }) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/experience/$id'),
+        Uri.parse('$baseUrl/admin/experience/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
@@ -235,7 +235,7 @@ class ExperienceRemoteDataSourceImpl implements ExperienceRemoteDataSource {
   @override
   Future<void> deleteExperience(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/experience/$id'));
+      final response = await client.delete(Uri.parse('$baseUrl/admin/experience/$id'));
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         if (response.statusCode == 404) {
@@ -258,7 +258,7 @@ class ExperienceRemoteDataSourceImpl implements ExperienceRemoteDataSource {
   Future<void> updateExperienceOrder(List<Map<String, dynamic>> experienceOrders) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/experience/order'),
+        Uri.parse('$baseUrl/admin/experience/order'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'experienceOrders': experienceOrders}),
       );
