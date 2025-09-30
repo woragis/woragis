@@ -35,3 +35,6 @@ export const Card: React.FC<CardProps> = ({
     </div>
   );
 };
+
+// Re-export Card sub-components
+export { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./CardComponents";

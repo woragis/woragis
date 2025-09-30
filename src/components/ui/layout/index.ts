@@ -1,5 +1,5 @@
 export { Button } from "./Button";
-export { Card } from "./Card";
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./Card";
 export { Container } from "./Container";
 export { Section } from "./Section";
 

@@ -26,7 +26,7 @@ export * from "./AbstractIcons";
 // Backward compatibility - direct exports for old import paths
 // Layout components
 export { Button } from "./layout/Button";
-export { Card } from "./layout/Card";
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./layout/Card";
 export { Container } from "./layout/Container";
 export { Section } from "./layout/Section";
 
