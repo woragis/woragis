@@ -1,0 +1,113 @@
+import 'package:sqflite/sqflite.dart';
+import '../../../../core/database/database_helper.dart';
+import '../../../../core/database/sync_manager.dart';
+import '../../domain/entities/experience_entity.dart';
+import '../models/experience_model.dart';
+
+abstract class ExperienceLocalDataSource {
+  Future<List<ExperienceEntity>> getCachedExperienceList();
+  Future<ExperienceEntity?> getCachedExperience(String id);
+  Future<void> cacheExperience(ExperienceEntity experience);
+  Future<void> cacheExperienceList(List<ExperienceEntity> experienceList);
+  Future<void> updateCachedExperience(ExperienceEntity experience);
+  Future<void> removeCachedExperience(String id);
+}
+
+class ExperienceLocalDataSourceImpl implements ExperienceLocalDataSource {
+  final DatabaseHelper _dbHelper = DatabaseHelper();
+  final SyncManager _syncManager = SyncManager();
+
+  @override
+  Future<List<ExperienceEntity>> getCachedExperienceList() async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'experience',
+      orderBy: 'order_index ASC, company ASC',
+    );
+    return result.map((experienceMap) => ExperienceModel.fromJson(experienceMap)).toList();
+  }
+
+  @override
+  Future<ExperienceEntity?> getCachedExperience(String id) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'experience',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return result.isEmpty ? null : ExperienceModel.fromJson(result.first);
+  }
+
+  @override
+  Future<void> cacheExperience(ExperienceEntity experience) async {
+    final db = await _dbHelper.database;
+    final experienceMap = ExperienceModel.fromEntity(experience).toJson();
+    experienceMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
+    experienceMap['is_dirty'] = 0;
+
+    await db.insert(
+      'experience',
+      experienceMap,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  @override
+  Future<void> cacheExperienceList(List<ExperienceEntity> experienceList) async {
+    final db = await _dbHelper.database;
+    final batch = db.batch();
+
+    for (final experience in experienceList) {
+      final experienceMap = ExperienceModel.fromEntity(experience).toJson();
+      experienceMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
+      experienceMap['is_dirty'] = 0;
+
+      batch.insert(
+        'experience',
+        experienceMap,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    await batch.commit();
+  }
+
+  @override
+  Future<void> updateCachedExperience(ExperienceEntity experience) async {
+    final db = await _dbHelper.database;
+    final experienceMap = ExperienceModel.fromEntity(experience).toJson();
+    experienceMap['updated_at'] = DateTime.now().millisecondsSinceEpoch;
+    experienceMap['is_dirty'] = 1;
+
+    await db.update(
+      'experience',
+      experienceMap,
+      where: 'id = ?',
+      whereArgs: [experience.id],
+    );
+
+    await _syncManager.addToSyncQueue(
+      tableName: 'experience',
+      recordId: experience.id,
+      operation: SyncOperation.update,
+      data: experienceMap,
+    );
+  }
+
+  @override
+  Future<void> removeCachedExperience(String id) async {
+    final db = await _dbHelper.database;
+    
+    await _syncManager.addToSyncQueue(
+      tableName: 'experience',
+      recordId: id,
+      operation: SyncOperation.delete,
+    );
+
+    await db.delete(
+      'experience',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+}
