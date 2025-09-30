@@ -20,7 +20,9 @@ class MoneyRepositoryImpl implements MoneyRepository {
   Future<Either<Failure, List<IdeaEntity>>> getIdeas({
     int? page,
     int? limit,
+    bool? featured,
     bool? visible,
+    bool? public,
     String? search,
     String? sortBy,
     String? sortOrder,
@@ -29,7 +31,9 @@ class MoneyRepositoryImpl implements MoneyRepository {
       final ideas = await remoteDataSource.getIdeas(
         page: page,
         limit: limit,
+        featured: featured,
         visible: visible,
+        public: public,
         search: search,
         sortBy: sortBy,
         sortOrder: sortOrder,
@@ -78,39 +82,39 @@ class MoneyRepositoryImpl implements MoneyRepository {
   }
 
   @override
+  Future<Either<Failure, IdeaEntity>> getIdeaBySlug(String slug) async {
+    try {
+      final idea = await remoteDataSource.getIdeaBySlug(slug);
+      return Right(idea);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, IdeaEntity>> createIdea({
     required String title,
-    required String description,
-    String? category,
-    String? targetAudience,
-    String? businessModel,
-    String? marketSize,
-    String? competition,
-    String? revenueProjection,
-    String? timeline,
-    String? resources,
-    String? risks,
-    String? opportunities,
-    String? nextSteps,
+    required String slug,
+    required String document,
+    String? description,
+    required bool featured,
     required bool visible,
+    required bool public,
     required int order,
   }) async {
     try {
       final idea = await remoteDataSource.createIdea(
         title: title,
+        slug: slug,
+        document: document,
         description: description,
-        category: category,
-        targetAudience: targetAudience,
-        businessModel: businessModel,
-        marketSize: marketSize,
-        competition: competition,
-        revenueProjection: revenueProjection,
-        timeline: timeline,
-        resources: resources,
-        risks: risks,
-        opportunities: opportunities,
-        nextSteps: nextSteps,
+        featured: featured,
         visible: visible,
+        public: public,
         order: order,
       );
 
@@ -131,38 +135,24 @@ class MoneyRepositoryImpl implements MoneyRepository {
   Future<Either<Failure, IdeaEntity>> updateIdea({
     required String id,
     String? title,
+    String? slug,
+    String? document,
     String? description,
-    String? category,
-    String? targetAudience,
-    String? businessModel,
-    String? marketSize,
-    String? competition,
-    String? revenueProjection,
-    String? timeline,
-    String? resources,
-    String? risks,
-    String? opportunities,
-    String? nextSteps,
+    bool? featured,
     bool? visible,
+    bool? public,
     int? order,
   }) async {
     try {
       final idea = await remoteDataSource.updateIdea(
         id: id,
         title: title,
+        slug: slug,
+        document: document,
         description: description,
-        category: category,
-        targetAudience: targetAudience,
-        businessModel: businessModel,
-        marketSize: marketSize,
-        competition: competition,
-        revenueProjection: revenueProjection,
-        timeline: timeline,
-        resources: resources,
-        risks: risks,
-        opportunities: opportunities,
-        nextSteps: nextSteps,
+        featured: featured,
         visible: visible,
+        public: public,
         order: order,
       );
 
@@ -198,6 +188,10 @@ class MoneyRepositoryImpl implements MoneyRepository {
   Future<Either<Failure, List<AiChatEntity>>> getAiChats({
     int? page,
     int? limit,
+    String? ideaNodeId,
+    String? agent,
+    bool? archived,
+    bool? visible,
     String? search,
     String? sortBy,
     String? sortOrder,
@@ -206,6 +200,10 @@ class MoneyRepositoryImpl implements MoneyRepository {
       final chats = await remoteDataSource.getAiChats(
         page: page,
         limit: limit,
+        ideaNodeId: ideaNodeId,
+        agent: agent,
+        archived: archived,
+        visible: visible,
         search: search,
         sortBy: sortBy,
         sortOrder: sortOrder,
@@ -256,14 +254,26 @@ class MoneyRepositoryImpl implements MoneyRepository {
   @override
   Future<Either<Failure, AiChatEntity>> createAiChat({
     required String title,
-    String? description,
-    required String initialMessage,
+    String? ideaNodeId,
+    required String agent,
+    String? model,
+    String? systemPrompt,
+    required double temperature,
+    int? maxTokens,
+    required bool visible,
+    required bool archived,
   }) async {
     try {
       final chat = await remoteDataSource.createAiChat(
         title: title,
-        description: description,
-        initialMessage: initialMessage,
+        ideaNodeId: ideaNodeId,
+        agent: agent,
+        model: model,
+        systemPrompt: systemPrompt,
+        temperature: temperature,
+        maxTokens: maxTokens,
+        visible: visible,
+        archived: archived,
       );
 
       // Cache the new chat
@@ -283,13 +293,27 @@ class MoneyRepositoryImpl implements MoneyRepository {
   Future<Either<Failure, AiChatEntity>> updateAiChat({
     required String id,
     String? title,
-    String? description,
+    String? ideaNodeId,
+    String? agent,
+    String? model,
+    String? systemPrompt,
+    double? temperature,
+    int? maxTokens,
+    bool? visible,
+    bool? archived,
   }) async {
     try {
       final chat = await remoteDataSource.updateAiChat(
         id: id,
         title: title,
-        description: description,
+        ideaNodeId: ideaNodeId,
+        agent: agent,
+        model: model,
+        systemPrompt: systemPrompt,
+        temperature: temperature,
+        maxTokens: maxTokens,
+        visible: visible,
+        archived: archived,
       );
 
       // Update cached chat
@@ -330,10 +354,6 @@ class MoneyRepositoryImpl implements MoneyRepository {
         chatId: chatId,
         message: message,
       );
-
-      // Update cached chat
-      await localDataSource.updateCachedAiChat(chat);
-
       return Right(chat);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -343,6 +363,21 @@ class MoneyRepositoryImpl implements MoneyRepository {
       return Left(UnexpectedFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, List<ChatMessageEntity>>> getChatMessages(String chatId) async {
+    try {
+      final messages = await remoteDataSource.getChatMessages(chatId);
+      return Right(messages);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
 
   @override
   Future<Either<Failure, List<IdeaEntity>>> getCachedIdeas() async {
