@@ -37,10 +37,13 @@ export const env = {
   // Upload Configuration
   UPLOAD_DIR: process.env.UPLOAD_DIR || "uploads",
   UPLOAD_PUBLIC_URL: process.env.UPLOAD_PUBLIC_URL || "http://localhost:3000/uploads",
+
+  // AI Configuration
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
 } as const;
 
 // Validate required environment variables
-const requiredEnvVars = ["DATABASE_URL", "REDIS_URL"] as const;
+const requiredEnvVars = ["DATABASE_URL", "REDIS_URL", "OPENAI_API_KEY"] as const;
 
 for (const envVar of requiredEnvVars) {
   if (!env[envVar]) {
