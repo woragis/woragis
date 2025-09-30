@@ -102,7 +102,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
       if (sortBy != null) queryParams['sortBy'] = sortBy;
       if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
 
-      final uri = Uri.parse('$baseUrl/projects').replace(queryParameters: queryParams);
+      final uri = Uri.parse('$baseUrl/admin/projects').replace(queryParameters: queryParams);
       final response = await client.get(uri);
 
       if (response.statusCode == 200) {
@@ -131,7 +131,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   @override
   Future<ProjectEntity> getProjectById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/projects/$id'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/projects/$id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -158,7 +158,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   @override
   Future<ProjectEntity> getProjectBySlug(String slug) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/projects/slug/$slug'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/projects/slug/$slug'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -201,7 +201,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   }) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/projects'),
+        Uri.parse('$baseUrl/admin/projects'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -264,7 +264,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   }) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/projects/$id'),
+        Uri.parse('$baseUrl/admin/projects/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
@@ -312,7 +312,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   @override
   Future<void> deleteProject(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/projects/$id'));
+      final response = await client.delete(Uri.parse('$baseUrl/admin/projects/$id'));
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         if (response.statusCode == 404) {
@@ -335,7 +335,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   Future<void> updateProjectOrder(List<Map<String, dynamic>> projectOrders) async {
     try {
       final response = await client.put(
-        Uri.parse('$baseUrl/projects/order'),
+        Uri.parse('$baseUrl/admin/projects/order'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'projectOrders': projectOrders,
@@ -359,7 +359,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   Future<void> assignFrameworkToProject({required String projectId, required String frameworkId}) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/projects/$projectId/frameworks'),
+        Uri.parse('$baseUrl/admin/projects/$projectId/frameworks'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'frameworkId': frameworkId}),
       );
@@ -381,7 +381,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   Future<void> removeFrameworkFromProject({required String projectId, required String frameworkId}) async {
     try {
       final response = await client.delete(
-        Uri.parse('$baseUrl/projects/$projectId/frameworks/$frameworkId'),
+        Uri.parse('$baseUrl/admin/projects/$projectId/frameworks/$frameworkId'),
       );
 
       if (response.statusCode != 200 && response.statusCode != 204) {
@@ -400,7 +400,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   @override
   Future<List<String>> getProjectFrameworkIds(String projectId) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/projects/$projectId/frameworks'));
+      final response = await client.get(Uri.parse('$baseUrl/admin/projects/$projectId/frameworks'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -426,7 +426,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   Future<void> incrementViewCount(String projectId) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/projects/$projectId/view'),
+        Uri.parse('$baseUrl/admin/projects/$projectId/view'),
       );
 
       if (response.statusCode != 200) {
@@ -446,7 +446,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   Future<void> incrementLikeCount(String projectId) async {
     try {
       final response = await client.post(
-        Uri.parse('$baseUrl/projects/$projectId/like'),
+        Uri.parse('$baseUrl/admin/projects/$projectId/like'),
       );
 
       if (response.statusCode != 200) {
