@@ -11,46 +11,35 @@ abstract class MoneyRemoteDataSource {
   Future<List<IdeaEntity>> getIdeas({
     int? page,
     int? limit,
+    bool? featured,
     bool? visible,
+    bool? public,
     String? search,
     String? sortBy,
     String? sortOrder,
   });
 
   Future<IdeaEntity> getIdeaById(String id);
+  Future<IdeaEntity> getIdeaBySlug(String slug);
   Future<IdeaEntity> createIdea({
     required String title,
-    required String description,
-    String? category,
-    String? targetAudience,
-    String? businessModel,
-    String? marketSize,
-    String? competition,
-    String? revenueProjection,
-    String? timeline,
-    String? resources,
-    String? risks,
-    String? opportunities,
-    String? nextSteps,
+    required String slug,
+    required String document,
+    String? description,
+    required bool featured,
     required bool visible,
+    required bool public,
     required int order,
   });
   Future<IdeaEntity> updateIdea({
     required String id,
     String? title,
+    String? slug,
+    String? document,
     String? description,
-    String? category,
-    String? targetAudience,
-    String? businessModel,
-    String? marketSize,
-    String? competition,
-    String? revenueProjection,
-    String? timeline,
-    String? resources,
-    String? risks,
-    String? opportunities,
-    String? nextSteps,
+    bool? featured,
     bool? visible,
+    bool? public,
     int? order,
   });
   Future<void> deleteIdea(String id);
@@ -59,6 +48,10 @@ abstract class MoneyRemoteDataSource {
   Future<List<AiChatEntity>> getAiChats({
     int? page,
     int? limit,
+    String? ideaNodeId,
+    String? agent,
+    bool? archived,
+    bool? visible,
     String? search,
     String? sortBy,
     String? sortOrder,
@@ -67,19 +60,33 @@ abstract class MoneyRemoteDataSource {
   Future<AiChatEntity> getAiChatById(String id);
   Future<AiChatEntity> createAiChat({
     required String title,
-    String? description,
-    required String initialMessage,
+    String? ideaNodeId,
+    required String agent,
+    String? model,
+    String? systemPrompt,
+    required double temperature,
+    int? maxTokens,
+    required bool visible,
+    required bool archived,
   });
   Future<AiChatEntity> updateAiChat({
     required String id,
     String? title,
-    String? description,
+    String? ideaNodeId,
+    String? agent,
+    String? model,
+    String? systemPrompt,
+    double? temperature,
+    int? maxTokens,
+    bool? visible,
+    bool? archived,
   });
   Future<void> deleteAiChat(String id);
   Future<AiChatEntity> sendMessage({
     required String chatId,
     required String message,
   });
+  Future<List<ChatMessageEntity>> getChatMessages(String chatId);
 }
 
 class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
@@ -96,7 +103,9 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
   Future<List<IdeaEntity>> getIdeas({
     int? page,
     int? limit,
+    bool? featured,
     bool? visible,
+    bool? public,
     String? search,
     String? sortBy,
     String? sortOrder,
@@ -105,7 +114,9 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       final queryParams = <String, String>{};
       if (page != null) queryParams['page'] = page.toString();
       if (limit != null) queryParams['limit'] = limit.toString();
+      if (featured != null) queryParams['featured'] = featured.toString();
       if (visible != null) queryParams['visible'] = visible.toString();
+      if (public != null) queryParams['public'] = public.toString();
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
       if (sortBy != null) queryParams['sortBy'] = sortBy;
       if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
@@ -164,21 +175,41 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
   }
 
   @override
+  Future<IdeaEntity> getIdeaBySlug(String slug) async {
+    try {
+      final response = await client.get(Uri.parse('$baseUrl/money/ideas/slug/$slug'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return IdeaModel.fromJson(data['data']).toEntity();
+        } else {
+          throw ServerException(data['message'] ?? 'Failed to fetch idea');
+        }
+      } else if (response.statusCode == 404) {
+        throw NotFoundException('Idea not found');
+      } else {
+        throw ServerException('Failed to fetch idea with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException || e is NotFoundException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
   Future<IdeaEntity> createIdea({
     required String title,
-    required String description,
-    String? category,
-    String? targetAudience,
-    String? businessModel,
-    String? marketSize,
-    String? competition,
-    String? revenueProjection,
-    String? timeline,
-    String? resources,
-    String? risks,
-    String? opportunities,
-    String? nextSteps,
+    required String slug,
+    required String document,
+    String? description,
+    required bool featured,
     required bool visible,
+    required bool public,
     required int order,
   }) async {
     try {
@@ -187,19 +218,12 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
-          'description': description,
-          if (category != null) 'category': category,
-          if (targetAudience != null) 'targetAudience': targetAudience,
-          if (businessModel != null) 'businessModel': businessModel,
-          if (marketSize != null) 'marketSize': marketSize,
-          if (competition != null) 'competition': competition,
-          if (revenueProjection != null) 'revenueProjection': revenueProjection,
-          if (timeline != null) 'timeline': timeline,
-          if (resources != null) 'resources': resources,
-          if (risks != null) 'risks': risks,
-          if (opportunities != null) 'opportunities': opportunities,
-          if (nextSteps != null) 'nextSteps': nextSteps,
+          'slug': slug,
+          'document': document,
+          if (description != null) 'description': description,
+          'featured': featured,
           'visible': visible,
+          'public': public,
           'order': order,
         }),
       );
@@ -231,19 +255,12 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
   Future<IdeaEntity> updateIdea({
     required String id,
     String? title,
+    String? slug,
+    String? document,
     String? description,
-    String? category,
-    String? targetAudience,
-    String? businessModel,
-    String? marketSize,
-    String? competition,
-    String? revenueProjection,
-    String? timeline,
-    String? resources,
-    String? risks,
-    String? opportunities,
-    String? nextSteps,
+    bool? featured,
     bool? visible,
+    bool? public,
     int? order,
   }) async {
     try {
@@ -252,19 +269,12 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
+          if (slug != null) 'slug': slug,
+          if (document != null) 'document': document,
           if (description != null) 'description': description,
-          if (category != null) 'category': category,
-          if (targetAudience != null) 'targetAudience': targetAudience,
-          if (businessModel != null) 'businessModel': businessModel,
-          if (marketSize != null) 'marketSize': marketSize,
-          if (competition != null) 'competition': competition,
-          if (revenueProjection != null) 'revenueProjection': revenueProjection,
-          if (timeline != null) 'timeline': timeline,
-          if (resources != null) 'resources': resources,
-          if (risks != null) 'risks': risks,
-          if (opportunities != null) 'opportunities': opportunities,
-          if (nextSteps != null) 'nextSteps': nextSteps,
+          if (featured != null) 'featured': featured,
           if (visible != null) 'visible': visible,
+          if (public != null) 'public': public,
           if (order != null) 'order': order,
         }),
       );
@@ -321,6 +331,10 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
   Future<List<AiChatEntity>> getAiChats({
     int? page,
     int? limit,
+    String? ideaNodeId,
+    String? agent,
+    bool? archived,
+    bool? visible,
     String? search,
     String? sortBy,
     String? sortOrder,
@@ -329,6 +343,10 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       final queryParams = <String, String>{};
       if (page != null) queryParams['page'] = page.toString();
       if (limit != null) queryParams['limit'] = limit.toString();
+      if (ideaNodeId != null) queryParams['ideaNodeId'] = ideaNodeId;
+      if (agent != null) queryParams['agent'] = agent;
+      if (archived != null) queryParams['archived'] = archived.toString();
+      if (visible != null) queryParams['visible'] = visible.toString();
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
       if (sortBy != null) queryParams['sortBy'] = sortBy;
       if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
@@ -389,8 +407,14 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
   @override
   Future<AiChatEntity> createAiChat({
     required String title,
-    String? description,
-    required String initialMessage,
+    String? ideaNodeId,
+    required String agent,
+    String? model,
+    String? systemPrompt,
+    required double temperature,
+    int? maxTokens,
+    required bool visible,
+    required bool archived,
   }) async {
     try {
       final response = await client.post(
@@ -398,8 +422,14 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
-          if (description != null) 'description': description,
-          'initialMessage': initialMessage,
+          if (ideaNodeId != null) 'ideaNodeId': ideaNodeId,
+          'agent': agent,
+          if (model != null) 'model': model,
+          if (systemPrompt != null) 'systemPrompt': systemPrompt,
+          'temperature': temperature,
+          if (maxTokens != null) 'maxTokens': maxTokens,
+          'visible': visible,
+          'archived': archived,
         }),
       );
 
@@ -430,7 +460,14 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
   Future<AiChatEntity> updateAiChat({
     required String id,
     String? title,
-    String? description,
+    String? ideaNodeId,
+    String? agent,
+    String? model,
+    String? systemPrompt,
+    double? temperature,
+    int? maxTokens,
+    bool? visible,
+    bool? archived,
   }) async {
     try {
       final response = await client.put(
@@ -438,7 +475,14 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
-          if (description != null) 'description': description,
+          if (ideaNodeId != null) 'ideaNodeId': ideaNodeId,
+          if (agent != null) 'agent': agent,
+          if (model != null) 'model': model,
+          if (systemPrompt != null) 'systemPrompt': systemPrompt,
+          if (temperature != null) 'temperature': temperature,
+          if (maxTokens != null) 'maxTokens': maxTokens,
+          if (visible != null) 'visible': visible,
+          if (archived != null) 'archived': archived,
         }),
       );
 
@@ -522,6 +566,35 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       throw NetworkException('Network error occurred');
     } catch (e) {
       if (e is ServerException || e is NetworkException || e is NotFoundException || e is ValidationException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<List<ChatMessageEntity>> getChatMessages(String chatId) async {
+    try {
+      final response = await client.get(Uri.parse('$baseUrl/money/ai-chats/$chatId/messages'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          // For now, return an empty list since we don't have a ChatMessageModel yet
+          // TODO: Implement ChatMessageModel and proper deserialization
+          return [];
+        } else {
+          throw ServerException(data['message'] ?? 'Failed to fetch messages');
+        }
+      } else if (response.statusCode == 404) {
+        throw NotFoundException('AI chat not found');
+      } else {
+        throw ServerException('Failed to fetch messages with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException || e is NotFoundException) {
         rethrow;
       }
       throw ServerException('Unexpected error: $e');
