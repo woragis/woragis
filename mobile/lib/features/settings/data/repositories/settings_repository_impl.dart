@@ -17,21 +17,13 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<Either<Failure, List<SettingEntity>>> getSettings({
-    int? page,
-    int? limit,
     String? category,
-    String? search,
-    String? sortBy,
-    String? sortOrder,
+    bool? isPublic,
   }) async {
     try {
       final settings = await remoteDataSource.getSettings(
-        page: page,
-        limit: limit,
         category: category,
-        search: search,
-        sortBy: sortBy,
-        sortOrder: sortOrder,
+        isPublic: isPublic,
       );
 
       // Cache the settings locally
@@ -208,11 +200,103 @@ class SettingsRepositoryImpl implements SettingsRepository {
     }
   }
 
+
+  // Bulk operations
   @override
-  Future<Either<Failure, void>> deleteSettingByKey(String key) async {
+  Future<Either<Failure, Map<String, String>>> getSettingsAsMap({
+    String? category,
+    bool? isPublic,
+  }) async {
     try {
-      await remoteDataSource.deleteSettingByKey(key);
-      await localDataSource.removeCachedSettingByKey(key);
+      final settingsMap = await remoteDataSource.getSettingsAsMap(
+        category: category,
+        isPublic: isPublic,
+      );
+      return Right(settingsMap);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateSettingsBulk(Map<String, String> settings) async {
+    try {
+      await remoteDataSource.updateSettingsBulk(settings);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  // Category-specific settings
+  @override
+  Future<Either<Failure, Map<String, String>>> getCoreProfileSettings() async {
+    try {
+      final settings = await remoteDataSource.getCoreProfileSettings();
+      return Right(settings);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, String>>> getSocialMediaSettings() async {
+    try {
+      final settings = await remoteDataSource.getSocialMediaSettings();
+      return Right(settings);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, String>>> getContactSettings() async {
+    try {
+      final settings = await remoteDataSource.getContactSettings();
+      return Right(settings);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, String>>> getSiteSettings() async {
+    try {
+      final settings = await remoteDataSource.getSiteSettings();
+      return Right(settings);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateCoreProfileSettings(Map<String, String> settings) async {
+    try {
+      await remoteDataSource.updateCoreProfileSettings(settings);
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -224,40 +308,42 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
-  Future<Either<Failure, List<SettingEntity>>> getSettingsByCategory(String category) async {
+  Future<Either<Failure, void>> updateSocialMediaSettings(Map<String, String> settings) async {
     try {
-      final settings = await remoteDataSource.getSettingsByCategory(category);
-      return Right(settings);
+      await remoteDataSource.updateSocialMediaSettings(settings);
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      // Try to get from cache
-      try {
-        final cachedSettings = await localDataSource.getCachedSettingsByCategory(category);
-        return Right(cachedSettings);
-      } catch (cacheError) {
-        return Left(NetworkFailure(e.message));
-      }
+      return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, List<SettingEntity>>> getPublicSettings() async {
+  Future<Either<Failure, void>> updateContactSettings(Map<String, String> settings) async {
     try {
-      final settings = await remoteDataSource.getPublicSettings();
-      return Right(settings);
+      await remoteDataSource.updateContactSettings(settings);
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      // Try to get from cache
-      try {
-        final cachedSettings = await localDataSource.getCachedPublicSettings();
-        return Right(cachedSettings);
-      } catch (cacheError) {
-        return Left(NetworkFailure(e.message));
-      }
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateSiteSettings(Map<String, String> settings) async {
+    try {
+      await remoteDataSource.updateSiteSettings(settings);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
