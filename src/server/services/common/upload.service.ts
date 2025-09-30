@@ -183,6 +183,55 @@ export class UploadService extends BaseService {
   }
 
   /**
+   * Upload a file from URL (download and save)
+   */
+  async uploadFromUrl(
+    url: string,
+    filename?: string,
+    options: UploadOptions = {}
+  ): Promise<ApiResponse<FileInfo>> {
+    try {
+      // Download the file from URL
+      const response = await fetch(url);
+      if (!response.ok) {
+        return this.handleError(
+          new Error(`Failed to download file from URL: ${response.statusText}`),
+          "uploadFromUrl"
+        );
+      }
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      
+      // Generate filename if not provided
+      const finalFilename = filename || this.generateFilenameFromUrl(url);
+      
+      return this.uploadFile(buffer, finalFilename, options);
+    } catch (error) {
+      return this.handleError(error, "uploadFromUrl");
+    }
+  }
+
+  /**
+   * Generate a filename from URL
+   */
+  private generateFilenameFromUrl(url: string): string {
+    try {
+      const urlPath = new URL(url).pathname;
+      const extension = path.extname(urlPath) || '.jpg';
+      const baseName = path.basename(urlPath, extension) || 'ai-generated';
+      const timestamp = Date.now();
+      const uuid = uuidv4().substring(0, 8);
+      
+      return `${baseName}-${timestamp}-${uuid}${extension}`;
+    } catch {
+      // Fallback if URL parsing fails
+      const timestamp = Date.now();
+      const uuid = uuidv4().substring(0, 8);
+      return `ai-generated-${timestamp}-${uuid}.jpg`;
+    }
+  }
+
+  /**
    * Delete a file
    */
   async deleteFile(filePath: string): Promise<ApiResponse<boolean>> {
