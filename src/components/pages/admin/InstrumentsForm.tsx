@@ -7,7 +7,11 @@ import {
   FormInput,
   FormSelect,
   FormCheckbox,
+  FormTextarea,
 } from "@/components/pages/admin";
+import { AIAboutGenerator } from "@/components/ui/ai/AIAboutGenerator";
+import { Button } from "@/components/ui/layout/Button";
+import { Sparkles } from "lucide-react";
 import type {
   Instrument,
   NewInstrument,
@@ -42,8 +46,10 @@ export const InstrumentsForm: React.FC<InstrumentsFormProps> = ({
     name: "",
     knowledgeLevel: "beginner",
     learningStatus: "want_to_learn",
+    description: "",
     visible: true,
   });
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
 
   useEffect(() => {
     if (instrument) {
@@ -51,6 +57,7 @@ export const InstrumentsForm: React.FC<InstrumentsFormProps> = ({
         name: instrument.name || "",
         knowledgeLevel: instrument.knowledgeLevel || "beginner",
         learningStatus: instrument.learningStatus || "want_to_learn",
+        description: instrument.description || "",
         visible: instrument.visible || true,
       });
     }
@@ -85,6 +92,15 @@ export const InstrumentsForm: React.FC<InstrumentsFormProps> = ({
     onSubmit(e);
   };
 
+  const handleAIContentGenerated = (content: string, type: 'text' | 'image') => {
+    if (type === 'text') {
+      setFormData(prev => ({
+        ...prev,
+        description: content,
+      }));
+    }
+  };
+
   return (
     <AdminForm
       onSubmit={handleSubmit}
@@ -110,6 +126,45 @@ export const InstrumentsForm: React.FC<InstrumentsFormProps> = ({
           options={knowledgeLevelOptions}
           required
         />
+      </FormField>
+
+      <FormField label="Description">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Description
+            </span>
+            <Button
+              type="button"
+              onClick={() => setShowAIGenerator(!showAIGenerator)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              {showAIGenerator ? 'Hide AI' : 'AI Generator'}
+            </Button>
+          </div>
+          
+          {showAIGenerator && (
+            <div className="mb-4">
+              <AIAboutGenerator
+                category="instruments"
+                onContentGenerated={handleAIContentGenerated}
+                currentInfo={formData.name || ''}
+                itemId={instrument?.id}
+              />
+            </div>
+          )}
+          
+          <FormTextarea
+            name="description"
+            value={formData.description || ""}
+            onChange={handleInputChange}
+            placeholder="Describe your experience with this instrument, what you've learned, or your goals..."
+            rows={4}
+          />
+        </div>
       </FormField>
 
       <FormCheckbox

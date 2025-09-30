@@ -8,6 +8,9 @@ import {
   FormTextarea,
   FormCheckbox,
 } from "@/components/pages/admin";
+import { AIAboutGenerator } from "@/components/ui/ai/AIAboutGenerator";
+import { Button } from "@/components/ui/layout/Button";
+import { Sparkles } from "lucide-react";
 import type { Hobby, NewHobby } from "@/types/about/hobbies";
 
 interface HobbiesFormProps {
@@ -32,6 +35,7 @@ export const HobbiesForm: React.FC<HobbiesFormProps> = ({
     description: "",
     visible: true,
   });
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
 
   useEffect(() => {
     if (hobby) {
@@ -67,6 +71,15 @@ export const HobbiesForm: React.FC<HobbiesFormProps> = ({
     }
   }, [formData, userId, onFormDataChange]);
 
+  const handleAIContentGenerated = (content: string, type: 'text' | 'image') => {
+    if (type === 'text') {
+      setFormData(prev => ({
+        ...prev,
+        description: content,
+      }));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(e);
@@ -90,13 +103,42 @@ export const HobbiesForm: React.FC<HobbiesFormProps> = ({
       </FormField>
 
       <FormField label="Description">
-        <FormTextarea
-          name="description"
-          value={formData.description || ""}
-          onChange={handleInputChange}
-          placeholder="Tell us more about this hobby..."
-          rows={3}
-        />
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Description
+            </span>
+            <Button
+              type="button"
+              onClick={() => setShowAIGenerator(!showAIGenerator)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              {showAIGenerator ? 'Hide AI' : 'AI Generator'}
+            </Button>
+          </div>
+          
+          {showAIGenerator && (
+            <div className="mb-4">
+              <AIAboutGenerator
+                category="hobbies"
+                onContentGenerated={handleAIContentGenerated}
+                currentInfo={formData.name || ''}
+                itemId={hobby?.id}
+              />
+            </div>
+          )}
+          
+          <FormTextarea
+            name="description"
+            value={formData.description || ""}
+            onChange={handleInputChange}
+            placeholder="Tell us more about this hobby..."
+            rows={3}
+          />
+        </div>
       </FormField>
 
       <FormCheckbox

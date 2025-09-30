@@ -9,6 +9,9 @@ import {
   FormSelect,
   FormCheckbox,
 } from "@/components/pages/admin";
+import { AIAboutGenerator } from "@/components/ui/ai/AIAboutGenerator";
+import { Button } from "@/components/ui/layout/Button";
+import { Sparkles } from "lucide-react";
 import type { Anime, NewAnime, AnimeStatus } from "@/types";
 
 interface AnimeFormProps {
@@ -50,6 +53,7 @@ export const AnimeForm: React.FC<AnimeFormProps> = ({
     order: 0,
     visible: true,
   });
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
 
   useEffect(() => {
     if (anime) {
@@ -98,6 +102,15 @@ export const AnimeForm: React.FC<AnimeFormProps> = ({
     }
   }, [formData, userId, onFormDataChange]);
 
+  const handleAIContentGenerated = (content: string, type: 'text' | 'image') => {
+    if (type === 'text') {
+      setFormData(prev => ({
+        ...prev,
+        description: content,
+      }));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(e);
@@ -120,12 +133,41 @@ export const AnimeForm: React.FC<AnimeFormProps> = ({
       </FormField>
 
       <FormField label="Description">
-        <FormTextarea
-          name="description"
-          value={formData.description || ""}
-          onChange={handleInputChange}
-          rows={3}
-        />
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Description
+            </span>
+            <Button
+              type="button"
+              onClick={() => setShowAIGenerator(!showAIGenerator)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              {showAIGenerator ? 'Hide AI' : 'AI Generator'}
+            </Button>
+          </div>
+          
+          {showAIGenerator && (
+            <div className="mb-4">
+              <AIAboutGenerator
+                category="anime"
+                onContentGenerated={handleAIContentGenerated}
+                currentInfo={formData.title || ''}
+                itemId={anime?.id}
+              />
+            </div>
+          )}
+          
+          <FormTextarea
+            name="description"
+            value={formData.description || ""}
+            onChange={handleInputChange}
+            rows={3}
+          />
+        </div>
       </FormField>
 
       <FormField label="Status" required>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { GraduationCap, Building2, FileText, Globe, Calendar, Award, Hash, Eye } from "lucide-react";
 import type { Education, NewEducation, EducationType, DegreeLevel } from "@/types/education";
 
@@ -22,6 +23,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
   isLoading = false,
   onFormDataChange,
 }) => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     title: "",
     institution: "",
@@ -166,7 +168,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
           <GraduationCap className="w-4 h-4 mr-2" />
-          Title *
+          {t("admin.education.form.title")} *
         </label>
         <input
           type="text"
@@ -174,7 +176,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
           value={formData.title}
           onChange={handleInputChange}
           required
-          placeholder="e.g., Bachelor of Computer Science, AWS Certified Solutions Architect"
+          placeholder={t("admin.education.form.titlePlaceholder")}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         />
       </div>
@@ -183,7 +185,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
           <Building2 className="w-4 h-4 mr-2" />
-          Institution *
+          {t("admin.education.form.institution")} *
         </label>
         <input
           type="text"
@@ -191,7 +193,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
           value={formData.institution}
           onChange={handleInputChange}
           required
-          placeholder="e.g., University of Technology, Amazon Web Services"
+          placeholder={t("admin.education.form.institutionPlaceholder")}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         />
       </div>
@@ -200,7 +202,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Type *
+            {t("admin.education.form.type")} *
           </label>
           <select
             name="type"
@@ -209,15 +211,15 @@ export const EducationForm: React.FC<EducationFormProps> = ({
             required
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
-            <option value="degree">Degree</option>
-            <option value="certificate">Certificate</option>
+            <option value="degree">{t("admin.education.types.degree")}</option>
+            <option value="certificate">{t("admin.education.types.certificate")}</option>
           </select>
         </div>
 
         {formData.type === "degree" && (
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Degree Level *
+              {t("admin.education.form.degreeLevel")} *
             </label>
             <select
               name="degreeLevel"
@@ -226,11 +228,11 @@ export const EducationForm: React.FC<EducationFormProps> = ({
               required
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              <option value="bachelor">Bachelor</option>
-              <option value="master">Master</option>
-              <option value="doctorate">Doctorate</option>
-              <option value="associate">Associate</option>
-              <option value="diploma">Diploma</option>
+              <option value="bachelor">{t("admin.education.degreeLevels.bachelor")}</option>
+              <option value="master">{t("admin.education.degreeLevels.master")}</option>
+              <option value="doctorate">{t("admin.education.degreeLevels.doctorate")}</option>
+              <option value="associate">{t("admin.education.degreeLevels.associate")}</option>
+              <option value="diploma">{t("admin.education.degreeLevels.diploma")}</option>
             </select>
           </div>
         )}

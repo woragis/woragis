@@ -7,7 +7,11 @@ import {
   FormInput,
   FormSelect,
   FormCheckbox,
+  FormTextarea,
 } from "@/components/pages/admin";
+import { AIAboutGenerator } from "@/components/ui/ai/AIAboutGenerator";
+import { Button } from "@/components/ui/layout/Button";
+import { Sparkles } from "lucide-react";
 import type {
   MartialArt,
   NewMartialArt,
@@ -43,8 +47,10 @@ export const MartialArtsForm: React.FC<MartialArtsFormProps> = ({
     knowledgeLevel: "beginner",
     learningStatus: "want_to_learn",
     grade: "",
+    description: "",
     visible: true,
   });
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
 
   useEffect(() => {
     if (martialArt) {
@@ -53,6 +59,7 @@ export const MartialArtsForm: React.FC<MartialArtsFormProps> = ({
         knowledgeLevel: martialArt.knowledgeLevel || "beginner",
         learningStatus: martialArt.learningStatus || "want_to_learn",
         grade: martialArt.grade || "",
+        description: martialArt.description || "",
         visible: martialArt.visible || true,
       });
     }
@@ -81,6 +88,15 @@ export const MartialArtsForm: React.FC<MartialArtsFormProps> = ({
       });
     }
   }, [formData, userId, onFormDataChange]);
+
+  const handleAIContentGenerated = (content: string, type: 'text' | 'image') => {
+    if (type === 'text') {
+      setFormData(prev => ({
+        ...prev,
+        description: content,
+      }));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,6 +137,45 @@ export const MartialArtsForm: React.FC<MartialArtsFormProps> = ({
           onChange={handleInputChange}
           placeholder="e.g., Black Belt, 1st Dan, Blue Belt"
         />
+      </FormField>
+
+      <FormField label="Description">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Description
+            </span>
+            <Button
+              type="button"
+              onClick={() => setShowAIGenerator(!showAIGenerator)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              {showAIGenerator ? 'Hide AI' : 'AI Generator'}
+            </Button>
+          </div>
+          
+          {showAIGenerator && (
+            <div className="mb-4">
+              <AIAboutGenerator
+                category="martial-arts"
+                onContentGenerated={handleAIContentGenerated}
+                currentInfo={formData.name || ''}
+                itemId={martialArt?.id}
+              />
+            </div>
+          )}
+          
+          <FormTextarea
+            name="description"
+            value={formData.description || ""}
+            onChange={handleInputChange}
+            placeholder="Describe your experience with this martial art, what you've learned, or your goals..."
+            rows={4}
+          />
+        </div>
       </FormField>
 
       <FormCheckbox

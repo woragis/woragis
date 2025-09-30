@@ -3,8 +3,9 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button, FileUpload } from "@/components/ui";
 import { MarkdownEditor } from "@/components/ui";
+import { AIContentGenerator } from "@/components/ui/ai/AIContentGenerator";
 import { useBlogTags } from "@/hooks/useBlogTags";
-import { Tag, X, FileText, Plus, Upload, Calendar, Eye, Star } from "lucide-react";
+import { Tag, X, FileText, Plus, Upload, Calendar, Eye, Star, Sparkles, Loader2 } from "lucide-react";
 import type { BlogPost, NewBlogPost, BlogPostWithTags } from "@/types";
 import type { BlogTag } from "@/types/blog-tags";
 
@@ -42,6 +43,8 @@ export const BlogForm: React.FC<BlogFormProps> = ({
 
   const [selectedTags, setSelectedTags] = useState<BlogTag[]>([]);
   const [showTagSection, setShowTagSection] = useState(false);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const { data: availableTags = [] } = useBlogTags({ visible: true }, { enabled: showTagSection });
 
@@ -119,6 +122,65 @@ export const BlogForm: React.FC<BlogFormProps> = ({
     }));
   };
 
+  const handleAIContentGenerated = (content: string, type: 'text' | 'image') => {
+    if (type === 'text') {
+      setFormData(prev => ({
+        ...prev,
+        content: prev.content + (prev.content ? '\n\n' : '') + content,
+      }));
+    }
+  };
+
+  const handleAIImageGenerated = (imageUrl: string) => {
+    setFormData(prev => ({
+      ...prev,
+      featuredImage: imageUrl,
+    }));
+  };
+
+  const handleGenerateFeaturedImage = async () => {
+    if (!formData.title.trim()) {
+      alert('Please enter a blog title first to generate a relevant image');
+      return;
+    }
+
+    setIsGeneratingImage(true);
+    try {
+      const response = await fetch('/api/ai/image/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'blog',
+          params: {
+            prompt: formData.title,
+            style: 'professional',
+            blogTitle: formData.title
+          },
+          saveToUploads: true
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate image');
+      }
+
+      const data = await response.json();
+      if (data.success && data.imageUrl) {
+        setFormData(prev => ({
+          ...prev,
+          featuredImage: data.imageUrl,
+        }));
+      }
+    } catch (error) {
+      console.error('Error generating image:', error);
+      alert('Failed to generate image. Please try again.');
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
   // Update refs when values change
   // Notify parent of form data changes
   useEffect(() => {
@@ -191,10 +253,27 @@ export const BlogForm: React.FC<BlogFormProps> = ({
 
       {/* Featured Image Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-          <Upload className="w-4 h-4 mr-2" />
-          Featured Image
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+            <Upload className="w-4 h-4 mr-2" />
+            Featured Image
+          </label>
+          <Button
+            type="button"
+            onClick={handleGenerateFeaturedImage}
+            disabled={isGeneratingImage || !formData.title.trim()}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            {isGeneratingImage ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4" />
+            )}
+            AI Generate
+          </Button>
+        </div>
         <div className="space-y-3">
           <FileUpload
             accept="image/*,.jpg,.jpeg,.png,.webp"
@@ -230,10 +309,33 @@ export const BlogForm: React.FC<BlogFormProps> = ({
       {/* Rich Content - Markdown Editor */}
       <div>
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
-            <FileText className="w-5 h-5 mr-2" />
-            Blog Content (Markdown)
-          </h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+              <FileText className="w-5 h-5 mr-2" />
+              Blog Content (Markdown)
+            </h3>
+            <Button
+              type="button"
+              onClick={() => setShowAIGenerator(!showAIGenerator)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              {showAIGenerator ? 'Hide AI' : 'AI Generator'}
+            </Button>
+          </div>
+          
+          {showAIGenerator && (
+            <div className="mb-4">
+              <AIContentGenerator
+                contentType="blog"
+                onContentGenerated={handleAIContentGenerated}
+                onImageGenerated={handleAIImageGenerated}
+              />
+            </div>
+          )}
+          
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
             <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
               Markdown Guide
