@@ -4,16 +4,19 @@ import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/exceptions.dart';
+import '../../../../core/stores/auth_store.dart';
 import '../datasources/auth_local_datasource.dart';
 import '../datasources/auth_remote_datasource.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final AuthLocalDataSource localDataSource;
+  final AuthStoreBloc authStore;
 
   AuthRepositoryImpl({
     required this.remoteDataSource,
     required this.localDataSource,
+    required this.authStore,
   });
 
   @override
@@ -22,18 +25,30 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
+      print('🔐 Starting login process for: $email');
       final authResponse = await remoteDataSource.login(
         email: email,
         password: password,
       );
+      print('✅ Login successful, storing data locally');
 
-      // Store tokens and user data locally
-      await localDataSource.storeTokens(
-        accessToken: authResponse.tokens.accessToken,
-        refreshToken: authResponse.tokens.refreshToken,
-        expiresAt: authResponse.tokens.expiresAt,
-      );
-      await localDataSource.storeUserData(authResponse.user);
+          // Store user data first, then tokens (tokens need user data to be stored first)
+          await localDataSource.storeUserData(authResponse.user);
+          await localDataSource.storeTokens(
+            accessToken: authResponse.tokens.accessToken,
+            refreshToken: authResponse.tokens.refreshToken,
+            expiresAt: authResponse.tokens.expiresAt,
+          );
+          
+          // Update auth store with tokens and user
+          authStore.updateTokens(
+            accessToken: authResponse.tokens.accessToken,
+            refreshToken: authResponse.tokens.refreshToken,
+            expiresAt: authResponse.tokens.expiresAt,
+          );
+          authStore.updateUser(authResponse.user);
+          
+          print('✅ Login data stored successfully');
 
       return Right(authResponse);
     } on ServerException catch (e) {
@@ -96,6 +111,13 @@ class AuthRepositoryImpl implements AuthRepository {
         expiresAt: authResponse.tokens.expiresAt,
       );
 
+      // Update auth store with tokens
+      authStore.updateTokens(
+        accessToken: authResponse.tokens.accessToken,
+        refreshToken: authResponse.tokens.refreshToken,
+        expiresAt: authResponse.tokens.expiresAt,
+      );
+
       return Right(authResponse);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -109,15 +131,28 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
+      print('🚪 Logging out user...');
       await remoteDataSource.logout();
+      print('✅ Remote logout successful');
+      
       await localDataSource.clearStoredTokens();
+      print('✅ Local tokens cleared');
+      
       await localDataSource.clearStoredUserData();
+      print('✅ Local user data cleared');
+      
+      // Clear auth store
+      authStore.logout();
+      
       return const Right(null);
     } on ServerException catch (e) {
+      print('🚨 Server error during logout: ${e.message}');
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
+      print('🚨 Network error during logout: ${e.message}');
       return Left(NetworkFailure(e.message));
     } catch (e) {
+      print('🚨 Unexpected error during logout: $e');
       return Left(UnexpectedFailure(e.toString()));
     }
   }
