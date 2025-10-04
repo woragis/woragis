@@ -270,7 +270,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       OutlinedButton.icon(
-                        onPressed: () => context.go('/change-password'),
+                        onPressed: () => context.push('/change-password'),
                         icon: const Icon(Icons.lock),
                         label: const Text('Change Password'),
                       ),

@@ -14,25 +14,56 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   void initState() {
     super.initState();
-    // Check if user is already authenticated when the app starts
-    context.read<AuthBloc>().add(GetCurrentUserRequested());
+    // Restore authentication state from local storage when the app starts
+    context.read<AuthBloc>().add(RestoreAuthStateRequested());
+    
+    // Add a timeout to prevent infinite loading
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        final currentState = context.read<AuthBloc>().state;
+        if (currentState is AuthLoading) {
+          print('⏰ Auth restoration timeout, redirecting to login');
+          // Force navigation to login to break the loading loop
+          context.go('/login');
+        }
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
+        print('🎯 AuthWrapper listener: ${state.runtimeType}');
         if (state is AuthAuthenticated) {
+          print('🏠 Navigating to home');
           // User is authenticated, navigate to home
           context.go('/home');
         } else if (state is AuthUnauthenticated) {
+          print('🔐 Navigating to login');
           // User is not authenticated, navigate to login
           context.go('/login');
         }
       },
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
+          print('🎨 AuthWrapper builder: ${state.runtimeType}');
           if (state is AuthLoading) {
+            return const SplashScreen();
+          } else if (state is AuthAuthenticated) {
+            // User is authenticated, show home (navigation will be handled by listener)
+            return const SplashScreen();
+          } else if (state is AuthUnauthenticated) {
+            // User is not authenticated, show login (navigation will be handled by listener)
+            return const SplashScreen();
+          } else if (state is AuthError) {
+            // Show error state, but still redirect to login
+            return const SplashScreen();
+          } else if (state is AuthInitial) {
+            // Initial state, trigger auth restoration
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.read<AuthBloc>().add(RestoreAuthStateRequested());
+            });
             return const SplashScreen();
           }
           
@@ -138,7 +169,7 @@ class AuthGuard extends StatelessWidget {
           } else if (state is AuthUnauthenticated) {
             // Redirect to login if not authenticated
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.go('/login');
+              context.push('/login');
             });
             return const SplashScreen();
           } else {

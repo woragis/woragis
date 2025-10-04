@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                   BlocConsumer<AuthBloc, AuthState>(
                     listener: (context, state) {
                       if (state is AuthAuthenticated) {
-                        context.go('/home');
+                        context.push('/home');
                       } else if (state is AuthError) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -217,7 +217,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       const Text("Don't have an account? "),
                       TextButton(
-                        onPressed: () => context.go('/register'),
+                        onPressed: () => context.push('/register'),
                         child: const Text('Sign Up'),
                       ),
                     ],

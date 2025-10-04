@@ -212,7 +212,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 BlocConsumer<AuthBloc, AuthState>(
                   listener: (context, state) {
                     if (state is AuthAuthenticated) {
-                      context.go('/home');
+                      context.push('/home');
                     } else if (state is AuthError) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -275,7 +275,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const Text("Already have an account? "),
                     TextButton(
-                      onPressed: () => context.go('/login'),
+                      onPressed: () => context.push('/login'),
                       child: const Text('Sign In'),
                     ),
                   ],

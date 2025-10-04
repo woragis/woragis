@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/injection/injection_container.dart';
+import '../../../../core/stores/auth_store.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/usecases.dart';
 
@@ -45,6 +46,8 @@ class RegisterRequested extends AuthEvent {
 }
 
 class GetCurrentUserRequested extends AuthEvent {}
+
+class RestoreAuthStateRequested extends AuthEvent {}
 
 class LogoutRequested extends AuthEvent {}
 
@@ -126,6 +129,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RefreshTokenUseCase refreshTokenUseCase;
   final ChangePasswordUseCase changePasswordUseCase;
   final UpdateProfileUseCase updateProfileUseCase;
+  final RestoreAuthStateUseCase restoreAuthStateUseCase;
+  final AuthStoreBloc authStore;
 
   AuthBloc({
     required this.loginUseCase,
@@ -135,10 +140,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.refreshTokenUseCase,
     required this.changePasswordUseCase,
     required this.updateProfileUseCase,
+    required this.restoreAuthStateUseCase,
+    required this.authStore,
   }) : super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
     on<RegisterRequested>(_onRegisterRequested);
     on<GetCurrentUserRequested>(_onGetCurrentUserRequested);
+    on<RestoreAuthStateRequested>(_onRestoreAuthStateRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<RefreshTokenRequested>(_onRefreshTokenRequested);
     on<ChangePasswordRequested>(_onChangePasswordRequested);
@@ -193,6 +201,43 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthUnauthenticated()),
       (user) => emit(AuthAuthenticated(user)),
+    );
+  }
+
+  Future<void> _onRestoreAuthStateRequested(
+    RestoreAuthStateRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    print('🔄 Restoring auth state from local storage...');
+    emit(AuthLoading());
+
+    final result = await restoreAuthStateUseCase();
+
+    result.fold(
+      (failure) {
+        print('🚨 Failed to restore auth state: ${failure.message}');
+        emit(AuthUnauthenticated());
+      },
+      (authStateResult) {
+        print('📋 Auth state result: isAuthenticated=${authStateResult.isAuthenticated}, user=${authStateResult.user?.email}');
+        if (authStateResult.isAuthenticated && authStateResult.user != null) {
+          print('✅ Restoring authenticated user: ${authStateResult.user!.email}');
+          // Update auth store with restored tokens FIRST, then user
+          if (authStateResult.accessToken != null) {
+            authStore.updateTokens(
+              accessToken: authStateResult.accessToken!,
+              refreshToken: authStateResult.refreshToken ?? '',
+              expiresAt: authStateResult.expiresAt ?? DateTime.now().add(const Duration(hours: 1)),
+            );
+          }
+          // Then update user (this will preserve the tokens)
+          authStore.updateUser(authStateResult.user!);
+          emit(AuthAuthenticated(authStateResult.user!));
+        } else {
+          print('❌ No valid auth state found, redirecting to login');
+          emit(AuthUnauthenticated());
+        }
+      },
     );
   }
 
@@ -280,5 +325,7 @@ AuthBloc createAuthBloc() {
     refreshTokenUseCase: sl<RefreshTokenUseCase>(),
     changePasswordUseCase: sl<ChangePasswordUseCase>(),
     updateProfileUseCase: sl<UpdateProfileUseCase>(),
+    restoreAuthStateUseCase: sl<RestoreAuthStateUseCase>(),
+    authStore: sl<AuthStoreBloc>(),
   );
 }
