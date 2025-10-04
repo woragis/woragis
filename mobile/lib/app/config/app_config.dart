@@ -9,39 +9,48 @@ import '../../features/about/presentation/bloc/about_bloc.dart';
 import '../../features/settings/presentation/bloc/settings_bloc.dart';
 import '../../features/experience/presentation/bloc/experience_bloc.dart';
 import '../../features/blog/presentation/bloc/blog_bloc.dart';
+import '../../features/blog/presentation/bloc/blog_filter/blog_filter_bloc.dart';
+import '../../features/blog/presentation/bloc/create_blog_post/create_blog_post_bloc.dart';
 import '../../features/testimonials/presentation/bloc/testimonials_bloc.dart';
+import '../../core/injection/injection_container.dart' as di;
 
 class AppConfig {
   static List<BlocProvider> get providers => [
     BlocProvider<AboutBloc>(
-      create: (context) => createAboutBloc(),
+      create: (context) => di.sl<AboutBloc>(),
     ),
     BlocProvider<AuthBloc>(
-      create: (context) => createAuthBloc(),
+      create: (context) => di.sl<AuthBloc>(),
     ),
     BlocProvider<BlogBloc>(
-      create: (context) => createBlogBloc(),
+      create: (context) => di.sl<BlogBloc>(),
+    ),
+    BlocProvider<BlogFilterBloc>(
+      create: (context) => di.sl<BlogFilterBloc>(),
+    ),
+    BlocProvider<CreateBlogPostBloc>(
+      create: (context) => di.sl<CreateBlogPostBloc>(),
     ),
     BlocProvider<EducationBloc>(
-      create: (context) => createEducationBloc(),
+      create: (context) => di.sl<EducationBloc>(),
     ),
     BlocProvider<ExperienceBloc>(
-      create: (context) => createExperienceBloc(),
+      create: (context) => di.sl<ExperienceBloc>(),
     ),
     BlocProvider<FrameworksBloc>(
-      create: (context) => createFrameworksBloc(),
+      create: (context) => di.sl<FrameworksBloc>(),
     ),
     BlocProvider<MoneyBloc>(
-      create: (context) => createMoneyBloc(),
+      create: (context) => di.sl<MoneyBloc>(),
     ),
     BlocProvider<ProjectsBloc>(
-      create: (context) => createProjectsBloc(),
+      create: (context) => di.sl<ProjectsBloc>(),
     ),
     BlocProvider<SettingsBloc>(
-      create: (context) => createSettingsBloc(),
+      create: (context) => di.sl<SettingsBloc>(),
     ),
     BlocProvider<TestimonialsBloc>(
-      create: (context) => createTestimonialsBloc(),
+      create: (context) => di.sl<TestimonialsBloc>(),
     ),
   ];
 
