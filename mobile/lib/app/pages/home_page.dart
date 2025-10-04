@@ -63,13 +63,13 @@ class HomePage extends StatelessWidget {
               context.go('/home');
               break;
             case 1:
-              // TODO: Navigate to blog
+              context.go('/money/ideas');
               break;
             case 2:
-              // TODO: Navigate to projects
+              context.go('/projects');
               break;
             case 3:
-              // TODO: Navigate to about
+              context.go('/profile');
               break;
           }
         },
@@ -163,15 +163,12 @@ class HomePage extends StatelessWidget {
             children: [
               _buildQuickActionCard(
                 context,
-                icon: Icons.article,
-                title: 'Blog Posts',
-                subtitle: 'Manage your blog',
+                icon: Icons.lightbulb,
+                title: 'Money Ideas',
+                subtitle: 'Business ideas & AI chats',
                 color: Colors.green,
                 onTap: () {
-                  // TODO: Navigate to blog management
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Blog management coming soon!')),
-                  );
+                  context.go('/money/ideas');
                 },
               ),
               _buildQuickActionCard(
@@ -179,25 +176,69 @@ class HomePage extends StatelessWidget {
                 icon: Icons.work,
                 title: 'Projects',
                 subtitle: 'Showcase your work',
-                color: Colors.orange,
+                color: Colors.blue,
                 onTap: () {
-                  // TODO: Navigate to projects management
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Project management coming soon!')),
-                  );
+                  context.go('/projects');
                 },
               ),
               _buildQuickActionCard(
                 context,
-                icon: Icons.analytics,
-                title: 'Analytics',
-                subtitle: 'View statistics',
+                icon: Icons.code,
+                title: 'Frameworks',
+                subtitle: 'Manage technologies',
                 color: Colors.purple,
                 onTap: () {
-                  // TODO: Navigate to analytics
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Analytics coming soon!')),
-                  );
+                  context.go('/frameworks');
+                },
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.school,
+                title: 'Education',
+                subtitle: 'Manage certifications',
+                color: Colors.orange,
+                onTap: () {
+                  context.go('/education');
+                },
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.person,
+                title: 'About Me',
+                subtitle: 'Personal information',
+                color: Colors.teal,
+                onTap: () {
+                  context.go('/about');
+                },
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.article,
+                title: 'Blog',
+                subtitle: 'Write and publish',
+                color: Colors.purple,
+                onTap: () {
+                  context.go('/blog');
+                },
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.business,
+                title: 'Experience',
+                subtitle: 'Professional history',
+                color: Colors.indigo,
+                onTap: () {
+                  context.go('/experience');
+                },
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.star,
+                title: 'Testimonials',
+                subtitle: 'Client feedback',
+                color: Colors.amber,
+                onTap: () {
+                  context.go('/testimonials');
                 },
               ),
               _buildQuickActionCard(
@@ -207,7 +248,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'App preferences',
                 color: Colors.grey,
                 onTap: () {
-                  context.go('/profile');
+                  context.go('/settings');
                 },
               ),
             ],
