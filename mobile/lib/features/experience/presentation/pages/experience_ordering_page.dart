@@ -71,7 +71,7 @@ class _ExperienceOrderingPageState extends State<ExperienceOrderingPage> {
             setState(() {
               _isLoading = false;
             });
-            context.go('/experience');
+            context.push('/experience');
           }
         },
         builder: (context, state) {
@@ -213,7 +213,7 @@ class _ExperienceOrderingPageState extends State<ExperienceOrderingPage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () => context.go('/experience/create'),
+            onPressed: () => context.push('/experience/create'),
             icon: const Icon(Icons.add),
             label: const Text('Add Experience'),
             style: ElevatedButton.styleFrom(

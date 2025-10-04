@@ -36,7 +36,7 @@ class _ExperienceDetailPageState extends State<ExperienceDetailPage> {
                   onSelected: (value) {
                     switch (value) {
                       case 'edit':
-                        context.go('/experience/${widget.experienceId}/edit');
+                        context.push('/experience/${widget.experienceId}/edit');
                         break;
                       case 'delete':
                         _showDeleteDialog(context, state.experience);
@@ -101,7 +101,7 @@ class _ExperienceDetailPageState extends State<ExperienceDetailPage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.go('/experience');
+            context.push('/experience');
           } else if (state is ExperienceUpdated) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -391,7 +391,7 @@ class _ExperienceDetailPageState extends State<ExperienceDetailPage> {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => context.go('/experience/${widget.experienceId}/edit'),
+                  onPressed: () => context.push('/experience/${widget.experienceId}/edit'),
                   icon: const Icon(Icons.edit),
                   label: const Text('Edit Experience'),
                   style: OutlinedButton.styleFrom(

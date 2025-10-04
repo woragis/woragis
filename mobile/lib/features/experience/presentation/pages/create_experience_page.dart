@@ -96,7 +96,7 @@ class _CreateExperiencePageState extends State<CreateExperiencePage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.go('/experience');
+            context.push('/experience');
           } else if (state is ExperienceUpdated) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -104,7 +104,7 @@ class _CreateExperiencePageState extends State<CreateExperiencePage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.go('/experience');
+            context.push('/experience');
           }
         },
         builder: (context, state) {

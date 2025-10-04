@@ -51,7 +51,7 @@ class _ExperienceListPageState extends State<ExperienceListPage> {
             icon: Icon(_isGridView ? Icons.list : Icons.grid_view),
           ),
           IconButton(
-            onPressed: () => context.go('/experience/create'),
+            onPressed: () => context.push('/experience/create'),
             icon: const Icon(Icons.add),
           ),
         ],
@@ -240,7 +240,7 @@ class _ExperienceListPageState extends State<ExperienceListPage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () => context.go('/experience/create'),
+            onPressed: () => context.push('/experience/create'),
             icon: const Icon(Icons.add),
             label: const Text('Add Experience'),
             style: ElevatedButton.styleFrom(
@@ -367,7 +367,7 @@ class _ExperienceListPageState extends State<ExperienceListPage> {
                 const Icon(Icons.arrow_forward_ios, size: 16),
               ],
             ),
-            onTap: () => context.go('/experience/${experience.id}'),
+            onTap: () => context.push('/experience/${experience.id}'),
           ),
         );
       },
@@ -388,7 +388,7 @@ class _ExperienceListPageState extends State<ExperienceListPage> {
         final experience = experiences[index];
         return Card(
           child: InkWell(
-            onTap: () => context.go('/experience/${experience.id}'),
+            onTap: () => context.push('/experience/${experience.id}'),
             borderRadius: BorderRadius.circular(12),
             child: Padding(
               padding: const EdgeInsets.all(12),
