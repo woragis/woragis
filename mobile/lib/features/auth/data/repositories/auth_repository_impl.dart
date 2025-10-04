@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/auth_response_entity.dart';
 import '../../domain/entities/user_entity.dart';
@@ -25,12 +26,12 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      print('🔐 Starting login process for: $email');
+      log('🔐 Starting login process for: $email');
       final authResponse = await remoteDataSource.login(
         email: email,
         password: password,
       );
-      print('✅ Login successful, storing data locally');
+      log('✅ Login successful, storing data locally');
 
           // Store user data first, then tokens (tokens need user data to be stored first)
           await localDataSource.storeUserData(authResponse.user);
@@ -48,7 +49,7 @@ class AuthRepositoryImpl implements AuthRepository {
           );
           authStore.updateUser(authResponse.user);
           
-          print('✅ Login data stored successfully');
+          log('✅ Login data stored successfully');
 
       return Right(authResponse);
     } on ServerException catch (e) {
@@ -131,28 +132,24 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      print('🚪 Logging out user...');
-      await remoteDataSource.logout();
-      print('✅ Remote logout successful');
+      log('🚪 Logging out user...');
       
+      // Clear local tokens
       await localDataSource.clearStoredTokens();
-      print('✅ Local tokens cleared');
+      log('✅ Local tokens cleared');
       
+      // Clear local user data
       await localDataSource.clearStoredUserData();
-      print('✅ Local user data cleared');
+      log('✅ Local user data cleared');
       
       // Clear auth store
       authStore.logout();
+      log('✅ Auth store cleared');
       
+      log('✅ Logout successful - all local data cleared');
       return const Right(null);
-    } on ServerException catch (e) {
-      print('🚨 Server error during logout: ${e.message}');
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      print('🚨 Network error during logout: ${e.message}');
-      return Left(NetworkFailure(e.message));
     } catch (e) {
-      print('🚨 Unexpected error during logout: $e');
+      log('🚨 Error during logout: $e');
       return Left(UnexpectedFailure(e.toString()));
     }
   }
@@ -316,6 +313,16 @@ class AuthRepositoryImpl implements AuthRepository {
       if (expiresAt == null) return const Right(false);
 
       return Right(DateTime.now().isBefore(expiresAt));
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, DateTime?>> getTokenExpiration() async {
+    try {
+      final expiresAt = await localDataSource.getTokenExpiration();
+      return Right(expiresAt);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }

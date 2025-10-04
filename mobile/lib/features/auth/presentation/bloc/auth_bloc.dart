@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/injection/injection_container.dart';
@@ -208,20 +209,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     RestoreAuthStateRequested event,
     Emitter<AuthState> emit,
   ) async {
-    print('🔄 Restoring auth state from local storage...');
+    log('🔄 Restoring auth state from local storage...');
     emit(AuthLoading());
 
     final result = await restoreAuthStateUseCase();
 
     result.fold(
       (failure) {
-        print('🚨 Failed to restore auth state: ${failure.message}');
+        log('🚨 Failed to restore auth state: ${failure.message}');
         emit(AuthUnauthenticated());
       },
       (authStateResult) {
-        print('📋 Auth state result: isAuthenticated=${authStateResult.isAuthenticated}, user=${authStateResult.user?.email}');
+        log('📋 Auth state result: isAuthenticated=${authStateResult.isAuthenticated}, user=${authStateResult.user?.email}');
         if (authStateResult.isAuthenticated && authStateResult.user != null) {
-          print('✅ Restoring authenticated user: ${authStateResult.user!.email}');
+          log('✅ Restoring authenticated user: ${authStateResult.user!.email}');
           // Update auth store with restored tokens FIRST, then user
           if (authStateResult.accessToken != null) {
             authStore.updateTokens(
@@ -234,7 +235,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           authStore.updateUser(authStateResult.user!);
           emit(AuthAuthenticated(authStateResult.user!));
         } else {
-          print('❌ No valid auth state found, redirecting to login');
+          log('❌ No valid auth state found, redirecting to login');
           emit(AuthUnauthenticated());
         }
       },
@@ -246,17 +247,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
-    print('🚪 Starting logout process');
+    log('🚪 Starting logout process');
 
     final result = await logoutUseCase();
 
     result.fold(
       (failure) {
-        print('🚨 Logout failed: ${failure.message}');
+        log('🚨 Logout failed: ${failure.message}');
         emit(AuthError(failure.message));
       },
       (_) {
-        print('✅ Logout successful, clearing authentication state');
+        log('✅ Logout successful, clearing authentication state');
         emit(AuthUnauthenticated());
       },
     );

@@ -127,8 +127,8 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          final ideas = (data['data']['ideas'] as List)
-              .map((ideaJson) => IdeaModel.fromJson(ideaJson).toEntity())
+          final ideas = (data['data'] as List)
+              .map((ideaJson) => IdeaModel.fromApiJson(ideaJson).toEntity())
               .toList();
           return ideas;
         } else {
@@ -155,7 +155,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return IdeaModel.fromJson(data['data']).toEntity();
+          return IdeaModel.fromApiJson(data['data']).toEntity();
         } else {
           throw ServerException(data['message'] ?? 'Failed to fetch idea');
         }
@@ -182,7 +182,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return IdeaModel.fromJson(data['data']).toEntity();
+          return IdeaModel.fromApiJson(data['data']).toEntity();
         } else {
           throw ServerException(data['message'] ?? 'Failed to fetch idea');
         }
@@ -231,7 +231,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return IdeaModel.fromJson(data['data']).toEntity();
+          return IdeaModel.fromApiJson(data['data']).toEntity();
         } else {
           throw ServerException(data['message'] ?? 'Failed to create idea');
         }
@@ -282,7 +282,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return IdeaModel.fromJson(data['data']).toEntity();
+          return IdeaModel.fromApiJson(data['data']).toEntity();
         } else {
           throw ServerException(data['message'] ?? 'Failed to update idea');
         }
@@ -357,8 +357,8 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          final chats = (data['data']['chats'] as List)
-              .map((chatJson) => AiChatModel.fromJson(chatJson).toEntity())
+          final chats = (data['data'] as List)
+              .map((chatJson) => AiChatModel.fromApiJson(chatJson).toEntity())
               .toList();
           return chats;
         } else {
@@ -385,7 +385,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AiChatModel.fromJson(data['data']).toEntity();
+          return AiChatModel.fromApiJson(data['data']).toEntity();
         } else {
           throw ServerException(data['message'] ?? 'Failed to fetch AI chat');
         }
@@ -436,7 +436,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AiChatModel.fromJson(data['data']).toEntity();
+          return AiChatModel.fromApiJson(data['data']).toEntity();
         } else {
           throw ServerException(data['message'] ?? 'Failed to create AI chat');
         }
@@ -489,7 +489,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AiChatModel.fromJson(data['data']).toEntity();
+          return AiChatModel.fromApiJson(data['data']).toEntity();
         } else {
           throw ServerException(data['message'] ?? 'Failed to update AI chat');
         }
@@ -550,7 +550,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AiChatModel.fromJson(data['data']).toEntity();
+          return AiChatModel.fromApiJson(data['data']).toEntity();
         } else {
           throw ServerException(data['message'] ?? 'Failed to send message');
         }

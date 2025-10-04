@@ -22,7 +22,7 @@ class ExperienceLocalDataSourceImpl implements ExperienceLocalDataSource {
     final db = await _dbHelper.database;
     final result = await db.query(
       'experience',
-      orderBy: 'order_index ASC, company ASC',
+      orderBy: 'order ASC, company ASC',
     );
     return result.map((experienceMap) => ExperienceModel.fromJson(experienceMap)).toList();
   }

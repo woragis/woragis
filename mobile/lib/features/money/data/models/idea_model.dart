@@ -25,6 +25,75 @@ class IdeaModel extends IdeaEntity {
 
   Map<String, dynamic> toJson() => _$IdeaModelToJson(this);
 
+  // Custom methods for API (camelCase) and Local Storage (snake_case) conversion
+  factory IdeaModel.fromApiJson(Map<String, dynamic> json) {
+    return IdeaModel(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      title: json['title'] as String,
+      slug: json['slug'] as String,
+      document: json['document'] as String,
+      description: json['description'] as String?,
+      featured: json['featured'] as bool,
+      visible: json['visible'] as bool,
+      public: json['public'] as bool,
+      order: (json['order'] as num).toInt(),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toApiJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'title': title,
+      'slug': slug,
+      'document': document,
+      'description': description,
+      'featured': featured,
+      'visible': visible,
+      'public': public,
+      'order': order,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
+  factory IdeaModel.fromLocalJson(Map<String, dynamic> json) {
+    return IdeaModel(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      title: json['title'] as String,
+      slug: json['slug'] as String,
+      document: json['document'] as String,
+      description: json['description'] as String?,
+      featured: (json['featured'] as int) == 1,
+      visible: (json['visible'] as int) == 1,
+      public: (json['public'] as int) == 1,
+      order: json['order'] as int,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updated_at'] as int),
+    );
+  }
+
+  Map<String, dynamic> toLocalJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'title': title,
+      'slug': slug,
+      'document': document,
+      'description': description,
+      'featured': featured ? 1 : 0,
+      'visible': visible ? 1 : 0,
+      'public': public ? 1 : 0,
+      'order': order,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
+    };
+  }
+
   factory IdeaModel.fromEntity(IdeaEntity entity) {
     return IdeaModel(
       id: entity.id,

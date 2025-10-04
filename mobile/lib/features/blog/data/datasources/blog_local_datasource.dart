@@ -104,7 +104,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
       'blog_posts',
       where: whereClause,
       whereArgs: whereArgs,
-      orderBy: 'order_index ASC, created_at DESC',
+      orderBy: 'order ASC, created_at DESC',
       limit: limit,
       offset: offset,
     );

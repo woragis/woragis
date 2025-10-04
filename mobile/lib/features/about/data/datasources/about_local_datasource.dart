@@ -136,7 +136,7 @@ class AboutLocalDataSourceImpl implements AboutLocalDataSource {
     final db = await _dbHelper.database;
     final result = await db.query(
       'anime_list',
-      orderBy: 'order_index ASC, title ASC',
+      orderBy: 'order ASC, title ASC',
     );
     return result.map((animeMap) => AnimeModel.fromJson(animeMap)).toList();
   }
@@ -231,7 +231,7 @@ class AboutLocalDataSourceImpl implements AboutLocalDataSource {
     final db = await _dbHelper.database;
     final result = await db.query(
       'music_genres',
-      orderBy: 'order_index ASC, name ASC',
+      orderBy: 'order ASC, name ASC',
     );
     return result.map((genreMap) => MusicGenreModel.fromJson(genreMap)).toList();
   }

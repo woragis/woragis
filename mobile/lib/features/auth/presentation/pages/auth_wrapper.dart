@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +23,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
       if (mounted) {
         final currentState = context.read<AuthBloc>().state;
         if (currentState is AuthLoading) {
-          print('⏰ Auth restoration timeout, redirecting to login');
+          log('⏰ Auth restoration timeout, redirecting to login');
           // Force navigation to login to break the loading loop
           context.go('/login');
         }
@@ -34,20 +35,20 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        print('🎯 AuthWrapper listener: ${state.runtimeType}');
+        log('🎯 AuthWrapper listener: ${state.runtimeType}');
         if (state is AuthAuthenticated) {
-          print('🏠 Navigating to home');
+          log('🏠 Navigating to home');
           // User is authenticated, navigate to home
           context.go('/home');
         } else if (state is AuthUnauthenticated) {
-          print('🔐 Navigating to login');
+          log('🔐 Navigating to login');
           // User is not authenticated, navigate to login
           context.go('/login');
         }
       },
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
-          print('🎨 AuthWrapper builder: ${state.runtimeType}');
+          log('🎨 AuthWrapper builder: ${state.runtimeType}');
           if (state is AuthLoading) {
             return const SplashScreen();
           } else if (state is AuthAuthenticated) {

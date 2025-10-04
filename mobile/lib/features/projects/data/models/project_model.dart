@@ -30,10 +30,63 @@ class ProjectModel extends ProjectEntity {
     required super.updatedAt,
   }) : super(frameworks: frameworks);
 
-  factory ProjectModel.fromJson(Map<String, dynamic> json) =>
-      _$ProjectModelFromJson(json);
+  factory ProjectModel.fromJson(Map<String, dynamic> json) {
+    // Handle the case where frameworks might not be present in the response
+    final jsonWithFrameworks = Map<String, dynamic>.from(json);
+    if (!jsonWithFrameworks.containsKey('frameworks')) {
+      jsonWithFrameworks['frameworks'] = null;
+    }
+    return _$ProjectModelFromJson(jsonWithFrameworks);
+  }
+
+  /// Creates a ProjectModel from database JSON with snake_case field names
+  factory ProjectModel.fromDatabaseJson(Map<String, dynamic> json) {
+    return ProjectModel(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      title: json['title'] as String,
+      slug: json['slug'] as String,
+      description: json['description'] as String,
+      longDescription: json['long_description'] as String?,
+      content: json['content'] as String?,
+      videoUrl: json['video_url'] as String?,
+      image: json['image'] as String,
+      githubUrl: json['github_url'] as String?,
+      liveUrl: json['live_url'] as String?,
+      featured: (json['featured'] as int) == 1,
+      order: json['order'] as int,
+      visible: (json['visible'] as int) == 1,
+      public: (json['public'] as int) == 1,
+      frameworks: null, // Frameworks are stored in separate project_frameworks table
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updated_at'] as int),
+    );
+  }
 
   Map<String, dynamic> toJson() => _$ProjectModelToJson(this);
+
+  /// Converts to database format with snake_case field names
+  Map<String, dynamic> toDatabaseJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'title': title,
+      'slug': slug,
+      'description': description,
+      'long_description': longDescription,
+      'content': content,
+      'video_url': videoUrl,
+      'image': image,
+      'github_url': githubUrl,
+      'live_url': liveUrl,
+      'featured': featured ? 1 : 0,
+      'order': order,
+      'visible': visible ? 1 : 0,
+      'public': public ? 1 : 0,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
+    };
+  }
 
   factory ProjectModel.fromEntity(ProjectEntity entity) {
     return ProjectModel(

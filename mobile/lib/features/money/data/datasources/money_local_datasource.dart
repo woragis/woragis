@@ -34,9 +34,9 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
     final db = await _dbHelper.database;
     final result = await db.query(
       'ideas',
-      orderBy: 'order_index ASC, title ASC',
+      orderBy: 'order ASC, title ASC',
     );
-    return result.map((ideaMap) => IdeaModel.fromJson(ideaMap)).toList();
+    return result.map((ideaMap) => IdeaModel.fromLocalJson(ideaMap).toEntity()).toList();
   }
 
   @override
@@ -47,13 +47,13 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
       where: 'id = ?',
       whereArgs: [id],
     );
-    return result.isEmpty ? null : IdeaModel.fromJson(result.first);
+    return result.isEmpty ? null : IdeaModel.fromLocalJson(result.first).toEntity();
   }
 
   @override
   Future<void> cacheIdea(IdeaEntity idea) async {
     final db = await _dbHelper.database;
-    final ideaMap = IdeaModel.fromEntity(idea).toJson();
+    final ideaMap = IdeaModel.fromEntity(idea).toLocalJson();
     ideaMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
     ideaMap['is_dirty'] = 0;
 
@@ -70,7 +70,7 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
     final batch = db.batch();
 
     for (final idea in ideas) {
-      final ideaMap = IdeaModel.fromEntity(idea).toJson();
+      final ideaMap = IdeaModel.fromEntity(idea).toLocalJson();
       ideaMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
       ideaMap['is_dirty'] = 0;
 
@@ -87,7 +87,7 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
   @override
   Future<void> updateCachedIdea(IdeaEntity idea) async {
     final db = await _dbHelper.database;
-    final ideaMap = IdeaModel.fromEntity(idea).toJson();
+    final ideaMap = IdeaModel.fromEntity(idea).toLocalJson();
     ideaMap['updated_at'] = DateTime.now().millisecondsSinceEpoch;
     ideaMap['is_dirty'] = 1;
 
@@ -131,7 +131,7 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
       'ai_chats',
       orderBy: 'created_at DESC',
     );
-    return result.map((chatMap) => AiChatModel.fromJson(chatMap)).toList();
+    return result.map((chatMap) => AiChatModel.fromLocalJson(chatMap).toEntity()).toList();
   }
 
   @override
@@ -142,13 +142,13 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
       where: 'id = ?',
       whereArgs: [id],
     );
-    return result.isEmpty ? null : AiChatModel.fromJson(result.first);
+    return result.isEmpty ? null : AiChatModel.fromLocalJson(result.first).toEntity();
   }
 
   @override
   Future<void> cacheAiChat(AiChatEntity aiChat) async {
     final db = await _dbHelper.database;
-    final chatMap = AiChatModel.fromEntity(aiChat).toJson();
+    final chatMap = AiChatModel.fromEntity(aiChat).toLocalJson();
     chatMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
     chatMap['is_dirty'] = 0;
 
@@ -165,7 +165,7 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
     final batch = db.batch();
 
     for (final aiChat in aiChats) {
-      final chatMap = AiChatModel.fromEntity(aiChat).toJson();
+      final chatMap = AiChatModel.fromEntity(aiChat).toLocalJson();
       chatMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
       chatMap['is_dirty'] = 0;
 
@@ -182,7 +182,7 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
   @override
   Future<void> updateCachedAiChat(AiChatEntity aiChat) async {
     final db = await _dbHelper.database;
-    final chatMap = AiChatModel.fromEntity(aiChat).toJson();
+    final chatMap = AiChatModel.fromEntity(aiChat).toLocalJson();
     chatMap['updated_at'] = DateTime.now().millisecondsSinceEpoch;
     chatMap['is_dirty'] = 1;
 
