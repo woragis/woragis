@@ -1,11 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/money/presentation/bloc/money_bloc.dart';
+import '../../features/projects/presentation/bloc/projects_bloc.dart';
+import '../../features/frameworks/presentation/bloc/frameworks_bloc.dart';
+import '../../features/education/presentation/bloc/education_bloc.dart';
+import '../../features/about/presentation/bloc/about_bloc.dart';
+import '../../features/settings/presentation/bloc/settings_bloc.dart';
+import '../../features/experience/presentation/bloc/experience_bloc.dart';
+import '../../features/blog/presentation/bloc/blog_bloc.dart';
+import '../../features/testimonials/presentation/bloc/testimonials_bloc.dart';
 
 class AppConfig {
   static List<BlocProvider> get providers => [
     BlocProvider<AuthBloc>(
       create: (context) => createAuthBloc(),
+    ),
+    BlocProvider<MoneyBloc>(
+      create: (context) => createMoneyBloc(),
+    ),
+    BlocProvider<ProjectsBloc>(
+      create: (context) => createProjectsBloc(),
+    ),
+    BlocProvider<FrameworksBloc>(
+      create: (context) => createFrameworksBloc(),
+    ),
+    BlocProvider<EducationBloc>(
+      create: (context) => createEducationBloc(),
+    ),
+    BlocProvider<AboutBloc>(
+      create: (context) => createAboutBloc(),
+    ),
+    BlocProvider<SettingsBloc>(
+      create: (context) => createSettingsBloc(),
+    ),
+    BlocProvider<ExperienceBloc>(
+      create: (context) => createExperienceBloc(),
+    ),
+    BlocProvider<BlogBloc>(
+      create: (context) => createBlogBloc(),
+    ),
+    BlocProvider<TestimonialsBloc>(
+      create: (context) => createTestimonialsBloc(),
     ),
   ];
 
