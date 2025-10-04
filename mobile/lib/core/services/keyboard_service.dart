@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'dart:developer';
 
 /// Service to handle keyboard-related issues and provide consistent keyboard behavior
 class KeyboardService {
@@ -15,8 +16,7 @@ class KeyboardService {
       // Small delay to ensure proper initialization
       await Future.delayed(const Duration(milliseconds: 100));
     } catch (e) {
-      // Ignore errors during initialization
-      print('KeyboardService initialization warning: $e');
+      log('KeyboardService initialization warning: $e');
     }
   }
 
@@ -25,7 +25,7 @@ class KeyboardService {
     try {
       await SystemChannels.textInput.invokeMethod('TextInput.show');
     } catch (e) {
-      print('KeyboardService show warning: $e');
+      log('KeyboardService show warning: $e');
     }
   }
 
@@ -34,7 +34,7 @@ class KeyboardService {
     try {
       await SystemChannels.textInput.invokeMethod('TextInput.hide');
     } catch (e) {
-      print('KeyboardService hide warning: $e');
+      log('KeyboardService hide warning: $e');
     }
   }
 
@@ -45,7 +45,7 @@ class KeyboardService {
       await Future.delayed(const Duration(milliseconds: 50));
       await SystemChannels.textInput.invokeMethod('TextInput.show');
     } catch (e) {
-      print('KeyboardService reset warning: $e');
+      log('KeyboardService reset warning: $e');
     }
   }
 }
