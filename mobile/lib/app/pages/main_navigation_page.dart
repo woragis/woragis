@@ -15,8 +15,8 @@ class MainNavigationPage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreatePage(context),
         backgroundColor: Colors.blue.shade600,
-        child: const Icon(Icons.add, color: Colors.white),
         tooltip: 'Create',
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

@@ -404,7 +404,7 @@ class AppRouter {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => context.go('/'),
+              onPressed: () => context.push('/'),
               child: const Text('Go Home'),
             ),
           ],

@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () => context.go('/profile'),
+            onPressed: () => context.push('/profile'),
             icon: const Icon(Icons.person),
           ),
         ],
@@ -60,16 +60,16 @@ class HomePage extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              context.go('/home');
+              context.push('/home');
               break;
             case 1:
-              context.go('/money/ideas');
+              context.push('/money/ideas');
               break;
             case 2:
-              context.go('/projects');
+              context.push('/projects');
               break;
             case 3:
-              context.go('/profile');
+              context.push('/profile');
               break;
           }
         },
@@ -168,7 +168,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'Business ideas & AI chats',
                 color: Colors.green,
                 onTap: () {
-                  context.go('/money/ideas');
+                  context.push('/money/ideas');
                 },
               ),
               _buildQuickActionCard(
@@ -178,7 +178,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'Showcase your work',
                 color: Colors.blue,
                 onTap: () {
-                  context.go('/projects');
+                  context.push('/projects');
                 },
               ),
               _buildQuickActionCard(
@@ -188,7 +188,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'Manage technologies',
                 color: Colors.purple,
                 onTap: () {
-                  context.go('/frameworks');
+                  context.push('/frameworks');
                 },
               ),
               _buildQuickActionCard(
@@ -198,7 +198,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'Manage certifications',
                 color: Colors.orange,
                 onTap: () {
-                  context.go('/education');
+                  context.push('/education');
                 },
               ),
               _buildQuickActionCard(
@@ -208,7 +208,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'Personal information',
                 color: Colors.teal,
                 onTap: () {
-                  context.go('/about');
+                  context.push('/about');
                 },
               ),
               _buildQuickActionCard(
@@ -218,7 +218,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'Write and publish',
                 color: Colors.purple,
                 onTap: () {
-                  context.go('/blog');
+                  context.push('/blog');
                 },
               ),
               _buildQuickActionCard(
@@ -228,7 +228,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'Professional history',
                 color: Colors.indigo,
                 onTap: () {
-                  context.go('/experience');
+                  context.push('/experience');
                 },
               ),
               _buildQuickActionCard(
@@ -238,7 +238,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'Client feedback',
                 color: Colors.amber,
                 onTap: () {
-                  context.go('/testimonials');
+                  context.push('/testimonials');
                 },
               ),
               _buildQuickActionCard(
@@ -248,7 +248,7 @@ class HomePage extends StatelessWidget {
                 subtitle: 'App preferences',
                 color: Colors.grey,
                 onTap: () {
-                  context.go('/settings');
+                  context.push('/settings');
                 },
               ),
             ],
