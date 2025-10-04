@@ -39,30 +39,34 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     if (result.isEmpty) return null;
 
     final userMap = result.first;
-    return UserModel.fromJson(userMap).toEntity();
+    return UserModel.fromDatabaseMap(userMap).toEntity();
   }
 
   @override
   Future<void> storeUserData(UserEntity user) async {
     final db = await _dbHelper.database;
     final userModel = UserModel.fromEntity(user);
-    final userMap = userModel.toJson();
+    final userMap = userModel.toDatabaseMap();
     
     // Add metadata for sync
     userMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
     userMap['is_dirty'] = 0;
 
+    print('👤 Storing user data for: ${user.email}');
     await db.insert(
       'users',
       userMap,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    print('✅ User data stored successfully');
   }
 
   @override
   Future<void> clearStoredUserData() async {
     final db = await _dbHelper.database;
+    print('🗑️ Clearing stored user data from database');
     await db.delete('users');
+    print('✅ User data cleared from database');
   }
 
   @override
@@ -75,7 +79,9 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
       orderBy: 'created_at DESC',
     );
 
-    return result.isEmpty ? null : result.first['access_token'] as String?;
+    final token = result.isEmpty ? null : result.first['access_token'] as String?;
+    print('🔍 Retrieved access token: ${token != null ? 'Found' : 'Not found'}');
+    return token;
   }
 
   @override
@@ -117,7 +123,12 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     
     // Get current user ID
     final userData = await getStoredUserData();
-    if (userData == null) return;
+    if (userData == null) {
+      print('🚨 Cannot store tokens: No user data found');
+      return;
+    }
+    
+    print('🔐 Storing tokens for user: ${userData.id}');
 
     await db.insert(
       'user_sessions',
@@ -136,7 +147,9 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<void> clearStoredTokens() async {
     final db = await _dbHelper.database;
+    print('🗑️ Clearing stored tokens from database');
     await db.delete('user_sessions');
+    print('✅ Tokens cleared from database');
   }
 
   @override
