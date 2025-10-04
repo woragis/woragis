@@ -100,7 +100,7 @@ class AuthStoreBloc extends Bloc<AuthStoreEvent, AuthStoreState> {
   void _onUserUpdated(AuthStoreUserUpdated event, Emitter<AuthStoreState> emit) {
     emit(state.copyWith(
       user: event.user,
-      isAuthenticated: event.user != null,
+      isAuthenticated: event.user != null && state.accessToken != null,
     ));
   }
 
