@@ -74,7 +74,7 @@ class _FrameworksListPageState extends State<FrameworksListPage> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              context.go('/frameworks/create');
+              context.push('/frameworks/create');
             },
           ),
         ],
@@ -267,7 +267,7 @@ class _FrameworksListPageState extends State<FrameworksListPage> {
                           const SizedBox(height: 24),
                           ElevatedButton.icon(
                             onPressed: () {
-                              context.go('/frameworks/create');
+                              context.push('/frameworks/create');
                             },
                             icon: const Icon(Icons.add),
                             label: const Text('Add Framework'),
@@ -328,7 +328,7 @@ class _FrameworksListPageState extends State<FrameworksListPage> {
     return Card(
       child: InkWell(
         onTap: () {
-          context.go('/frameworks/${framework.id}');
+          context.push('/frameworks/${framework.id}');
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -544,7 +544,7 @@ class _FrameworksListPageState extends State<FrameworksListPage> {
           ],
         ),
         onTap: () {
-          context.go('/frameworks/${framework.id}');
+          context.push('/frameworks/${framework.id}');
         },
       ),
     );

@@ -38,7 +38,7 @@ class FrameworkDetailPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              context.go('/frameworks/${framework.id}/edit');
+              context.push('/frameworks/${framework.id}/edit');
             },
           ),
         ],
@@ -252,7 +252,7 @@ class FrameworkDetailPage extends StatelessWidget {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () {
-                              context.go('/frameworks/${framework.id}/edit');
+                              context.push('/frameworks/${framework.id}/edit');
                             },
                             icon: const Icon(Icons.edit),
                             label: const Text('Edit'),
