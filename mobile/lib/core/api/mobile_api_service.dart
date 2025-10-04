@@ -129,7 +129,6 @@ class MobileApiService {
       case DioExceptionType.badCertificate:
         return Exception('Certificate error. Please check your connection.');
       case DioExceptionType.unknown:
-      default:
         return Exception('Unknown error: ${e.message}');
     }
   }
