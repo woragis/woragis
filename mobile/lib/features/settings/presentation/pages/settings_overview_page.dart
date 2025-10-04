@@ -23,7 +23,7 @@ class SettingsOverviewPage extends StatelessWidget {
             subtitle: 'Basic profile information and preferences',
             icon: Icons.person,
             color: Colors.blue,
-            onTap: () => context.go('/settings/core-profile'),
+            onTap: () => context.push('/settings/core-profile'),
           ),
           const SizedBox(height: 16),
 
@@ -34,7 +34,7 @@ class SettingsOverviewPage extends StatelessWidget {
             subtitle: 'Connect your social media accounts',
             icon: Icons.share,
             color: Colors.purple,
-            onTap: () => context.go('/settings/social-media'),
+            onTap: () => context.push('/settings/social-media'),
           ),
           const SizedBox(height: 16),
 
@@ -45,7 +45,7 @@ class SettingsOverviewPage extends StatelessWidget {
             subtitle: 'Manage your contact details',
             icon: Icons.contact_mail,
             color: Colors.green,
-            onTap: () => context.go('/settings/contact'),
+            onTap: () => context.push('/settings/contact'),
           ),
           const SizedBox(height: 16),
 
@@ -56,7 +56,7 @@ class SettingsOverviewPage extends StatelessWidget {
             subtitle: 'Configure your portfolio site',
             icon: Icons.settings,
             color: Colors.orange,
-            onTap: () => context.go('/settings/site'),
+            onTap: () => context.push('/settings/site'),
           ),
           const SizedBox(height: 24),
 
@@ -163,7 +163,7 @@ class SettingsOverviewPage extends StatelessWidget {
                     title: 'Change Password',
                     subtitle: 'Update your account password',
                     icon: Icons.lock,
-                    onTap: () => context.go('/change-password'),
+                    onTap: () => context.push('/change-password'),
                   ),
                   _buildAppSettingTile(
                     context,
