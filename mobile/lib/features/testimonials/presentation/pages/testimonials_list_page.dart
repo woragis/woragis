@@ -200,7 +200,7 @@ class _TestimonialsListPageState extends State<TestimonialsListPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/testimonials/create'),
+        onPressed: () => context.push('/testimonials/create'),
         backgroundColor: Colors.purple.shade600,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -239,7 +239,7 @@ class _TestimonialsListPageState extends State<TestimonialsListPage> {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.go('/testimonials/${testimonial.id}'),
+        onTap: () => context.push('/testimonials/${testimonial.id}'),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -353,7 +353,7 @@ class _TestimonialsListPageState extends State<TestimonialsListPage> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => context.go('/testimonials/${testimonial.id}'),
+        onTap: () => context.push('/testimonials/${testimonial.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),

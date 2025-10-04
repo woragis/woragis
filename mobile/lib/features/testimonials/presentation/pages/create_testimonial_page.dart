@@ -82,7 +82,7 @@ class _CreateTestimonialPageState extends State<CreateTestimonialPage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.go('/testimonials');
+            context.push('/testimonials');
           } else if (state is TestimonialLoaded && widget.testimonialId != null) {
             // Populate form with existing testimonial data
             _populateForm(state.testimonial);

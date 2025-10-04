@@ -58,7 +58,7 @@ class _TestimonialDetailPageState extends State<TestimonialDetailPage> {
         actions: [
           if (!_isEditing)
             IconButton(
-              onPressed: () => context.go('/testimonials/${widget.testimonialId}/edit'),
+              onPressed: () => context.push('/testimonials/${widget.testimonialId}/edit'),
               icon: const Icon(Icons.edit),
             )
           else
