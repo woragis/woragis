@@ -47,7 +47,7 @@ class EducationDetailPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              context.go('/education/${education.id}/edit');
+              context.push('/education/${education.id}/edit');
             },
           ),
         ],
@@ -371,7 +371,7 @@ class EducationDetailPage extends StatelessWidget {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () {
-                              context.go('/education/${education.id}/edit');
+                              context.push('/education/${education.id}/edit');
                             },
                             icon: const Icon(Icons.edit),
                             label: const Text('Edit'),

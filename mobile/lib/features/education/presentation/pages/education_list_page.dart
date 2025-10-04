@@ -74,7 +74,7 @@ class _EducationListPageState extends State<EducationListPage> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              context.go('/education/create');
+              context.push('/education/create');
             },
           ),
         ],
@@ -271,7 +271,7 @@ class _EducationListPageState extends State<EducationListPage> {
                           const SizedBox(height: 24),
                           ElevatedButton.icon(
                             onPressed: () {
-                              context.go('/education/create');
+                              context.push('/education/create');
                             },
                             icon: const Icon(Icons.add),
                             label: const Text('Add Education'),
@@ -332,7 +332,7 @@ class _EducationListPageState extends State<EducationListPage> {
     return Card(
       child: InkWell(
         onTap: () {
-          context.go('/education/${education.id}');
+          context.push('/education/${education.id}');
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -518,7 +518,7 @@ class _EducationListPageState extends State<EducationListPage> {
           ],
         ),
         onTap: () {
-          context.go('/education/${education.id}');
+          context.push('/education/${education.id}');
         },
       ),
     );
