@@ -39,6 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
         title: const Text('Create Account'),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        automaticallyImplyLeading: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -87,7 +88,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                    if (!RegExp(r'^[\w\-\.\+]+@([\w-]+\.)+[\w-]{2,4}$')
                         .hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
