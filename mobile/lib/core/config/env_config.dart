@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Environment configuration class that loads variables from .env file
@@ -357,10 +359,10 @@ class EnvConfig {
   static Future<void> init() async {
     try {
       await dotenv.load(fileName: '.env');
-      print('Environment configuration loaded successfully');
+      log('Environment configuration loaded successfully');
     } catch (e) {
       // .env file not found, will use fallback values
-      print('Warning: .env file not found, using fallback values. Error: $e');
+      log('Warning: .env file not found, using fallback values. Error: $e');
     }
   }
 
@@ -371,24 +373,24 @@ class EnvConfig {
       if (!debugMode) return;
     } catch (e) {
       // If dotenv is not initialized, skip printing config
-      print('Warning: Environment not fully initialized, skipping config print');
+      log('Warning: Environment not fully initialized, skipping config print');
       return;
     }
     
-    print('=== Environment Configuration ===');
-    print('Environment: $environment');
-    print('API Base URL: $apiBaseUrl');
-    print('API Key: $apiKey');
-    print('API Key Header: $apiKeyHeader');
-    print('Debug Mode: $debugMode');
-    print('Offline Cache: $offlineCacheEnabled');
-    print('Feature Flags:');
-    print('  - Blog: $featureBlog');
-    print('  - Projects: $featureProjects');
-    print('  - About: $featureAbout');
-    print('  - Money: $featureMoney');
-    print('  - Admin: $featureAdmin');
-    print('================================');
+    log('=== Environment Configuration ===');
+    log('Environment: $environment');
+    log('API Base URL: $apiBaseUrl');
+    log('API Key: $apiKey');
+    log('API Key Header: $apiKeyHeader');
+    log('Debug Mode: $debugMode');
+    log('Offline Cache: $offlineCacheEnabled');
+    log('Feature Flags:');
+    log('  - Blog: $featureBlog');
+    log('  - Projects: $featureProjects');
+    log('  - About: $featureAbout');
+    log('  - Money: $featureMoney');
+    log('  - Admin: $featureAdmin');
+    log('================================');
   }
 }
 

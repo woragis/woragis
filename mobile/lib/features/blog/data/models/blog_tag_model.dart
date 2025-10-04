@@ -7,11 +7,13 @@ part 'blog_tag_model.g.dart';
 class BlogTagModel extends BlogTagEntity {
   const BlogTagModel({
     required super.id,
+    required super.userId,
     required super.name,
     required super.slug,
     super.description,
     super.color,
-    super.postCount,
+    required super.visible,
+    required super.order,
     required super.createdAt,
     required super.updatedAt,
   });
@@ -24,11 +26,13 @@ class BlogTagModel extends BlogTagEntity {
   factory BlogTagModel.fromEntity(BlogTagEntity entity) {
     return BlogTagModel(
       id: entity.id,
+      userId: entity.userId,
       name: entity.name,
       slug: entity.slug,
       description: entity.description,
       color: entity.color,
-      postCount: entity.postCount,
+      visible: entity.visible,
+      order: entity.order,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );
@@ -37,11 +41,13 @@ class BlogTagModel extends BlogTagEntity {
   BlogTagEntity toEntity() {
     return BlogTagEntity(
       id: id,
+      userId: userId,
       name: name,
       slug: slug,
       description: description,
       color: color,
-      postCount: postCount,
+      visible: visible,
+      order: order,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -50,21 +56,25 @@ class BlogTagModel extends BlogTagEntity {
   @override
   BlogTagModel copyWith({
     String? id,
+    String? userId,
     String? name,
     String? slug,
     String? description,
     String? color,
-    int? postCount,
+    bool? visible,
+    int? order,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
     return BlogTagModel(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       name: name ?? this.name,
       slug: slug ?? this.slug,
       description: description ?? this.description,
       color: color ?? this.color,
-      postCount: postCount ?? this.postCount,
+      visible: visible ?? this.visible,
+      order: order ?? this.order,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

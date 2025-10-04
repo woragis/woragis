@@ -5,10 +5,10 @@ import '../../domain/repositories/money_repository.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/exceptions.dart';
 import '../datasources/money_local_datasource.dart';
-import '../datasources/money_remote_datasource.dart';
+import '../datasources/money_remote_datasource_dio.dart';
 
 class MoneyRepositoryImpl implements MoneyRepository {
-  final MoneyRemoteDataSource remoteDataSource;
+  final MoneyRemoteDataSourceDio remoteDataSource;
   final MoneyLocalDataSource localDataSource;
 
   MoneyRepositoryImpl({

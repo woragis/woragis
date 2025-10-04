@@ -1,6 +1,9 @@
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/query/query_client.dart';
+import '../../../../core/injection/injection_container.dart';
+import '../../../../core/stores/auth_store.dart';
 import '../../domain/entities/project_entity.dart';
 import '../models/project_model.dart';
 
@@ -66,17 +69,17 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
       }
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
-      print('🔍 Projects API Request: /admin/projects');
-      print('🔍 Query Parameters: $queryParams');
+      log('🔍 Projects API Request: /admin/projects');
+      log('🔍 Query Parameters: $queryParams');
 
       final response = await _dio.get(
         '/admin/projects',
         queryParameters: queryParams,
       );
 
-      print('📡 Projects API Response Status: ${response.statusCode}');
-      print('📡 Projects API Response Headers: ${response.headers}');
-      print('📡 Projects API Response Body: ${response.data.toString().substring(0, response.data.toString().length > 500 ? 500 : response.data.toString().length)}...');
+      log('📡 Projects API Response Status: ${response.statusCode}');
+      log('📡 Projects API Response Headers: ${response.headers}');
+      log('📡 Projects API Response Body: ${response.data.toString().substring(0, response.data.toString().length > 500 ? 500 : response.data.toString().length)}...');
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -90,7 +93,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
           throw ServerException(data['error'] ?? data['message'] ?? 'Failed to fetch projects');
         }
       } else {
-        print('🚨 Projects API Error: ${response.statusCode} - ${response.data}');
+        log('🚨 Projects API Error: ${response.statusCode} - ${response.data}');
         throw ServerException('Failed to fetch projects with status ${response.statusCode}');
       }
     } on DioException catch (e) {
@@ -113,8 +116,17 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
 
   @override
   Future<ProjectEntity> getProjectById(String id) async {
+    // UNIQUE_IDENTIFIER_FOR_GET_PROJECT_BY_ID
     try {
-      print('🔍 Project by ID API Request: /admin/projects/$id');
+      log('🔍 Project by ID API Request: /admin/projects/$id');
+      
+      // Debug: Check auth state before making request
+      final authStore = sl<AuthStoreBloc>();
+      final currentState = authStore.state;
+      log('🔍 Auth state before request:');
+      log('  - accessToken: ${currentState.accessToken != null ? 'Present (${currentState.accessToken!.substring(0, 20)}...)' : 'NULL'}');
+      log('  - hasValidToken: ${currentState.hasValidToken}');
+      log('  - isAuthenticated: ${currentState.isAuthenticated}');
 
       final response = await _dio.get('/admin/projects/$id');
 
@@ -131,6 +143,14 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
         throw ServerException('Failed to fetch project with status ${response.statusCode}');
       }
     } on DioException catch (e) {
+      log('❌ Project by ID DioException:');
+      log('  - Type: ${e.type}');
+      log('  - Status Code: ${e.response?.statusCode}');
+      log('  - Message: ${e.message}');
+      log('  - Response Data: ${e.response?.data}');
+      log('  - Request Headers: ${e.requestOptions.headers}');
+      log('  - Request URL: ${e.requestOptions.uri}');
+      log('');
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.sendTimeout) {

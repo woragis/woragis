@@ -22,7 +22,7 @@ class EducationLocalDataSourceImpl implements EducationLocalDataSource {
     final db = await _dbHelper.database;
     final result = await db.query(
       'education',
-      orderBy: 'order_index ASC, institution ASC',
+      orderBy: 'order ASC, institution ASC',
     );
     return result.map((educationMap) => EducationModel.fromJson(educationMap)).toList();
   }

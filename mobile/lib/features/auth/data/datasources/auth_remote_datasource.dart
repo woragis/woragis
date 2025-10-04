@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/query/query_client.dart';
@@ -165,10 +166,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserEntity> getCurrentUser() async {
     try {
-      print('🔍 Auth API Request: /auth/me');
+      log('🔍 Auth API Request: /auth/me');
       final response = await _dio.get('/auth/me');
 
-      print('📡 Auth API Response Status: ${response.statusCode}');
+      log('📡 Auth API Response Status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -202,22 +203,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> logout() async {
-    try {
-      await _dio.post('/auth/logout');
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
-      }
-    } catch (e) {
-      if (e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    // No remote logout call needed - just clear local data
+    // The logout endpoint doesn't exist in the backend
+    // This method is kept for interface compatibility but does nothing
+    return;
   }
 
   @override

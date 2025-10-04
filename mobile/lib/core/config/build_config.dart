@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 
 /// Build-time configuration that gets injected during build
@@ -37,12 +39,12 @@ class BuildConfig {
   /// Print build configuration (for debugging)
   static void printConfig() {
     if (kDebugMode) {
-      print('=== Build Configuration ===');
-      print('Environment: $environment');
-      print('API Base URL: $apiBaseUrl');
-      print('API Key: $apiKey');
-      print('API Key Header: $apiKeyHeader');
-      print('==========================');
+      log('=== Build Configuration ===');
+      log('Environment: $environment');
+      log('API Base URL: $apiBaseUrl');
+      log('API Key: $apiKey');
+      log('API Key Header: $apiKeyHeader');
+      log('==========================');
     }
   }
 }

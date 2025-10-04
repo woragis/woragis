@@ -23,7 +23,7 @@ class TestimonialsLocalDataSourceImpl implements TestimonialsLocalDataSource {
     final db = await _dbHelper.database;
     final result = await db.query(
       'testimonials',
-      orderBy: 'order_index ASC, client_name ASC',
+      orderBy: 'order ASC, name ASC',
     );
     return result.map((testimonialMap) => TestimonialModel.fromJson(testimonialMap)).toList();
   }
@@ -46,7 +46,7 @@ class TestimonialsLocalDataSourceImpl implements TestimonialsLocalDataSource {
       'testimonials',
       where: 'featured = ? AND visible = ?',
       whereArgs: [1, 1],
-      orderBy: 'order_index ASC, client_name ASC',
+      orderBy: 'order ASC, name ASC',
     );
     return result.map((testimonialMap) => TestimonialModel.fromJson(testimonialMap)).toList();
   }

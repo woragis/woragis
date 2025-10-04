@@ -77,12 +77,12 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
       'projects',
       where: whereClause,
       whereArgs: whereArgs,
-      orderBy: 'order_index ASC, created_at DESC',
+      orderBy: 'order ASC, created_at DESC',
       limit: limit,
       offset: offset,
     );
 
-    return result.map((projectMap) => ProjectModel.fromJson(projectMap).toEntity()).toList();
+    return result.map((projectMap) => ProjectModel.fromDatabaseJson(projectMap).toEntity()).toList();
   }
 
   @override
@@ -95,7 +95,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     );
 
     if (result.isEmpty) return null;
-    return ProjectModel.fromJson(result.first).toEntity();
+    return ProjectModel.fromDatabaseJson(result.first).toEntity();
   }
 
   @override
@@ -108,14 +108,14 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     );
 
     if (result.isEmpty) return null;
-    return ProjectModel.fromJson(result.first).toEntity();
+    return ProjectModel.fromDatabaseJson(result.first).toEntity();
   }
 
   @override
   Future<void> cacheProject(ProjectEntity project) async {
     final db = await _dbHelper.database;
     final projectModel = ProjectModel.fromEntity(project);
-    final projectMap = projectModel.toJson();
+    final projectMap = projectModel.toDatabaseJson();
     
     projectMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
     projectMap['is_dirty'] = 0;
@@ -134,7 +134,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
 
     for (final project in projects) {
       final projectModel = ProjectModel.fromEntity(project);
-      final projectMap = projectModel.toJson();
+      final projectMap = projectModel.toDatabaseJson();
       
       projectMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
       projectMap['is_dirty'] = 0;
@@ -153,7 +153,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
   Future<void> updateCachedProject(ProjectEntity project) async {
     final db = await _dbHelper.database;
     final projectModel = ProjectModel.fromEntity(project);
-    final projectMap = projectModel.toJson();
+    final projectMap = projectModel.toDatabaseJson();
     
     projectMap['updated_at'] = DateTime.now().millisecondsSinceEpoch;
     projectMap['is_dirty'] = 1;
@@ -249,7 +249,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
       whereArgs: [1],
     );
 
-    return result.map((projectMap) => ProjectModel.fromJson(projectMap).toEntity()).toList();
+    return result.map((projectMap) => ProjectModel.fromDatabaseJson(projectMap).toEntity()).toList();
   }
 
   @override

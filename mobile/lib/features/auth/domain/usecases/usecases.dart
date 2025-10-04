@@ -6,3 +6,4 @@ export 'logout_usecase.dart';
 export 'refresh_token_usecase.dart';
 export 'change_password_usecase.dart';
 export 'update_profile_usecase.dart';
+export 'restore_auth_state_usecase.dart';

@@ -56,4 +56,5 @@ abstract class AuthRepository {
   // Session validation
   Future<Either<Failure, bool>> isLoggedIn();
   Future<Either<Failure, bool>> isTokenValid();
+  Future<Either<Failure, DateTime?>> getTokenExpiration();
 }

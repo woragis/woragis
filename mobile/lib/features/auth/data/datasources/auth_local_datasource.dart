@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:sqflite/sqflite.dart';
 import '../../../../core/database/database_helper.dart';
 import '../../../../core/database/sync_manager.dart';
@@ -52,21 +53,21 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     userMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
     userMap['is_dirty'] = 0;
 
-    print('👤 Storing user data for: ${user.email}');
+    log('👤 Storing user data for: ${user.email}');
     await db.insert(
       'users',
       userMap,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    print('✅ User data stored successfully');
+    log('✅ User data stored successfully');
   }
 
   @override
   Future<void> clearStoredUserData() async {
     final db = await _dbHelper.database;
-    print('🗑️ Clearing stored user data from database');
+    log('🗑️ Clearing stored user data from database');
     await db.delete('users');
-    print('✅ User data cleared from database');
+    log('✅ User data cleared from database');
   }
 
   @override
@@ -80,7 +81,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     );
 
     final token = result.isEmpty ? null : result.first['access_token'] as String?;
-    print('🔍 Retrieved access token: ${token != null ? 'Found' : 'Not found'}');
+    log('🔍 Retrieved access token: ${token != null ? 'Found' : 'Not found'}');
     return token;
   }
 
@@ -124,11 +125,11 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     // Get current user ID
     final userData = await getStoredUserData();
     if (userData == null) {
-      print('🚨 Cannot store tokens: No user data found');
+      log('🚨 Cannot store tokens: No user data found');
       return;
     }
     
-    print('🔐 Storing tokens for user: ${userData.id}');
+    log('🔐 Storing tokens for user: ${userData.id}');
 
     await db.insert(
       'user_sessions',
@@ -147,9 +148,9 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<void> clearStoredTokens() async {
     final db = await _dbHelper.database;
-    print('🗑️ Clearing stored tokens from database');
+    log('🗑️ Clearing stored tokens from database');
     await db.delete('user_sessions');
-    print('✅ Tokens cleared from database');
+    log('✅ Tokens cleared from database');
   }
 
   @override
