@@ -1,5 +1,3 @@
-/// Core configuration exports
-/// 
-/// This file provides a single entry point for all configuration-related imports
+// This file provides a single entry point for all configuration-related imports
 export 'env_config.dart';
-
+export 'build_config.dart';
