@@ -39,6 +39,7 @@ class DatabaseHelper {
     await _createProjectsTables(db);
     await _createFrameworksTables(db);
     await _createAboutTables(db);
+    await _createMusicTables(db);
     await _createEducationTables(db);
     await _createExperienceTables(db);
     await _createMoneyTables(db);
@@ -62,6 +63,7 @@ class DatabaseHelper {
         id TEXT PRIMARY KEY,
         email TEXT NOT NULL UNIQUE,
         username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
         first_name TEXT,
         last_name TEXT,
         avatar TEXT,
@@ -80,9 +82,11 @@ class DatabaseHelper {
       CREATE TABLE IF NOT EXISTS user_sessions (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
-        access_token TEXT NOT NULL,
-        refresh_token TEXT NOT NULL,
+        token_hash TEXT NOT NULL UNIQUE,
         expires_at INTEGER NOT NULL,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        user_agent TEXT,
+        ip_address TEXT,
         created_at INTEGER NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
       )
@@ -104,7 +108,7 @@ class DatabaseHelper {
         featured INTEGER NOT NULL DEFAULT 0,
         published INTEGER NOT NULL DEFAULT 0,
         published_at INTEGER,
-        order_index INTEGER NOT NULL DEFAULT 0,
+        order INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         public INTEGER NOT NULL DEFAULT 1,
         view_count INTEGER DEFAULT 0,
@@ -119,11 +123,13 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS blog_tags (
         id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
         name TEXT NOT NULL,
         slug TEXT NOT NULL UNIQUE,
         description TEXT,
         color TEXT,
-        post_count INTEGER DEFAULT 0,
+        visible INTEGER NOT NULL DEFAULT 1,
+        order INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         synced_at INTEGER,
@@ -133,13 +139,12 @@ class DatabaseHelper {
 
     await db.execute('''
       CREATE TABLE IF NOT EXISTS blog_post_tags (
-        id TEXT PRIMARY KEY,
-        post_id TEXT NOT NULL,
+        blog_post_id TEXT NOT NULL,
         tag_id TEXT NOT NULL,
         created_at INTEGER NOT NULL,
-        FOREIGN KEY (post_id) REFERENCES blog_posts (id) ON DELETE CASCADE,
+        FOREIGN KEY (blog_post_id) REFERENCES blog_posts (id) ON DELETE CASCADE,
         FOREIGN KEY (tag_id) REFERENCES blog_tags (id) ON DELETE CASCADE,
-        UNIQUE(post_id, tag_id)
+        PRIMARY KEY (blog_post_id, tag_id)
       )
     ''');
   }
@@ -151,7 +156,7 @@ class DatabaseHelper {
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
         title TEXT NOT NULL,
-        slug TEXT NOT NULL UNIQUE,
+        slug TEXT NOT NULL,
         description TEXT NOT NULL,
         long_description TEXT,
         content TEXT,
@@ -159,8 +164,8 @@ class DatabaseHelper {
         image TEXT NOT NULL,
         github_url TEXT,
         live_url TEXT,
-        featured INTEGER NOT NULL DEFAULT 0,
-        order_index INTEGER NOT NULL DEFAULT 0,
+        featured INTEGER NOT NULL DEFAULT 1,
+        order INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         public INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
@@ -175,6 +180,8 @@ class DatabaseHelper {
         id TEXT PRIMARY KEY,
         project_id TEXT NOT NULL,
         framework_id TEXT NOT NULL,
+        version TEXT,
+        proficiency TEXT,
         created_at INTEGER NOT NULL,
         FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE,
         FOREIGN KEY (framework_id) REFERENCES frameworks (id) ON DELETE CASCADE,
@@ -189,16 +196,16 @@ class DatabaseHelper {
       CREATE TABLE IF NOT EXISTS frameworks (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
-        name TEXT NOT NULL,
+        name TEXT NOT NULL UNIQUE,
         slug TEXT NOT NULL UNIQUE,
         description TEXT,
         icon TEXT,
         color TEXT,
-        type TEXT NOT NULL,
-        proficiency_level TEXT,
+        website TEXT,
+        type TEXT NOT NULL DEFAULT 'framework',
+        version TEXT,
+        order INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
-        public INTEGER NOT NULL DEFAULT 1,
-        order_index INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         synced_at INTEGER,
@@ -210,23 +217,7 @@ class DatabaseHelper {
   // About tables
   Future<void> _createAboutTables(Database db) async {
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS about_core (
-        id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        current_profession_id TEXT,
-        biography TEXT,
-        featured_biography TEXT,
-        visible INTEGER NOT NULL DEFAULT 1,
-        created_at INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL,
-        synced_at INTEGER,
-        is_dirty INTEGER NOT NULL DEFAULT 0
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS biographies (
+      CREATE TABLE IF NOT EXISTS biography (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
         featured_biography TEXT,
@@ -240,22 +231,25 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
+    ''');
+
+    await db.execute('''
       CREATE TABLE IF NOT EXISTS anime_list (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
         title TEXT NOT NULL,
         description TEXT,
-        status TEXT NOT NULL,
-        my_anime_list_id TEXT,
+        status TEXT NOT NULL DEFAULT 'want_to_watch',
+        myanimelist_id TEXT,
         cover_image TEXT,
         genres TEXT, -- JSON array
         episodes INTEGER,
-        current_episode INTEGER,
-        rating REAL,
+        current_episode INTEGER DEFAULT 0,
+        rating INTEGER,
         notes TEXT,
         started_at INTEGER,
         completed_at INTEGER,
-        order_index INTEGER NOT NULL DEFAULT 0,
+        order INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -270,7 +264,26 @@ class DatabaseHelper {
         user_id TEXT NOT NULL,
         name TEXT NOT NULL,
         description TEXT,
-        order_index INTEGER NOT NULL DEFAULT 0,
+        order INTEGER DEFAULT 0,
+        visible INTEGER NOT NULL DEFAULT 1,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        synced_at INTEGER,
+        is_dirty INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS last_listened_songs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        artist TEXT NOT NULL,
+        album TEXT,
+        spotify_url TEXT,
+        youtube_url TEXT,
+        listened_at INTEGER,
+        order INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -303,7 +316,7 @@ class DatabaseHelper {
         pdf_document TEXT,
         verification_url TEXT,
         skills TEXT, -- JSON array
-        order_index INTEGER NOT NULL DEFAULT 0,
+        order INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -326,8 +339,8 @@ class DatabaseHelper {
         description TEXT NOT NULL,
         achievements TEXT, -- JSON array
         technologies TEXT, -- JSON array
-        icon TEXT NOT NULL,
-        order_index INTEGER NOT NULL DEFAULT 0,
+        icon TEXT NOT NULL DEFAULT '💼',
+        order INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -350,7 +363,28 @@ class DatabaseHelper {
         featured INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         public INTEGER NOT NULL DEFAULT 1,
-        order_index INTEGER NOT NULL DEFAULT 0,
+        order INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        synced_at INTEGER,
+        is_dirty INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS idea_nodes (
+        id TEXT PRIMARY KEY,
+        idea_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT,
+        type TEXT DEFAULT 'default',
+        position_x REAL NOT NULL DEFAULT 0,
+        position_y REAL NOT NULL DEFAULT 0,
+        width REAL DEFAULT 200,
+        height REAL DEFAULT 100,
+        color TEXT,
+        connections TEXT, -- JSON array
+        visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         synced_at INTEGER,
@@ -362,14 +396,14 @@ class DatabaseHelper {
       CREATE TABLE IF NOT EXISTS ai_chats (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
+        idea_node_id TEXT NOT NULL,
         title TEXT NOT NULL,
-        idea_node_id TEXT,
-        agent TEXT NOT NULL,
+        messages TEXT NOT NULL, -- JSON array
+        agent TEXT NOT NULL DEFAULT 'gpt-4',
         model TEXT,
         system_prompt TEXT,
-        temperature REAL NOT NULL DEFAULT 0.7,
-        max_tokens INTEGER,
-        messages TEXT NOT NULL, -- JSON array
+        temperature TEXT DEFAULT '0.7',
+        max_tokens TEXT,
         visible INTEGER NOT NULL DEFAULT 1,
         archived INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,
@@ -391,11 +425,33 @@ class DatabaseHelper {
         company TEXT NOT NULL,
         content TEXT NOT NULL,
         avatar TEXT,
-        rating INTEGER NOT NULL,
-        featured INTEGER NOT NULL DEFAULT 0,
-        order_index INTEGER NOT NULL DEFAULT 0,
+        rating INTEGER NOT NULL DEFAULT 5,
+        featured INTEGER NOT NULL DEFAULT 1,
+        order INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         public INTEGER NOT NULL DEFAULT 1,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        synced_at INTEGER,
+        is_dirty INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+  }
+
+  // Music tables
+  Future<void> _createMusicTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS last_listened_songs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        artist TEXT NOT NULL,
+        album TEXT,
+        spotify_url TEXT,
+        youtube_url TEXT,
+        listened_at INTEGER,
+        order INTEGER DEFAULT 0,
+        visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         synced_at INTEGER,
@@ -409,16 +465,56 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS settings (
         id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
         key TEXT NOT NULL UNIQUE,
         value TEXT NOT NULL,
-        description TEXT,
-        category TEXT,
-        is_public INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS social_media (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        github TEXT,
+        linkedin TEXT,
+        twitter TEXT,
+        instagram TEXT,
+        youtube TEXT,
+        discord TEXT,
+        telegram TEXT,
+        website TEXT,
         created_at INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL,
-        synced_at INTEGER,
-        is_dirty INTEGER NOT NULL DEFAULT 0
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS contact_info (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT,
+        address TEXT,
+        city TEXT,
+        country TEXT,
+        timezone TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS site_settings (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        theme TEXT DEFAULT 'system' NOT NULL,
+        language TEXT DEFAULT 'en' NOT NULL,
+        projects_per_page INTEGER DEFAULT 6 NOT NULL,
+        maintenance_mode INTEGER DEFAULT 0 NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
       )
     ''');
   }
@@ -460,16 +556,20 @@ class DatabaseHelper {
     await db.delete('blog_tags');
     await db.delete('projects');
     await db.delete('frameworks');
-    await db.delete('about_core');
-    await db.delete('biographies');
+    await db.delete('biography');
     await db.delete('anime_list');
     await db.delete('music_genres');
     await db.delete('education');
     await db.delete('experiences');
     await db.delete('ideas');
+    await db.delete('idea_nodes');
     await db.delete('ai_chats');
     await db.delete('testimonials');
     await db.delete('settings');
+    await db.delete('social_media');
+    await db.delete('contact_info');
+    await db.delete('site_settings');
+    await db.delete('last_listened_songs');
     await db.delete('sync_queue');
     await db.delete('sync_status');
   }
