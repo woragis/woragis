@@ -132,5 +132,3 @@ class AuthStoreBloc extends Bloc<AuthStoreEvent, AuthStoreState> {
   String? get currentAccessToken => state.accessToken;
   bool get isAuthenticated => state.isAuthenticated && state.hasValidToken;
 }
-
-
