@@ -188,7 +188,7 @@ class _IdeasListPageState extends State<IdeasListPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/money/ideas/create'),
+        onPressed: () => context.push('/money/ideas/create'),
         backgroundColor: Colors.green.shade600,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -199,7 +199,7 @@ class _IdeasListPageState extends State<IdeasListPage> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => context.go('/money/ideas/${idea.id}'),
+        onTap: () => context.push('/money/ideas/${idea.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),

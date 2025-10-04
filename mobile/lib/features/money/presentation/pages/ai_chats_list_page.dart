@@ -189,7 +189,7 @@ class _AiChatsListPageState extends State<AiChatsListPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/money/ai-chats/create'),
+        onPressed: () => context.push('/money/ai-chats/create'),
         backgroundColor: Colors.purple.shade600,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -200,7 +200,7 @@ class _AiChatsListPageState extends State<AiChatsListPage> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => context.go('/money/ai-chats/${chat.id}'),
+        onTap: () => context.push('/money/ai-chats/${chat.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),

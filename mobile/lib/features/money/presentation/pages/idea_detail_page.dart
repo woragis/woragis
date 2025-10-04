@@ -54,7 +54,7 @@ class _IdeaDetailPageState extends State<IdeaDetailPage> {
         actions: [
           if (!_isEditing)
             IconButton(
-              onPressed: () => context.go('/money/ideas/${widget.ideaId}/edit'),
+              onPressed: () => context.push('/money/ideas/${widget.ideaId}/edit'),
               icon: const Icon(Icons.edit),
             )
           else
@@ -295,7 +295,7 @@ class _IdeaDetailPageState extends State<IdeaDetailPage> {
                               const Spacer(),
                               if (!_isEditing)
                                 TextButton.icon(
-                                  onPressed: () => context.go('/money/ai-chats/create?ideaId=${idea.id}'),
+                                  onPressed: () => context.push('/money/ai-chats/create?ideaId=${idea.id}'),
                                   icon: const Icon(Icons.chat),
                                   label: const Text('AI Chat'),
                                 ),

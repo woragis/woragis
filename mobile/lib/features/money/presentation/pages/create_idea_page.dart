@@ -78,7 +78,7 @@ class _CreateIdeaPageState extends State<CreateIdeaPage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.go('/money/ideas');
+            context.push('/money/ideas');
           } else if (state is IdeaLoaded && widget.ideaId != null) {
             // Populate form with existing idea data
             _populateForm(state.idea);
