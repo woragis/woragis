@@ -13,8 +13,23 @@ import '../../features/testimonials/presentation/bloc/testimonials_bloc.dart';
 
 class AppConfig {
   static List<BlocProvider> get providers => [
+    BlocProvider<AboutBloc>(
+      create: (context) => createAboutBloc(),
+    ),
     BlocProvider<AuthBloc>(
       create: (context) => createAuthBloc(),
+    ),
+    BlocProvider<BlogBloc>(
+      create: (context) => createBlogBloc(),
+    ),
+    BlocProvider<EducationBloc>(
+      create: (context) => createEducationBloc(),
+    ),
+    BlocProvider<ExperienceBloc>(
+      create: (context) => createExperienceBloc(),
+    ),
+    BlocProvider<FrameworksBloc>(
+      create: (context) => createFrameworksBloc(),
     ),
     BlocProvider<MoneyBloc>(
       create: (context) => createMoneyBloc(),
@@ -22,23 +37,8 @@ class AppConfig {
     BlocProvider<ProjectsBloc>(
       create: (context) => createProjectsBloc(),
     ),
-    BlocProvider<FrameworksBloc>(
-      create: (context) => createFrameworksBloc(),
-    ),
-    BlocProvider<EducationBloc>(
-      create: (context) => createEducationBloc(),
-    ),
-    BlocProvider<AboutBloc>(
-      create: (context) => createAboutBloc(),
-    ),
     BlocProvider<SettingsBloc>(
       create: (context) => createSettingsBloc(),
-    ),
-    BlocProvider<ExperienceBloc>(
-      create: (context) => createExperienceBloc(),
-    ),
-    BlocProvider<BlogBloc>(
-      create: (context) => createBlogBloc(),
     ),
     BlocProvider<TestimonialsBloc>(
       create: (context) => createTestimonialsBloc(),
@@ -79,15 +79,13 @@ class AppConfig {
       secondaryContainer: Color(0xFFF3E8FF),
       tertiary: accentPink,
       tertiaryContainer: Color(0xFFFCE7F3),
-      surface: lightSurface,
+      surface: lightBackground,
       surfaceContainerHighest: lightCard,
-      background: lightBackground,
       error: Color(0xFFEF4444),
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onTertiary: Colors.white,
       onSurface: lightText,
-      onBackground: lightText,
       onError: Colors.white,
       outline: lightBorder,
       outlineVariant: Color(0xFFF1F5F9),
@@ -206,7 +204,7 @@ class AppConfig {
         backgroundColor: primaryPurple,
         foregroundColor: Colors.white,
         elevation: 0,
-        shadowColor: primaryPurple.withOpacity(0.3),
+        shadowColor: primaryPurple.withValues(alpha: 0.3),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -252,7 +250,7 @@ class AppConfig {
     // Card Theme
     cardTheme: CardThemeData(
       elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: Colors.black.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: lightBorder, width: 1),
@@ -310,15 +308,13 @@ class AppConfig {
       secondaryContainer: Color(0xFF7C3AED),
       tertiary: accentPink,
       tertiaryContainer: Color(0xFFBE185D),
-      surface: darkSurface,
+      surface: darkBackground,
       surfaceContainerHighest: darkCard,
-      background: darkBackground,
       error: Color(0xFFEF4444),
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onTertiary: Colors.white,
       onSurface: darkText,
-      onBackground: darkText,
       onError: Colors.white,
       outline: darkBorder,
       outlineVariant: Color(0xFF16213E),
@@ -437,7 +433,7 @@ class AppConfig {
         backgroundColor: primaryPurple,
         foregroundColor: Colors.white,
         elevation: 0,
-        shadowColor: primaryPurple.withOpacity(0.3),
+        shadowColor: primaryPurple.withValues(alpha: 0.3),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -483,7 +479,7 @@ class AppConfig {
     // Card Theme
     cardTheme: CardThemeData(
       elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.3),
+      shadowColor: Colors.black.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: darkBorder, width: 1),
