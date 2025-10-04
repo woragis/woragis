@@ -1,9 +1,10 @@
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart' as http;
+import '../stores/auth_store.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Core
+import '../config/env_config.dart';
 import '../database/database_helper.dart';
 import '../database/sync_manager.dart';
 import '../network/network_info.dart';
@@ -32,11 +33,11 @@ import '../../features/auth/domain/usecases/usecases.dart';
 // import '../../features/blog/presentation/bloc/blog_filter/blog_filter_bloc.dart';
 
 // Projects
-// import '../../features/projects/data/datasources/projects_local_datasource.dart';
-// import '../../features/projects/data/datasources/projects_remote_datasource.dart';
-// import '../../features/projects/data/datasources/projects_remote_datasource_query.dart';
-// import '../../features/projects/data/repositories/projects_repository_impl.dart';
-// import '../../features/projects/domain/repositories/projects_repository.dart';
+import '../../features/projects/data/datasources/projects_local_datasource.dart';
+import '../../features/projects/data/datasources/projects_remote_datasource.dart';
+import '../../features/projects/data/repositories/projects_repository_impl.dart';
+import '../../features/projects/domain/repositories/projects_repository.dart';
+import '../../features/projects/domain/usecases/usecases.dart';
 
 // Frameworks
 // import '../../features/frameworks/data/datasources/frameworks_local_datasource.dart';
@@ -95,7 +96,6 @@ Future<void> init() async {
   sl.registerLazySingleton<SyncManager>(() => SyncManager());
   
   // External
-  sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => Connectivity());
   
   // SharedPreferences (for BLoCs)
@@ -108,8 +108,14 @@ Future<void> init() async {
   // Core - Query Client Manager
   sl.registerLazySingleton<QueryClientManager>(() => QueryClientManager());
   
+  // Core - Auth Store
+  sl.registerLazySingleton<AuthStoreBloc>(() => AuthStoreBloc());
+  
   // Initialize Query Client Manager
   await sl<QueryClientManager>().initialize();
+  
+  // Set auth store in query client manager
+  sl<QueryClientManager>().setAuthStore(sl<AuthStoreBloc>());
 
   // Core BLoCs (for local UI state only)
   _initCoreBLoCs();
@@ -121,7 +127,7 @@ Future<void> init() async {
   // _initBlog();
   
   // Projects
-  // _initProjects();
+  _initProjects();
   
   // Frameworks
   // _initFrameworks();
@@ -166,8 +172,8 @@ void _initAuth() {
   
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(
-      client: sl(),
-      baseUrl: 'http://localhost:3000/api', // This should come from environment
+      queryClientManager: sl(),
+      baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
 
@@ -176,6 +182,7 @@ void _initAuth() {
     () => AuthRepositoryImpl(
       remoteDataSource: sl(),
       localDataSource: sl(),
+      authStore: sl(),
     ),
   );
 
@@ -238,34 +245,38 @@ void _initAuth() {
 // }
 
 // Projects
-// void _initProjects() {
-//   // Data sources
-//   sl.registerLazySingleton<ProjectsLocalDataSource>(
-//     () => ProjectsLocalDataSourceImpl(),
-//   );
-//   
-//   sl.registerLazySingleton<ProjectsRemoteDataSource>(
-//     () => ProjectsRemoteDataSourceImpl(
-//       client: sl(),
-//       baseUrl: 'http://localhost:3000/api',
-//     ),
-//   );
-//   
-//   sl.registerLazySingleton<ProjectsRemoteDataSourceQuery>(
-//     () => ProjectsRemoteDataSourceQueryImpl(
-//       queryClientManager: sl(),
-//       dio: sl<QueryClientManager>().dio,
-//     ),
-//   );
+void _initProjects() {
+  // Data sources
+  sl.registerLazySingleton<ProjectsLocalDataSource>(
+    () => ProjectsLocalDataSourceImpl(),
+  );
+  
+  sl.registerLazySingleton<ProjectsRemoteDataSource>(
+    () => ProjectsRemoteDataSourceImpl(
+      queryClientManager: sl(),
+      baseUrl: EnvConfig.apiBaseUrl,
+    ),
+  );
 
-//   // Repository
-//   sl.registerLazySingleton<ProjectsRepository>(
-//     () => ProjectsRepositoryImpl(
-//       remoteDataSource: sl(),
-//       localDataSource: sl(),
-//     ),
-//   );
-// }
+  // Repository
+  sl.registerLazySingleton<ProjectsRepository>(
+    () => ProjectsRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetProjectsUseCase(sl()));
+  sl.registerLazySingleton(() => GetProjectByIdUseCase(sl()));
+  sl.registerLazySingleton(() => GetProjectBySlugUseCase(sl()));
+  sl.registerLazySingleton(() => CreateProjectUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateProjectUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteProjectUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateProjectOrderUseCase(sl()));
+  sl.registerLazySingleton(() => IncrementProjectViewCountUseCase(sl()));
+  sl.registerLazySingleton(() => IncrementProjectLikeCountUseCase(sl()));
+}
 
 // Frameworks
 // void _initFrameworks() {
