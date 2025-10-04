@@ -52,6 +52,7 @@ class _SocialMediaSettingsPageState extends State<SocialMediaSettingsPage> {
         backgroundColor: Colors.purple.shade600,
         foregroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: true,
         actions: [
           TextButton(
             onPressed: _isLoading ? null : _saveSettings,

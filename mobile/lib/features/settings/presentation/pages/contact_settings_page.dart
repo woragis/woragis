@@ -57,6 +57,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
         backgroundColor: Colors.green.shade600,
         foregroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: true,
         actions: [
           TextButton(
             onPressed: _isLoading ? null : _saveSettings,
