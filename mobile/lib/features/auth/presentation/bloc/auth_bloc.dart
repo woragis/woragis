@@ -201,12 +201,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
+    print('🚪 Starting logout process');
 
     final result = await logoutUseCase();
 
     result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (_) => emit(AuthUnauthenticated()),
+      (failure) {
+        print('🚨 Logout failed: ${failure.message}');
+        emit(AuthError(failure.message));
+      },
+      (_) {
+        print('✅ Logout successful, clearing authentication state');
+        emit(AuthUnauthenticated());
+      },
     );
   }
 
