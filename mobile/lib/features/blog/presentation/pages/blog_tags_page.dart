@@ -260,9 +260,8 @@ class _BlogTagsPageState extends State<BlogTagsPage> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                if (tag.postCount != null)
-                  Text(
-                    '${tag.postCount} posts',
+                Text(
+                  'Order: ${tag.order}',
                     style: TextStyle(
                       color: Colors.blue.shade600,
                       fontSize: 11,

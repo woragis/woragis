@@ -206,7 +206,7 @@ class _BlogPostsListPageState extends State<BlogPostsListPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/blog/create'),
+        onPressed: () => context.push('/blog/create'),
         backgroundColor: Colors.green.shade600,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -245,7 +245,7 @@ class _BlogPostsListPageState extends State<BlogPostsListPage> {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.go('/blog/${post.id}'),
+        onTap: () => context.push('/blog/${post.id}'),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -399,7 +399,7 @@ class _BlogPostsListPageState extends State<BlogPostsListPage> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => context.go('/blog/${post.id}'),
+        onTap: () => context.push('/blog/${post.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),

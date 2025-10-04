@@ -54,7 +54,7 @@ class _BlogPostDetailPageState extends State<BlogPostDetailPage> {
         actions: [
           if (!_isEditing)
             IconButton(
-              onPressed: () => context.go('/blog/${widget.postId}/edit'),
+              onPressed: () => context.push('/blog/${widget.postId}/edit'),
               icon: const Icon(Icons.edit),
             )
           else

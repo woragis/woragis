@@ -85,7 +85,7 @@ class _CreateBlogPostPageState extends State<CreateBlogPostPage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.go('/blog');
+            context.push('/blog');
           } else if (state is BlogPostLoaded && widget.postId != null) {
             // Populate form with existing post data
             _populateForm(state.post);
