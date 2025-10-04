@@ -140,7 +140,7 @@ class _ProjectOrderingPageState extends State<ProjectOrderingPage> {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: () => context.go('/projects/create'),
+                      onPressed: () => context.push('/projects/create'),
                       child: const Text('Create Project'),
                     ),
                   ],
@@ -243,7 +243,7 @@ class _ProjectOrderingPageState extends State<ProjectOrderingPage> {
             ),
           ],
         ),
-        onTap: () => context.go('/projects/${project['id']}'),
+        onTap: () => context.push('/projects/${project['id']}'),
       ),
     );
   }

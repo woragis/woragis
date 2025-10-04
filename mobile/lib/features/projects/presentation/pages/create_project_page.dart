@@ -88,7 +88,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.go('/projects');
+            context.push('/projects');
           } else if (state is ProjectLoaded && widget.projectId != null) {
             // Populate form with existing project data
             _populateForm(state.project);

@@ -199,7 +199,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/projects/create'),
+        onPressed: () => context.push('/projects/create'),
         backgroundColor: Colors.blue.shade600,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -238,7 +238,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.go('/projects/${project.id}'),
+        onTap: () => context.push('/projects/${project.id}'),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -348,7 +348,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => context.go('/projects/${project.id}'),
+        onTap: () => context.push('/projects/${project.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),

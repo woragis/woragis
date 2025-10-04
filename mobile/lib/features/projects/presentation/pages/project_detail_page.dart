@@ -63,7 +63,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
         actions: [
           if (!_isEditing)
             IconButton(
-              onPressed: () => context.go('/projects/${widget.projectId}/edit'),
+              onPressed: () => context.push('/projects/${widget.projectId}/edit'),
               icon: const Icon(Icons.edit),
             )
           else
