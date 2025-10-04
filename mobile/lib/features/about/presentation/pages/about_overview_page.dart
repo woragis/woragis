@@ -29,7 +29,7 @@ class _AboutOverviewPageState extends State<AboutOverviewPage> {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              context.go('/about/edit');
+              context.push('/about/edit');
             },
           ),
         ],
@@ -241,7 +241,7 @@ class _AboutOverviewPageState extends State<AboutOverviewPage> {
                 const Spacer(),
                 TextButton(
                   onPressed: () {
-                    context.go('/about/anime');
+                    context.push('/about/anime');
                   },
                   child: const Text('View All'),
                 ),
@@ -337,7 +337,7 @@ class _AboutOverviewPageState extends State<AboutOverviewPage> {
                 const Spacer(),
                 TextButton(
                   onPressed: () {
-                    context.go('/about/music');
+                    context.push('/about/music');
                   },
                   child: const Text('View All'),
                 ),
@@ -391,7 +391,7 @@ class _AboutOverviewPageState extends State<AboutOverviewPage> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      context.go('/about/edit');
+                      context.push('/about/edit');
                     },
                     icon: const Icon(Icons.edit),
                     label: const Text('Edit Profile'),
@@ -401,7 +401,7 @@ class _AboutOverviewPageState extends State<AboutOverviewPage> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      context.go('/about/anime');
+                      context.push('/about/anime');
                     },
                     icon: const Icon(Icons.movie),
                     label: const Text('Manage Anime'),
@@ -415,7 +415,7 @@ class _AboutOverviewPageState extends State<AboutOverviewPage> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      context.go('/about/music');
+                      context.push('/about/music');
                     },
                     icon: const Icon(Icons.music_note),
                     label: const Text('Music Genres'),
@@ -425,7 +425,7 @@ class _AboutOverviewPageState extends State<AboutOverviewPage> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      context.go('/about/biography');
+                      context.push('/about/biography');
                     },
                     icon: const Icon(Icons.article),
                     label: const Text('Biography'),
