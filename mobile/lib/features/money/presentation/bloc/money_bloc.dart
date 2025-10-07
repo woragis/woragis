@@ -219,6 +219,55 @@ class CreateAiChatRequested extends MoneyEvent {
       ];
 }
 
+class UpdateAiChatRequested extends MoneyEvent {
+  final String id;
+  final String? title;
+  final String? ideaNodeId;
+  final String? agent;
+  final String? model;
+  final String? systemPrompt;
+  final double? temperature;
+  final int? maxTokens;
+  final bool? visible;
+  final bool? archived;
+
+  const UpdateAiChatRequested({
+    required this.id,
+    this.title,
+    this.ideaNodeId,
+    this.agent,
+    this.model,
+    this.systemPrompt,
+    this.temperature,
+    this.maxTokens,
+    this.visible,
+    this.archived,
+  });
+
+  @override
+  List<Object?> get props => [
+        id,
+        title,
+        ideaNodeId,
+        agent,
+        model,
+        systemPrompt,
+        temperature,
+        maxTokens,
+        visible,
+        archived,
+      ];
+}
+
+class DeleteAiChatRequested extends MoneyEvent {
+  final String id;
+
+  const DeleteAiChatRequested(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+
 class SendMessageRequested extends MoneyEvent {
   final String chatId;
   final String message;
@@ -370,6 +419,24 @@ class AiChatCreated extends MoneyState {
   List<Object> get props => [aiChat];
 }
 
+class AiChatUpdated extends MoneyState {
+  final AiChatEntity aiChat;
+
+  const AiChatUpdated(this.aiChat);
+
+  @override
+  List<Object> get props => [aiChat];
+}
+
+class AiChatDeleted extends MoneyState {
+  final String id;
+
+  const AiChatDeleted(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+
 class MessageSent extends MoneyState {
   final String chatId;
   final String message;
@@ -422,6 +489,8 @@ class MoneyBloc extends Bloc<MoneyEvent, MoneyState> {
     on<GetAiChatsRequested>(_onGetAiChatsRequested);
     on<GetAiChatByIdRequested>(_onGetAiChatByIdRequested);
     on<CreateAiChatRequested>(_onCreateAiChatRequested);
+    on<UpdateAiChatRequested>(_onUpdateAiChatRequested);
+    on<DeleteAiChatRequested>(_onDeleteAiChatRequested);
     on<SendMessageRequested>(_onSendMessageRequested);
   }
 
@@ -622,6 +691,45 @@ class MoneyBloc extends Bloc<MoneyEvent, MoneyState> {
     result.fold(
       (failure) => emit(MoneyError(failure.message)),
       (chat) => emit(AiChatCreated(chat)),
+    );
+  }
+
+  Future<void> _onUpdateAiChatRequested(
+    UpdateAiChatRequested event,
+    Emitter<MoneyState> emit,
+  ) async {
+    emit(MoneyLoading());
+
+    final result = await updateAiChatUseCase(
+      id: event.id,
+      title: event.title,
+      ideaNodeId: event.ideaNodeId,
+      agent: event.agent,
+      model: event.model,
+      systemPrompt: event.systemPrompt,
+      temperature: event.temperature,
+      maxTokens: event.maxTokens,
+      visible: event.visible,
+      archived: event.archived,
+    );
+
+    result.fold(
+      (failure) => emit(MoneyError(failure.message)),
+      (chat) => emit(AiChatUpdated(chat)),
+    );
+  }
+
+  Future<void> _onDeleteAiChatRequested(
+    DeleteAiChatRequested event,
+    Emitter<MoneyState> emit,
+  ) async {
+    emit(MoneyLoading());
+
+    final result = await deleteAiChatUseCase(event.id);
+
+    result.fold(
+      (failure) => emit(MoneyError(failure.message)),
+      (_) => emit(AiChatDeleted(event.id)),
     );
   }
 
