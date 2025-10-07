@@ -63,7 +63,7 @@ class DatabaseHelper {
         id TEXT PRIMARY KEY,
         email TEXT NOT NULL UNIQUE,
         username TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
+        password_hash TEXT,
         first_name TEXT,
         last_name TEXT,
         avatar TEXT,
@@ -82,7 +82,9 @@ class DatabaseHelper {
       CREATE TABLE IF NOT EXISTS user_sessions (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
-        token_hash TEXT NOT NULL UNIQUE,
+        access_token TEXT,
+        refresh_token TEXT,
+        token_hash TEXT UNIQUE,
         expires_at INTEGER NOT NULL,
         is_active INTEGER NOT NULL DEFAULT 1,
         user_agent TEXT,
@@ -108,7 +110,7 @@ class DatabaseHelper {
         featured INTEGER NOT NULL DEFAULT 0,
         published INTEGER NOT NULL DEFAULT 0,
         published_at INTEGER,
-        order INTEGER NOT NULL DEFAULT 0,
+        `order` INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         public INTEGER NOT NULL DEFAULT 1,
         view_count INTEGER DEFAULT 0,
@@ -129,7 +131,7 @@ class DatabaseHelper {
         description TEXT,
         color TEXT,
         visible INTEGER NOT NULL DEFAULT 1,
-        order INTEGER NOT NULL DEFAULT 0,
+        `order` INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         synced_at INTEGER,
@@ -165,7 +167,7 @@ class DatabaseHelper {
         github_url TEXT,
         live_url TEXT,
         featured INTEGER NOT NULL DEFAULT 1,
-        order INTEGER NOT NULL DEFAULT 0,
+        `order` INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         public INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
@@ -204,7 +206,7 @@ class DatabaseHelper {
         website TEXT,
         type TEXT NOT NULL DEFAULT 'framework',
         version TEXT,
-        order INTEGER DEFAULT 0,
+        `order` INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -249,7 +251,7 @@ class DatabaseHelper {
         notes TEXT,
         started_at INTEGER,
         completed_at INTEGER,
-        order INTEGER DEFAULT 0,
+        `order` INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -264,7 +266,7 @@ class DatabaseHelper {
         user_id TEXT NOT NULL,
         name TEXT NOT NULL,
         description TEXT,
-        order INTEGER DEFAULT 0,
+        `order` INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -283,7 +285,7 @@ class DatabaseHelper {
         spotify_url TEXT,
         youtube_url TEXT,
         listened_at INTEGER,
-        order INTEGER DEFAULT 0,
+        `order` INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -316,7 +318,7 @@ class DatabaseHelper {
         pdf_document TEXT,
         verification_url TEXT,
         skills TEXT, -- JSON array
-        order INTEGER DEFAULT 0,
+        `order` INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -340,7 +342,7 @@ class DatabaseHelper {
         achievements TEXT, -- JSON array
         technologies TEXT, -- JSON array
         icon TEXT NOT NULL DEFAULT '💼',
-        order INTEGER NOT NULL DEFAULT 0,
+        `order` INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -363,7 +365,7 @@ class DatabaseHelper {
         featured INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         public INTEGER NOT NULL DEFAULT 1,
-        order INTEGER NOT NULL DEFAULT 0,
+        `order` INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         synced_at INTEGER,
@@ -427,7 +429,7 @@ class DatabaseHelper {
         avatar TEXT,
         rating INTEGER NOT NULL DEFAULT 5,
         featured INTEGER NOT NULL DEFAULT 1,
-        order INTEGER NOT NULL DEFAULT 0,
+        `order` INTEGER NOT NULL DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         public INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
@@ -450,7 +452,7 @@ class DatabaseHelper {
         spotify_url TEXT,
         youtube_url TEXT,
         listened_at INTEGER,
-        order INTEGER DEFAULT 0,
+        `order` INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
@@ -572,6 +574,24 @@ class DatabaseHelper {
     await db.delete('last_listened_songs');
     await db.delete('sync_queue');
     await db.delete('sync_status');
+  }
+
+  /// Completely resets the database by deleting the file and recreating it
+  Future<void> resetDatabase() async {
+    // Close the current database connection
+    await close();
+    
+    // Get the database path
+    String path = join(await getDatabasesPath(), 'woragis.db');
+    
+    // Delete the database file
+    await deleteDatabase(path);
+    
+    // Reset the database instance
+    _database = null;
+    
+    // Recreate the database
+    await database;
   }
 
   Future<void> close() async {
