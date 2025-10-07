@@ -5,10 +5,10 @@ import '../../domain/repositories/money_repository.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/exceptions.dart';
 import '../datasources/money_local_datasource.dart';
-import '../datasources/money_remote_datasource_dio.dart';
+import '../datasources/money_remote_datasource.dart';
 
 class MoneyRepositoryImpl implements MoneyRepository {
-  final MoneyRemoteDataSourceDio remoteDataSource;
+  final MoneyRemoteDataSource remoteDataSource;
   final MoneyLocalDataSource localDataSource;
 
   MoneyRepositoryImpl({
@@ -62,6 +62,8 @@ class MoneyRepositoryImpl implements MoneyRepository {
   Future<Either<Failure, IdeaEntity>> getIdeaById(String id) async {
     try {
       final idea = await remoteDataSource.getIdeaById(id);
+      // Cache the idea locally
+      await localDataSource.cacheIdea(idea);
       return Right(idea);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -85,6 +87,8 @@ class MoneyRepositoryImpl implements MoneyRepository {
   Future<Either<Failure, IdeaEntity>> getIdeaBySlug(String slug) async {
     try {
       final idea = await remoteDataSource.getIdeaBySlug(slug);
+      // Cache the idea locally
+      await localDataSource.cacheIdea(idea);
       return Right(idea);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -232,6 +236,8 @@ class MoneyRepositoryImpl implements MoneyRepository {
   Future<Either<Failure, AiChatEntity>> getAiChatById(String id) async {
     try {
       final chat = await remoteDataSource.getAiChatById(id);
+      // Cache the chat locally
+      await localDataSource.cacheAiChat(chat);
       return Right(chat);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
