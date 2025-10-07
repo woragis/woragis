@@ -13,8 +13,6 @@ presentation/
 │   ├── framework_detail_page.dart     # Detailed view of a framework
 │   ├── create_framework_page.dart     # Create/edit framework form
 │   └── pages.dart                     # Export file for all pages
-├── queries/
-│   └── frameworks_queries.dart        # Query utility functions
 └── README.md                          # This documentation
 ```
 
@@ -49,7 +47,7 @@ The frameworks domain uses the BLoC (Business Logic Component) pattern for state
 #### **Events**
 - `LoadFrameworks`: Load frameworks with optional filtering and pagination
 - `RefreshFrameworks`: Refresh the current frameworks list
-- `SearchFrameworks`: Search frameworks by query
+- `SearchFrameworks`: Search frameworks by search term
 - `FilterFrameworks`: Apply type, visibility, or public filters
 - `SortFrameworks`: Sort frameworks by specified criteria
 
@@ -65,22 +63,22 @@ The frameworks domain uses the BLoC (Business Logic Component) pattern for state
 - **Error Handling**: Comprehensive error handling with retry options
 - **Loading States**: Proper loading indicators and state management
 
-### **Query Integration**
+### **Data Access**
 
-The `FrameworksQueries` class provides utility functions for direct use case calls:
+The frameworks domain uses the repository pattern with proper caching for efficient data access:
 
 ```dart
-// Get all frameworks
-final frameworks = await FrameworksQueries.getAllFrameworks();
+// Get all frameworks through BLoC
+context.read<FrameworksBloc>().add(const LoadFrameworks());
 
-// Get visible frameworks
-final visibleFrameworks = await FrameworksQueries.getVisibleFrameworks();
+// Get visible frameworks through BLoC
+context.read<FrameworksBloc>().add(const FilterFrameworks(visible: true));
 
-// Search frameworks
-final searchResults = await FrameworksQueries.searchFrameworks('flutter');
+// Search frameworks through BLoC
+context.read<FrameworksBloc>().add(const SearchFrameworks('flutter'));
 
-// Get frameworks by type
-final languages = await FrameworksQueries.getFrameworksByType('language');
+// Get frameworks by type through BLoC
+context.read<FrameworksBloc>().add(const FilterFrameworks(type: 'language'));
 ```
 
 ## 📱 Pages Overview
@@ -217,16 +215,16 @@ context.read<FrameworksBloc>().add(FilterFrameworks(type: 'framework'));
 context.read<FrameworksBloc>().add(const RefreshFrameworks());
 ```
 
-### **Query Usage**
+### **BLoC Usage**
 ```dart
 // Get all frameworks
-final frameworks = await FrameworksQueries.getAllFrameworks();
+context.read<FrameworksBloc>().add(const LoadFrameworks());
 
 // Get visible frameworks
-final visible = await FrameworksQueries.getVisibleFrameworks();
+context.read<FrameworksBloc>().add(const FilterFrameworks(visible: true));
 
 // Search frameworks
-final results = await FrameworksQueries.searchFrameworks('react');
+context.read<FrameworksBloc>().add(const SearchFrameworks('react'));
 ```
 
 ## 🔄 Integration Points
@@ -261,7 +259,7 @@ final results = await FrameworksQueries.searchFrameworks('react');
 
 ### **Unit Tests**
 - **BLoC Tests**: Test all events and state transitions
-- **Query Tests**: Test utility functions and error handling
+- **Repository Tests**: Test data access and caching logic
 - **Validation Tests**: Test form validation logic
 
 ### **Widget Tests**
