@@ -8,14 +8,6 @@ enum EducationTypeModel {
   degree,
   @JsonValue('certificate')
   certificate,
-  @JsonValue('course')
-  course,
-  @JsonValue('workshop')
-  workshop,
-  @JsonValue('bootcamp')
-  bootcamp,
-  @JsonValue('other')
-  other,
 }
 
 enum DegreeLevelModel {
@@ -29,11 +21,9 @@ enum DegreeLevelModel {
   doctorate,
   @JsonValue('diploma')
   diploma,
-  @JsonValue('certificate')
-  certificate,
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class EducationModel extends EducationEntity {
   const EducationModel({
     required super.id,
