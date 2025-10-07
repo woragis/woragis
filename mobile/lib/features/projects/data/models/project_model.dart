@@ -39,6 +39,51 @@ class ProjectModel extends ProjectEntity {
     return _$ProjectModelFromJson(jsonWithFrameworks);
   }
 
+  // Custom methods for API (camelCase) and Local Storage (snake_case) conversion
+  factory ProjectModel.fromApiJson(Map<String, dynamic> json) {
+    return ProjectModel(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      title: json['title'] as String,
+      slug: json['slug'] as String,
+      description: json['description'] as String,
+      longDescription: json['longDescription'] as String?,
+      content: json['content'] as String?,
+      videoUrl: json['videoUrl'] as String?,
+      image: json['image'] as String,
+      githubUrl: json['githubUrl'] as String?,
+      liveUrl: json['liveUrl'] as String?,
+      featured: json['featured'] as bool,
+      order: (json['order'] as num).toInt(),
+      visible: json['visible'] as bool,
+      public: json['public'] as bool,
+      frameworks: null, // Frameworks are handled separately in API responses
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toApiJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'title': title,
+      'description': description,
+      'longDescription': longDescription,
+      'content': content,
+      'videoUrl': videoUrl,
+      'image': image,
+      'githubUrl': githubUrl,
+      'liveUrl': liveUrl,
+      'featured': featured,
+      'order': order,
+      'visible': visible,
+      'public': public,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
   /// Creates a ProjectModel from database JSON with snake_case field names
   factory ProjectModel.fromDatabaseJson(Map<String, dynamic> json) {
     return ProjectModel(
@@ -71,7 +116,6 @@ class ProjectModel extends ProjectEntity {
       'id': id,
       'user_id': userId,
       'title': title,
-      'slug': slug,
       'description': description,
       'long_description': longDescription,
       'content': content,
