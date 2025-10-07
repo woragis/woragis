@@ -99,6 +99,76 @@ class _IdeasListPageState extends State<IdeasListPage> {
           Expanded(
             child: BlocBuilder<MoneyBloc, MoneyState>(
               builder: (context, state) {
+                // Handle composite state
+                if (state is MoneyDataState) {
+                  final dataState = state;
+                  
+                  // Show loading indicator if loading and no cached data
+                  if (dataState.isLoading && dataState.ideas == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  
+                  // Show error if there's an error and no cached data
+                  if (dataState.error != null && dataState.ideas == null) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 64,
+                            color: Colors.red.shade300,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error loading ideas',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.red.shade700,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            dataState.error!,
+                            style: TextStyle(color: Colors.red.shade600),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<MoneyBloc>().add(GetIdeasRequested());
+                            },
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  
+                  // Show cached data if available
+                  if (dataState.ideas != null) {
+                    final ideas = dataState.ideas!;
+                    
+                    // Show loading overlay if still loading
+                    if (dataState.isLoading) {
+                      return Stack(
+                        children: [
+                          _buildIdeasList(ideas),
+                          Container(
+                            color: Colors.black.withOpacity(0.3),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    
+                    return _buildIdeasList(ideas);
+                  }
+                }
+                
+                // Legacy state handling
                 if (state is MoneyLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is MoneyError) {
@@ -191,6 +261,52 @@ class _IdeasListPageState extends State<IdeasListPage> {
         onPressed: () => context.push('/money/ideas/create'),
         backgroundColor: Colors.green.shade600,
         child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildIdeasList(List<IdeaEntity> ideas) {
+    if (ideas.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.lightbulb_outline,
+              size: 64,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No ideas found',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Create your first money-making idea!',
+              style: TextStyle(
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<MoneyBloc>().add(GetIdeasRequested());
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: ideas.length,
+        itemBuilder: (context, index) {
+          final idea = ideas[index];
+          return _buildIdeaCard(context, idea);
+        },
       ),
     );
   }

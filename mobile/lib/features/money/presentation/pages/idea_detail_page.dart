@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../bloc/money_bloc.dart';
+import '../../domain/entities/idea_entity.dart';
 
 class IdeaDetailPage extends StatefulWidget {
   final String ideaId;
@@ -41,6 +42,258 @@ class _IdeaDetailPageState extends State<IdeaDetailPage> {
     _documentController.dispose();
     _slugController.dispose();
     super.dispose();
+  }
+
+  Widget _buildIdeaDetailContent(IdeaEntity idea) {
+    // Populate controllers if not already done
+    if (_titleController.text.isEmpty) {
+      _titleController.text = idea.title;
+      _descriptionController.text = idea.description ?? '';
+      _documentController.text = idea.document;
+      _slugController.text = idea.slug;
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _isEditing
+                            ? TextField(
+                                controller: _titleController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Title',
+                                  border: OutlineInputBorder(),
+                                ),
+                              )
+                            : Text(
+                                idea.title,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                      if (idea.featured)
+                        Container(
+                          margin: const EdgeInsets.only(left: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.star,
+                                size: 16,
+                                color: Colors.amber.shade700,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Featured',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.amber.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.link,
+                        size: 16,
+                        color: Colors.grey.shade600,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _isEditing
+                            ? TextField(
+                                controller: _slugController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Slug',
+                                  border: OutlineInputBorder(),
+                                ),
+                              )
+                            : Text(
+                                idea.slug,
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Description Section
+          if (idea.description != null && idea.description!.isNotEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Description',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _isEditing
+                        ? TextField(
+                            controller: _descriptionController,
+                            decoration: const InputDecoration(
+                              labelText: 'Description',
+                              border: OutlineInputBorder(),
+                            ),
+                            maxLines: 3,
+                          )
+                        : Text(
+                            idea.description!,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                  ],
+                ),
+              ),
+            ),
+
+          if (idea.description != null && idea.description!.isNotEmpty)
+            const SizedBox(height: 16),
+
+          // Document Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Document',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _isEditing
+                      ? TextField(
+                          controller: _documentController,
+                          decoration: const InputDecoration(
+                            labelText: 'Document',
+                            border: OutlineInputBorder(),
+                          ),
+                          maxLines: 10,
+                        )
+                      : Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: Text(
+                            idea.document,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Metadata Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Metadata',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMetadataRow('ID', idea.id),
+                  _buildMetadataRow('Created', _formatDate(idea.createdAt)),
+                  _buildMetadataRow('Updated', _formatDate(idea.updatedAt)),
+                  _buildMetadataRow('Order', idea.order.toString()),
+                  _buildMetadataRow('Visible', idea.visible ? 'Yes' : 'No'),
+                  _buildMetadataRow('Public', idea.public ? 'Yes' : 'No'),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 80), // Space for FAB
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetadataRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -90,6 +343,76 @@ class _IdeaDetailPageState extends State<IdeaDetailPage> {
           }
         },
         builder: (context, state) {
+          // Handle composite state
+          if (state is MoneyDataState) {
+            final dataState = state;
+            
+            // Show loading indicator if loading and no cached data
+            if (dataState.isLoading && dataState.currentIdea == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            
+            // Show error if there's an error and no cached data
+            if (dataState.error != null && dataState.currentIdea == null) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red.shade300,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error loading idea',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.red.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      dataState.error!,
+                      style: TextStyle(color: Colors.red.shade600),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<MoneyBloc>().add(GetIdeaByIdRequested(widget.ideaId));
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
+            
+            // Show cached data if available
+            if (dataState.currentIdea != null) {
+              final idea = dataState.currentIdea!;
+              
+              // Show loading overlay if still loading
+              if (dataState.isLoading) {
+                return Stack(
+                  children: [
+                    _buildIdeaDetailContent(idea),
+                    Container(
+                      color: Colors.black.withOpacity(0.3),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ],
+                );
+              }
+              
+              return _buildIdeaDetailContent(idea);
+            }
+          }
+          
+          // Legacy state handling
           if (state is MoneyLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is MoneyError) {
@@ -396,35 +719,6 @@ class _IdeaDetailPageState extends State<IdeaDetailPage> {
     );
   }
 
-  Widget _buildMetadataRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              '$label:',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _saveIdea() {
     context.read<MoneyBloc>().add(UpdateIdeaRequested(
       id: widget.ideaId,
@@ -465,21 +759,6 @@ class _IdeaDetailPageState extends State<IdeaDetailPage> {
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays == 0) {
-      return 'Today';
-    } else if (difference.inDays == 1) {
-      return 'Yesterday';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
-    } else {
-      return '${date.day}/${date.month}/${date.year}';
-    }
   }
 
   String _formatFullDate(DateTime date) {
