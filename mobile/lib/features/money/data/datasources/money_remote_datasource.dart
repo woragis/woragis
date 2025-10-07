@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../../domain/entities/idea_entity.dart';
@@ -90,13 +91,47 @@ abstract class MoneyRemoteDataSource {
 }
 
 class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
-  final http.Client client;
-  final String baseUrl;
+  final http.Client _client = http.Client();
+  final String _baseUrl;
+
+  // Simple in-memory cache
+  static final Map<String, dynamic> _cache = {};
+  static final Map<String, DateTime> _cacheTimestamps = {};
+  static const Duration _cacheDuration = Duration(minutes: 5);
 
   MoneyRemoteDataSourceImpl({
-    required this.client,
-    required this.baseUrl,
-  });
+    required String baseUrl,
+  }) : _baseUrl = baseUrl;
+
+  // Helper method to get cached data or fetch fresh
+  Future<T> _getCachedOrFetch<T>(
+    String cacheKey,
+    Future<T> Function() fetcher,
+  ) async {
+    final now = DateTime.now();
+    
+    // Check if we have cached data that's still fresh
+    if (_cache.containsKey(cacheKey) && 
+        _cacheTimestamps.containsKey(cacheKey) &&
+        now.difference(_cacheTimestamps[cacheKey]!).compareTo(_cacheDuration) < 0) {
+      log('📦 Using cached data for: $cacheKey');
+      return _cache[cacheKey] as T;
+    }
+    
+    // Fetch fresh data
+    log('🌐 Fetching fresh data for: $cacheKey');
+    final data = await fetcher();
+    _cache[cacheKey] = data;
+    _cacheTimestamps[cacheKey] = now;
+    return data;
+  }
+
+  // Helper method to invalidate cache
+  void _invalidateCache(String pattern) {
+    _cache.removeWhere((key, value) => key.contains(pattern));
+    _cacheTimestamps.removeWhere((key, value) => key.contains(pattern));
+    log('🗑️ Cache invalidated for pattern: $pattern');
+  }
 
   // Ideas Implementation
   @override
@@ -110,74 +145,86 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
     String? sortBy,
     String? sortOrder,
   }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (page != null) queryParams['page'] = page.toString();
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (featured != null) queryParams['featured'] = featured.toString();
-      if (visible != null) queryParams['visible'] = visible.toString();
-      if (public != null) queryParams['public'] = public.toString();
-      if (search != null && search.isNotEmpty) queryParams['search'] = search;
-      if (sortBy != null) queryParams['sortBy'] = sortBy;
-      if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
+    final cacheKey = 'ideas_${page}_${limit}_${featured}_${visible}_${public}_${search}_${sortBy}_${sortOrder}';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        final queryParams = <String, String>{};
+        if (page != null) queryParams['page'] = page.toString();
+        if (limit != null) queryParams['limit'] = limit.toString();
+        if (featured != null) queryParams['featured'] = featured.toString();
+        if (visible != null) queryParams['visible'] = visible.toString();
+        if (public != null) queryParams['public'] = public.toString();
+        if (search != null && search.isNotEmpty) queryParams['search'] = search;
+        if (sortBy != null) queryParams['sortBy'] = sortBy;
+        if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
 
-      final uri = Uri.parse('$baseUrl/money/ideas').replace(queryParameters: queryParams);
-      final response = await client.get(uri);
+        log('🔍 Ideas List API Request: /api/money/ideas');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          final ideas = (data['data'] as List)
-              .map((ideaJson) => IdeaModel.fromApiJson(ideaJson).toEntity())
-              .toList();
-          return ideas;
+        final uri = Uri.parse('$_baseUrl/api/money/ideas').replace(queryParameters: queryParams);
+        final response = await _client.get(uri);
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final ideas = (data['data'] as List)
+                .map((ideaJson) => IdeaModel.fromApiJson(ideaJson).toEntity())
+                .toList();
+            return ideas;
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch ideas');
+          }
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch ideas');
+          throw ServerException('Failed to fetch ideas with status ${response.statusCode}');
         }
-      } else {
-        throw ServerException('Failed to fetch ideas with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<IdeaEntity> getIdeaById(String id) async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/money/ideas/$id'));
+    final cacheKey = 'idea_$id';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Idea by ID API Request: /api/money/ideas/$id');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          return IdeaModel.fromApiJson(data['data']).toEntity();
+        final response = await _client.get(Uri.parse('$_baseUrl/api/money/ideas/$id'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            return IdeaModel.fromApiJson(data['data']).toEntity();
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch idea');
+          }
+        } else if (response.statusCode == 404) {
+          throw NotFoundException('Idea not found');
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch idea');
+          throw ServerException('Failed to fetch idea with status ${response.statusCode}');
         }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Idea not found');
-      } else {
-        throw ServerException('Failed to fetch idea with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException || e is NotFoundException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<IdeaEntity> getIdeaBySlug(String slug) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/money/ideas/slug/$slug'));
+      final response = await _client.get(Uri.parse('$_baseUrl/api/money/ideas/slug/$slug'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -213,8 +260,8 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
     required int order,
   }) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/money/ideas'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/api/money/ideas'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -231,7 +278,12 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return IdeaModel.fromApiJson(data['data']).toEntity();
+          final idea = IdeaModel.fromApiJson(data['data']).toEntity();
+          
+          // Invalidate ideas cache
+          _invalidateCache('ideas_');
+          
+          return idea;
         } else {
           throw ServerException(data['message'] ?? 'Failed to create idea');
         }
@@ -264,8 +316,8 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
     int? order,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/money/ideas/$id'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/api/money/ideas/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
@@ -282,7 +334,13 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return IdeaModel.fromApiJson(data['data']).toEntity();
+          final idea = IdeaModel.fromApiJson(data['data']).toEntity();
+          
+          // Invalidate ideas cache
+          _invalidateCache('ideas_');
+          _invalidateCache('idea_$id');
+          
+          return idea;
         } else {
           throw ServerException(data['message'] ?? 'Failed to update idea');
         }
@@ -307,9 +365,13 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
   @override
   Future<void> deleteIdea(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/money/ideas/$id'));
+      final response = await _client.delete(Uri.parse('$_baseUrl/api/money/ideas/$id'));
 
-      if (response.statusCode != 200 && response.statusCode != 204) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Invalidate ideas cache
+        _invalidateCache('ideas_');
+        _invalidateCache('idea_$id');
+      } else {
         if (response.statusCode == 404) {
           throw NotFoundException('Idea not found');
         } else {
@@ -351,8 +413,8 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (sortBy != null) queryParams['sortBy'] = sortBy;
       if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
 
-      final uri = Uri.parse('$baseUrl/money/ai-chats').replace(queryParameters: queryParams);
-      final response = await client.get(uri);
+      final uri = Uri.parse('$_baseUrl/api/money/ai-chats').replace(queryParameters: queryParams);
+      final response = await _client.get(uri);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -379,29 +441,35 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
 
   @override
   Future<AiChatEntity> getAiChatById(String id) async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/money/ai-chats/$id'));
+    final cacheKey = 'ai_chat_$id';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 AI Chat by ID API Request: /api/money/ai-chats/$id');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          return AiChatModel.fromApiJson(data['data']).toEntity();
+        final response = await _client.get(Uri.parse('$_baseUrl/api/money/ai-chats/$id'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            return AiChatModel.fromApiJson(data['data']).toEntity();
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch AI chat');
+          }
+        } else if (response.statusCode == 404) {
+          throw NotFoundException('AI chat not found');
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch AI chat');
+          throw ServerException('Failed to fetch AI chat with status ${response.statusCode}');
         }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('AI chat not found');
-      } else {
-        throw ServerException('Failed to fetch AI chat with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException || e is NotFoundException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
@@ -417,8 +485,8 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
     required bool archived,
   }) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/money/ai-chats'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/api/money/ai-chats'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -436,7 +504,12 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AiChatModel.fromApiJson(data['data']).toEntity();
+          final aiChat = AiChatModel.fromApiJson(data['data']).toEntity();
+          
+          // Invalidate AI chats cache
+          _invalidateCache('ai_chats_');
+          
+          return aiChat;
         } else {
           throw ServerException(data['message'] ?? 'Failed to create AI chat');
         }
@@ -470,8 +543,8 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
     bool? archived,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/money/ai-chats/$id'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/api/money/ai-chats/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
@@ -489,7 +562,13 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AiChatModel.fromApiJson(data['data']).toEntity();
+          final aiChat = AiChatModel.fromApiJson(data['data']).toEntity();
+          
+          // Invalidate AI chats cache
+          _invalidateCache('ai_chats_');
+          _invalidateCache('ai_chat_$id');
+          
+          return aiChat;
         } else {
           throw ServerException(data['message'] ?? 'Failed to update AI chat');
         }
@@ -514,9 +593,13 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
   @override
   Future<void> deleteAiChat(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/money/ai-chats/$id'));
+      final response = await _client.delete(Uri.parse('$_baseUrl/api/money/ai-chats/$id'));
 
-      if (response.statusCode != 200 && response.statusCode != 204) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Invalidate AI chats cache
+        _invalidateCache('ai_chats_');
+        _invalidateCache('ai_chat_$id');
+      } else {
         if (response.statusCode == 404) {
           throw NotFoundException('AI chat not found');
         } else {
@@ -539,8 +622,8 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
     required String message,
   }) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/money/ai-chats/$chatId/messages'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/api/money/ai-chats/$chatId/messages'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'message': message,
@@ -575,7 +658,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
   @override
   Future<List<ChatMessageEntity>> getChatMessages(String chatId) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/money/ai-chats/$chatId/messages'));
+      final response = await _client.get(Uri.parse('$_baseUrl/api/money/ai-chats/$chatId/messages'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
