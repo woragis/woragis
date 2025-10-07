@@ -34,10 +34,7 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
         featured: featured,
         visible: visible,
         public: public,
-        technologies: technologies,
         search: search,
-        sortBy: sortBy,
-        sortOrder: sortOrder,
       );
 
       // Cache the projects locally
@@ -49,7 +46,13 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
     } on NetworkException catch (e) {
       // Return cached data if available
       try {
-        final cachedProjects = await localDataSource.getCachedProjects();
+        final cachedProjects = await localDataSource.getCachedProjects(
+          limit: limit,
+          featured: featured,
+          visible: visible,
+          public: public,
+          search: search,
+        );
         return Right(cachedProjects);
       } catch (cacheError) {
         return Left(NetworkFailure(e.message));
@@ -63,6 +66,8 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   Future<Either<Failure, ProjectEntity>> getProjectById(String id) async {
     try {
       final project = await remoteDataSource.getProjectById(id);
+      // Cache the project locally
+      await localDataSource.cacheProject(project);
       return Right(project);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -86,6 +91,8 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   Future<Either<Failure, ProjectEntity>> getProjectBySlug(String slug) async {
     try {
       final project = await remoteDataSource.getProjectBySlug(slug);
+      // Cache the project locally
+      await localDataSource.cacheProject(project);
       return Right(project);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -95,6 +102,7 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
       return Left(UnexpectedFailure(e.toString()));
     }
   }
+
 
   @override
   Future<Either<Failure, ProjectEntity>> createProject({
@@ -114,22 +122,22 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
     List<String>? frameworkIds,
   }) async {
     try {
-      final project = await remoteDataSource.createProject({
-        'title': title,
-        'slug': slug,
-        'description': description,
-        'longDescription': longDescription,
-        'content': content,
-        'videoUrl': videoUrl,
-        'image': image,
-        'githubUrl': githubUrl,
-        'liveUrl': liveUrl,
-        'featured': featured,
-        'order': order,
-        'visible': visible,
-        'public': public,
-        'frameworkIds': frameworkIds,
-      });
+      final project = await remoteDataSource.createProject(
+        title: title,
+        slug: slug,
+        description: description,
+        longDescription: longDescription,
+        content: content,
+        videoUrl: videoUrl,
+        image: image,
+        githubUrl: githubUrl,
+        liveUrl: liveUrl,
+        featured: featured,
+        order: order,
+        visible: visible,
+        public: public,
+        frameworkIds: frameworkIds,
+      );
 
       // Cache the new project
       await localDataSource.cacheProject(project);
@@ -163,22 +171,23 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
     List<String>? frameworkIds,
   }) async {
     try {
-      final project = await remoteDataSource.updateProject(id, {
-        'title': title,
-        'slug': slug,
-        'description': description,
-        'longDescription': longDescription,
-        'content': content,
-        'videoUrl': videoUrl,
-        'image': image,
-        'githubUrl': githubUrl,
-        'liveUrl': liveUrl,
-        'featured': featured,
-        'order': order,
-        'visible': visible,
-        'public': public,
-        'frameworkIds': frameworkIds,
-      });
+      final project = await remoteDataSource.updateProject(
+        id: id,
+        title: title,
+        slug: slug,
+        description: description,
+        longDescription: longDescription,
+        content: content,
+        videoUrl: videoUrl,
+        image: image,
+        githubUrl: githubUrl,
+        liveUrl: liveUrl,
+        featured: featured,
+        order: order,
+        visible: visible,
+        public: public,
+        frameworkIds: frameworkIds,
+      );
 
       // Update cached project
       await localDataSource.updateCachedProject(project);
@@ -209,11 +218,45 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   }
 
   @override
+  Future<Either<Failure, void>> incrementViewCount(String id) async {
+    try {
+      await remoteDataSource.incrementViewCount(id);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> incrementLikeCount(String id) async {
+    try {
+      await remoteDataSource.incrementLikeCount(id);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> updateProjectOrder(
     List<Map<String, dynamic>> projectOrders,
   ) async {
     try {
-      await remoteDataSource.updateProjectOrder(projectOrders);
+      // Update each project order individually
+      for (final orderData in projectOrders) {
+        await remoteDataSource.updateProjectOrder(
+          id: orderData['id'] as String,
+          order: orderData['order'] as int,
+        );
+      }
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -229,8 +272,29 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
     required String projectId,
     required String frameworkId,
   }) async {
-    // TODO: Implement this method in the datasource
-    return Left(ServerFailure('Method not implemented yet'));
+    try {
+      await remoteDataSource.assignFrameworkToProject(
+        projectId: projectId,
+        frameworkId: frameworkId,
+      );
+      
+      // Also update local cache
+      await localDataSource.assignFrameworkToProject(projectId, frameworkId);
+      
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Still update local cache for offline support
+      try {
+        await localDataSource.assignFrameworkToProject(projectId, frameworkId);
+        return const Right(null);
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
   }
 
   @override
@@ -238,43 +302,51 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
     required String projectId,
     required String frameworkId,
   }) async {
-    // TODO: Implement this method in the datasource
-    return Left(ServerFailure('Method not implemented yet'));
+    try {
+      await remoteDataSource.removeFrameworkFromProject(
+        projectId: projectId,
+        frameworkId: frameworkId,
+      );
+      
+      // Also update local cache
+      await localDataSource.removeFrameworkFromProject(projectId, frameworkId);
+      
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Still update local cache for offline support
+      try {
+        await localDataSource.removeFrameworkFromProject(projectId, frameworkId);
+        return const Right(null);
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
   }
 
   @override
   Future<Either<Failure, List<String>>> getProjectFrameworkIds(String projectId) async {
-    // TODO: Implement this method in the datasource
-    return Left(ServerFailure('Method not implemented yet'));
-  }
-
-  @override
-  Future<Either<Failure, void>> incrementViewCount(String projectId) async {
     try {
-      await remoteDataSource.incrementProjectViewCount(projectId);
-      return const Right(null);
+      final frameworkIds = await remoteDataSource.getProjectFrameworkIds(projectId);
+      return Right(frameworkIds);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      // Try to get from local cache
+      try {
+        final cachedFrameworkIds = await localDataSource.getProjectFrameworkIds(projectId);
+        return Right(cachedFrameworkIds);
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
   }
 
-  @override
-  Future<Either<Failure, void>> incrementLikeCount(String projectId) async {
-    try {
-      await remoteDataSource.incrementProjectLikeCount(projectId);
-      return const Right(null);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
 
   @override
   Future<Either<Failure, List<ProjectEntity>>> getCachedProjects() async {
