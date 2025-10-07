@@ -440,24 +440,8 @@ class DatabaseHelper {
 
   // Music tables
   Future<void> _createMusicTables(Database db) async {
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS last_listened_songs (
-        id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
-        title TEXT NOT NULL,
-        artist TEXT NOT NULL,
-        album TEXT,
-        spotify_url TEXT,
-        youtube_url TEXT,
-        listened_at INTEGER,
-        `order` INTEGER DEFAULT 0,
-        visible INTEGER NOT NULL DEFAULT 1,
-        created_at INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL,
-        synced_at INTEGER,
-        is_dirty INTEGER NOT NULL DEFAULT 0
-      )
-    ''');
+    // Note: last_listened_songs table is already created in _createAboutTables
+    // No additional music tables needed here
   }
 
   // Settings tables
