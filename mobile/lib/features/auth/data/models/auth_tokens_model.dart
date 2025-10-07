@@ -16,6 +16,23 @@ class AuthTokensModel extends AuthTokensEntity {
 
   Map<String, dynamic> toJson() => _$AuthTokensModelToJson(this);
 
+  // Custom methods for API (camelCase) and Local Storage (snake_case) conversion
+  factory AuthTokensModel.fromApiJson(Map<String, dynamic> json) {
+    return AuthTokensModel(
+      accessToken: json['accessToken'] as String,
+      refreshToken: json['refreshToken'] as String,
+      expiresAt: DateTime.parse(json['expiresAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toApiJson() {
+    return {
+      'accessToken': accessToken,
+      'refreshToken': refreshToken,
+      'expiresAt': expiresAt.toIso8601String(),
+    };
+  }
+
   factory AuthTokensModel.fromEntity(AuthTokensEntity entity) {
     return AuthTokensModel(
       accessToken: entity.accessToken,

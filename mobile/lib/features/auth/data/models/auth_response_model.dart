@@ -23,6 +23,21 @@ class AuthResponseModel extends AuthResponseEntity {
 
   Map<String, dynamic> toJson() => _$AuthResponseModelToJson(this);
 
+  // Custom methods for API (camelCase) and Local Storage (snake_case) conversion
+  factory AuthResponseModel.fromApiJson(Map<String, dynamic> json) {
+    return AuthResponseModel(
+      user: UserModel.fromApiJson(json['user'] as Map<String, dynamic>),
+      tokens: AuthTokensModel.fromApiJson(json['tokens'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toApiJson() {
+    return {
+      'user': user.toApiJson(),
+      'tokens': tokens.toApiJson(),
+    };
+  }
+
   factory AuthResponseModel.fromEntity(AuthResponseEntity entity) {
     return AuthResponseModel(
       user: UserModel.fromEntity(entity.user),

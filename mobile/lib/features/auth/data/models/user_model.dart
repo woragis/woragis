@@ -42,10 +42,7 @@ class UserModel extends UserEntity {
       firstName: map['first_name'] as String?,
       lastName: map['last_name'] as String?,
       avatar: map['avatar'] as String?,
-      role: UserRole.values.firstWhere(
-        (e) => e.name == map['role'],
-        orElse: () => UserRole.user,
-      ),
+      role: _mapStringToUserRole(map['role'] as String),
       isActive: (map['is_active'] as int?) == 1,
       emailVerified: (map['email_verified'] as int?) == 1,
       lastLoginAt: map['last_login_at'] != null 
@@ -58,6 +55,43 @@ class UserModel extends UserEntity {
 
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
+  // Custom methods for API (camelCase) and Local Storage (snake_case) conversion
+  factory UserModel.fromApiJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] as String,
+      email: json['email'] as String,
+      username: json['username'] as String,
+      firstName: json['firstName'] as String?,
+      lastName: json['lastName'] as String?,
+      avatar: json['avatar'] as String?,
+      role: _mapStringToUserRole(json['role'] as String),
+      isActive: json['isActive'] as bool,
+      emailVerified: json['emailVerified'] as bool,
+      lastLoginAt: json['lastLoginAt'] != null 
+          ? DateTime.parse(json['lastLoginAt'] as String)
+          : null,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toApiJson() {
+    return {
+      'id': id,
+      'email': email,
+      'username': username,
+      'firstName': firstName,
+      'lastName': lastName,
+      'avatar': avatar,
+      'role': _mapUserRoleToString(role),
+      'isActive': isActive,
+      'emailVerified': emailVerified,
+      'lastLoginAt': lastLoginAt?.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
   /// Converts the model to a map suitable for database storage
   /// Converts boolean values to integers (0/1) for SQLite compatibility
   Map<String, dynamic> toDatabaseMap() {
@@ -68,7 +102,7 @@ class UserModel extends UserEntity {
       'first_name': firstName,
       'last_name': lastName,
       'avatar': avatar,
-      'role': role.name,
+      'role': _mapUserRoleToString(role),
       'is_active': isActive ? 1 : 0,
       'email_verified': emailVerified ? 1 : 0,
       'last_login_at': lastLoginAt?.millisecondsSinceEpoch,
@@ -140,5 +174,30 @@ class UserModel extends UserEntity {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
+  }
+
+  // Helper methods for role mapping
+  static UserRole _mapStringToUserRole(String roleString) {
+    switch (roleString) {
+      case 'user':
+        return UserRole.user;
+      case 'admin':
+        return UserRole.admin;
+      case 'super_admin':
+        return UserRole.superAdmin;
+      default:
+        return UserRole.user;
+    }
+  }
+
+  static String _mapUserRoleToString(UserRole role) {
+    switch (role) {
+      case UserRole.user:
+        return 'user';
+      case UserRole.admin:
+        return 'admin';
+      case UserRole.superAdmin:
+        return 'super_admin';
+    }
   }
 }
