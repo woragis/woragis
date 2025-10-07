@@ -3,8 +3,10 @@ import '../../../../core/database/database_helper.dart';
 import '../../../../core/database/sync_manager.dart';
 import '../../domain/entities/idea_entity.dart';
 import '../../domain/entities/ai_chat_entity.dart';
+import '../../domain/entities/idea_node_entity.dart';
 import '../models/idea_model.dart';
 import '../models/ai_chat_model.dart';
+import '../models/idea_node_model.dart';
 
 abstract class MoneyLocalDataSource {
   // Ideas methods
@@ -22,6 +24,14 @@ abstract class MoneyLocalDataSource {
   Future<void> cacheAiChats(List<AiChatEntity> aiChats);
   Future<void> updateCachedAiChat(AiChatEntity aiChat);
   Future<void> removeCachedAiChat(String id);
+
+  // Idea Nodes methods
+  Future<List<IdeaNodeEntity>> getCachedIdeaNodes(String ideaId);
+  Future<IdeaNodeEntity?> getCachedIdeaNode(String id);
+  Future<void> cacheIdeaNode(IdeaNodeEntity ideaNode);
+  Future<void> cacheIdeaNodes(List<IdeaNodeEntity> ideaNodes);
+  Future<void> updateCachedIdeaNode(IdeaNodeEntity ideaNode);
+  Future<void> removeCachedIdeaNode(String id);
 }
 
 class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
@@ -213,6 +223,103 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
 
     await db.delete(
       'ai_chats',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Idea Nodes Implementation
+  @override
+  Future<List<IdeaNodeEntity>> getCachedIdeaNodes(String ideaId) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'idea_nodes',
+      where: 'idea_id = ?',
+      whereArgs: [ideaId],
+      orderBy: 'created_at ASC',
+    );
+    return result.map((nodeMap) => IdeaNodeModel.fromLocalJson(nodeMap).toEntity()).toList();
+  }
+
+  @override
+  Future<IdeaNodeEntity?> getCachedIdeaNode(String id) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'idea_nodes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return result.isEmpty ? null : IdeaNodeModel.fromLocalJson(result.first).toEntity();
+  }
+
+  @override
+  Future<void> cacheIdeaNode(IdeaNodeEntity ideaNode) async {
+    final db = await _dbHelper.database;
+    final nodeMap = IdeaNodeModel.fromEntity(ideaNode).toLocalJson();
+    nodeMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
+    nodeMap['is_dirty'] = 0;
+
+    await db.insert(
+      'idea_nodes',
+      nodeMap,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  @override
+  Future<void> cacheIdeaNodes(List<IdeaNodeEntity> ideaNodes) async {
+    final db = await _dbHelper.database;
+    final batch = db.batch();
+
+    for (final ideaNode in ideaNodes) {
+      final nodeMap = IdeaNodeModel.fromEntity(ideaNode).toLocalJson();
+      nodeMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
+      nodeMap['is_dirty'] = 0;
+
+      batch.insert(
+        'idea_nodes',
+        nodeMap,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    await batch.commit();
+  }
+
+  @override
+  Future<void> updateCachedIdeaNode(IdeaNodeEntity ideaNode) async {
+    final db = await _dbHelper.database;
+    final nodeMap = IdeaNodeModel.fromEntity(ideaNode).toLocalJson();
+    nodeMap['updated_at'] = DateTime.now().millisecondsSinceEpoch;
+    nodeMap['is_dirty'] = 1;
+
+    await db.update(
+      'idea_nodes',
+      nodeMap,
+      where: 'id = ?',
+      whereArgs: [ideaNode.id],
+    );
+
+    await _syncManager.addToSyncQueue(
+      tableName: 'idea_nodes',
+      recordId: ideaNode.id,
+      operation: SyncOperation.update,
+      data: nodeMap,
+    );
+  }
+
+  @override
+  Future<void> removeCachedIdeaNode(String id) async {
+    final db = await _dbHelper.database;
+    
+    await _syncManager.addToSyncQueue(
+      tableName: 'idea_nodes',
+      recordId: id,
+      operation: SyncOperation.delete,
+    );
+
+    await db.delete(
+      'idea_nodes',
       where: 'id = ?',
       whereArgs: [id],
     );
