@@ -6,7 +6,7 @@ import 'woragis_card.dart';
 import 'woragis_input.dart';
 
 class WoragisDemoPage extends StatefulWidget {
-  const WoragisDemoPage({Key? key}) : super(key: key);
+  const WoragisDemoPage({super.key});
 
   @override
   State<WoragisDemoPage> createState() => _WoragisDemoPageState();
@@ -65,7 +65,7 @@ class _WoragisDemoPageState extends State<WoragisDemoPage>
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -83,19 +83,19 @@ class _WoragisDemoPageState extends State<WoragisDemoPage>
                   flexibleSpace: FlexibleSpaceBar(
                     title: Text(
                       'Woragis Design System',
-                      style: WoragisTextStyles.headlineMedium(colorScheme.onBackground),
+                      style: WoragisTextStyles.headlineMedium(colorScheme.onSurface),
                     ),
                     background: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: isDark
                               ? [
-                                  colorScheme.primary.withOpacity(0.1),
-                                  colorScheme.secondary.withOpacity(0.1),
+                                  colorScheme.primary.withValues(alpha: 0.1),
+                                  colorScheme.secondary.withValues(alpha: 0.1),
                                 ]
                               : [
-                                  colorScheme.primary.withOpacity(0.05),
-                                  colorScheme.secondary.withOpacity(0.05),
+                                  colorScheme.primary.withValues(alpha: 0.05),
+                                  colorScheme.secondary.withValues(alpha: 0.05),
                                 ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -137,7 +137,7 @@ class _WoragisDemoPageState extends State<WoragisDemoPage>
                             Text(
                               'A modern Flutter design system inspired by your Next.js portfolio',
                               style: WoragisTextStyles.bodyLarge(
-                                colorScheme.onSurface.withOpacity(0.8),
+                                colorScheme.onSurface.withValues(alpha: 0.8),
                               ),
                             ),
                             const SizedBox(height: WoragisStyles.spacingLg),
@@ -251,7 +251,7 @@ class _WoragisDemoPageState extends State<WoragisDemoPage>
         Text(
           subtitle,
           style: WoragisTextStyles.bodyMedium(
-            colorScheme.onBackground.withOpacity(0.7),
+            colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         const SizedBox(height: WoragisStyles.spacingLg),
@@ -375,7 +375,7 @@ class _WoragisDemoPageState extends State<WoragisDemoPage>
               Container(
                 padding: const EdgeInsets.all(WoragisStyles.spacingMd),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(WoragisStyles.radiusMd),
                 ),
                 child: Icon(
@@ -399,7 +399,7 @@ class _WoragisDemoPageState extends State<WoragisDemoPage>
                     Text(
                       'Access to all advanced functionality',
                       style: WoragisTextStyles.bodyMedium(
-                        Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -423,7 +423,7 @@ class _WoragisDemoPageState extends State<WoragisDemoPage>
           variant: WoragisInputVariant.modern,
           prefixIcon: Icon(
             Icons.email_outlined,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
         const SizedBox(height: WoragisStyles.spacingLg),

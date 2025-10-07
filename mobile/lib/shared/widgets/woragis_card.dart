@@ -22,7 +22,7 @@ class WoragisCard extends StatelessWidget {
   final bool showHoverEffect;
 
   const WoragisCard({
-    Key? key,
+    super.key,
     required this.child,
     this.variant = WoragisCardVariant.default_,
     this.padding,
@@ -33,7 +33,7 @@ class WoragisCard extends StatelessWidget {
     this.backgroundColor,
     this.gradientColors,
     this.showHoverEffect = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class WoragisCard extends StatelessWidget {
       case WoragisCardVariant.default_:
         return Card(
           elevation: elevation ?? 2,
-          shadowColor: Colors.black.withOpacity(0.1),
+          shadowColor: Colors.black.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: defaultBorderRadius,
             side: BorderSide(
@@ -94,7 +94,7 @@ class WoragisCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -109,15 +109,15 @@ class WoragisCard extends StatelessWidget {
       case WoragisCardVariant.glass:
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: defaultBorderRadius,
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -140,20 +140,20 @@ class WoragisCard extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: gradientColors ?? [
-                colorScheme.primary.withOpacity(0.1),
-                colorScheme.secondary.withOpacity(0.1),
+                colorScheme.primary.withValues(alpha: 0.1),
+                colorScheme.secondary.withValues(alpha: 0.1),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: defaultBorderRadius,
             border: Border.all(
-              color: colorScheme.outline.withOpacity(0.3),
+              color: colorScheme.outline.withValues(alpha: 0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 blurRadius: 15,
                 offset: const Offset(0, 6),
               ),
@@ -176,13 +176,13 @@ class WoragisCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
                 spreadRadius: 0,
               ),
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.05),
+                color: colorScheme.primary.withValues(alpha: 0.05),
                 blurRadius: 40,
                 offset: const Offset(0, 16),
                 spreadRadius: 0,
@@ -207,13 +207,13 @@ class WoragisFeatureCard extends StatelessWidget {
   final WoragisCardVariant variant;
 
   const WoragisFeatureCard({
-    Key? key,
+    super.key,
     required this.title,
     this.subtitle,
     this.icon,
     this.onTap,
     this.variant = WoragisCardVariant.modern,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +231,7 @@ class WoragisFeatureCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: icon!,
@@ -250,7 +250,7 @@ class WoragisFeatureCard extends StatelessWidget {
             Text(
               subtitle!,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.7),
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -267,12 +267,12 @@ class WoragisStatsCard extends StatelessWidget {
   final Color? valueColor;
 
   const WoragisStatsCard({
-    Key? key,
+    super.key,
     required this.label,
     required this.value,
     this.icon,
     this.valueColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -291,7 +291,7 @@ class WoragisStatsCard extends StatelessWidget {
               Text(
                 label,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.7),
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
               if (icon != null) icon!,

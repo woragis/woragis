@@ -32,7 +32,7 @@ class WoragisInput extends StatelessWidget {
   final EdgeInsetsGeometry? contentPadding;
 
   const WoragisInput({
-    Key? key,
+    super.key,
     this.label,
     this.hintText,
     this.helperText,
@@ -53,7 +53,7 @@ class WoragisInput extends StatelessWidget {
     this.maxLines = 1,
     this.maxLength,
     this.contentPadding,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,7 @@ class WoragisInput extends StatelessWidget {
             style: theme.textTheme.bodySmall?.copyWith(
               color: errorText != null
                   ? colorScheme.error
-                  : colorScheme.onSurface.withOpacity(0.6),
+                  : colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -136,7 +136,7 @@ class WoragisInput extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.05),
+            color: colorScheme.primary.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -164,13 +164,13 @@ class WoragisInput extends StatelessWidget {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
-              color: colorScheme.outline.withOpacity(0.3),
+              color: colorScheme.outline.withValues(alpha: 0.3),
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
-              color: colorScheme.outline.withOpacity(0.3),
+              color: colorScheme.outline.withValues(alpha: 0.3),
             ),
           ),
           focusedBorder: OutlineInputBorder(
@@ -198,10 +198,10 @@ class WoragisInput extends StatelessWidget {
   Widget _buildGlassInput(BuildContext context, ColorScheme colorScheme) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -226,7 +226,7 @@ class WoragisInput extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: TextStyle(
-                color: colorScheme.onSurface.withOpacity(0.6),
+                color: colorScheme.onSurface.withValues(alpha: 0.6),
               ),
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,
@@ -377,13 +377,13 @@ class WoragisSearchInput extends StatelessWidget {
   final bool showClearButton;
 
   const WoragisSearchInput({
-    Key? key,
+    super.key,
     this.hintText,
     this.controller,
     this.onChanged,
     this.onClear,
     this.showClearButton = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -397,7 +397,7 @@ class WoragisSearchInput extends StatelessWidget {
       onChanged: onChanged,
       prefixIcon: Icon(
         Icons.search,
-        color: colorScheme.onSurface.withOpacity(0.6),
+        color: colorScheme.onSurface.withValues(alpha: 0.6),
       ),
       suffixIcon: showClearButton && 
           controller != null && 
@@ -405,7 +405,7 @@ class WoragisSearchInput extends StatelessWidget {
           ? IconButton(
               icon: Icon(
                 Icons.clear,
-                color: colorScheme.onSurface.withOpacity(0.6),
+                color: colorScheme.onSurface.withValues(alpha: 0.6),
               ),
               onPressed: () {
                 controller?.clear();
@@ -426,14 +426,14 @@ class WoragisPasswordInput extends StatefulWidget {
   final WoragisInputVariant variant;
 
   const WoragisPasswordInput({
-    Key? key,
+    super.key,
     this.label,
     this.hintText,
     this.controller,
     this.onChanged,
     this.validator,
     this.variant = WoragisInputVariant.modern,
-  }) : super(key: key);
+  });
 
   @override
   State<WoragisPasswordInput> createState() => _WoragisPasswordInputState();
@@ -458,7 +458,7 @@ class _WoragisPasswordInputState extends State<WoragisPasswordInput> {
       suffixIcon: IconButton(
         icon: Icon(
           _obscureText ? Icons.visibility : Icons.visibility_off,
-          color: colorScheme.onSurface.withOpacity(0.6),
+          color: colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         onPressed: () {
           setState(() {

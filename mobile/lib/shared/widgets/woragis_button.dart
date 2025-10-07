@@ -26,7 +26,7 @@ class WoragisButton extends StatelessWidget {
   final bool isFullWidth;
 
   const WoragisButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.variant = WoragisButtonVariant.primary,
@@ -34,7 +34,7 @@ class WoragisButton extends StatelessWidget {
     this.icon,
     this.isLoading = false,
     this.isFullWidth = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +98,7 @@ class WoragisButton extends StatelessWidget {
             backgroundColor: colorScheme.primary,
             foregroundColor: colorScheme.onPrimary,
             elevation: 0,
-            shadowColor: colorScheme.primary.withOpacity(0.3),
+            shadowColor: colorScheme.primary.withValues(alpha: 0.3),
             padding: _getPadding(),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -114,7 +114,7 @@ class WoragisButton extends StatelessWidget {
             backgroundColor: colorScheme.secondary,
             foregroundColor: colorScheme.onSecondary,
             elevation: 0,
-            shadowColor: colorScheme.secondary.withOpacity(0.3),
+            shadowColor: colorScheme.secondary.withValues(alpha: 0.3),
             padding: _getPadding(),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -165,7 +165,7 @@ class WoragisButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.3),
+                color: colorScheme.primary.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -187,15 +187,15 @@ class WoragisButton extends StatelessWidget {
       case WoragisButtonVariant.glass:
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -228,7 +228,7 @@ class WoragisButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.3),
+                color: colorScheme.primary.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),

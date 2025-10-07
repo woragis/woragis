@@ -6,7 +6,7 @@ import 'woragis_input.dart';
 /// Example usage of Woragis widgets without explicit styling
 /// All styling is handled by the theme configuration
 class WoragisUsageExamples extends StatelessWidget {
-  const WoragisUsageExamples({Key? key}) : super(key: key);
+  const WoragisUsageExamples({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +209,7 @@ class _BasicInputsExampleState extends State<_BasicInputsExample> {
 
 /// Example of using standard Flutter widgets with theme styling
 class StandardWidgetsWithTheme extends StatelessWidget {
-  const StandardWidgetsWithTheme({Key? key}) : super(key: key);
+  const StandardWidgetsWithTheme({super.key});
 
   @override
   Widget build(BuildContext context) {
