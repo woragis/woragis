@@ -13,8 +13,6 @@ presentation/
 │   ├── education_detail_page.dart    # Detailed view of an education record
 │   ├── create_education_page.dart    # Create/edit education form
 │   └── pages.dart                    # Export file for all pages
-├── queries/
-│   └── education_queries.dart       # Query utility functions
 └── README.md                         # This documentation
 ```
 
@@ -49,7 +47,7 @@ The education domain uses the BLoC (Business Logic Component) pattern for state 
 #### **Events**
 - `LoadEducationList`: Load education records with optional filtering and pagination
 - `RefreshEducationList`: Refresh the current education list
-- `SearchEducation`: Search education records by query
+- `SearchEducation`: Search education records by search term
 - `FilterEducation`: Apply type, institution, or visibility filters
 - `SortEducation`: Sort education records by specified criteria
 
@@ -65,25 +63,25 @@ The education domain uses the BLoC (Business Logic Component) pattern for state 
 - **Error Handling**: Comprehensive error handling with retry options
 - **Loading States**: Proper loading indicators and state management
 
-### **Query Integration**
+### **Data Access**
 
-The `EducationQueries` class provides utility functions for direct use case calls:
+The education domain uses the repository pattern with proper caching for efficient data access:
 
 ```dart
-// Get all education records
-final education = await EducationQueries.getAllEducation();
+// Get all education records through BLoC
+context.read<EducationBloc>().add(const LoadEducationList());
 
-// Get visible education records
-final visible = await EducationQueries.getVisibleEducation();
+// Get visible education only through BLoC
+context.read<EducationBloc>().add(const FilterEducation(visible: true));
 
-// Search education records
-final searchResults = await EducationQueries.searchEducation('computer science');
+// Search education records through BLoC
+context.read<EducationBloc>().add(const SearchEducation('computer science'));
 
-// Get education by type
-final degrees = await EducationQueries.getEducationByType('degree');
+// Get education by type through BLoC
+context.read<EducationBloc>().add(const FilterEducation(type: 'degree'));
 
-// Get education by institution
-final university = await EducationQueries.getEducationByInstitution('University');
+// Get education by institution through BLoC
+context.read<EducationBloc>().add(const FilterEducation(institution: 'University'));
 ```
 
 ## 📱 Pages Overview
@@ -230,19 +228,19 @@ context.read<EducationBloc>().add(FilterEducation(type: 'degree'));
 context.read<EducationBloc>().add(const RefreshEducationList());
 ```
 
-### **Query Usage**
+### **BLoC Usage**
 ```dart
 // Get all education records
-final education = await EducationQueries.getAllEducation();
+context.read<EducationBloc>().add(const LoadEducationList());
 
 // Get visible education records
-final visible = await EducationQueries.getVisibleEducation();
+context.read<EducationBloc>().add(const FilterEducation(visible: true));
 
 // Search education records
-final results = await EducationQueries.searchEducation('university');
+context.read<EducationBloc>().add(const SearchEducation('university'));
 
 // Get degrees only
-final degrees = await EducationQueries.getDegrees();
+context.read<EducationBloc>().add(const FilterEducation(type: 'degree'));
 ```
 
 ## 🔄 Integration Points
@@ -277,7 +275,7 @@ final degrees = await EducationQueries.getDegrees();
 
 ### **Unit Tests**
 - **BLoC Tests**: Test all events and state transitions
-- **Query Tests**: Test utility functions and error handling
+- **Repository Tests**: Test data access and caching logic
 - **Validation Tests**: Test form validation logic
 
 ### **Widget Tests**

@@ -347,7 +347,7 @@ class _EducationListPageState extends State<EducationListPage> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: _getTypeColor(education.type).withOpacity(0.1),
+                      color: _getTypeColor(education.type).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -360,7 +360,7 @@ class _EducationListPageState extends State<EducationListPage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _getTypeColor(education.type).withOpacity(0.1),
+                      color: _getTypeColor(education.type).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -445,7 +445,7 @@ class _EducationListPageState extends State<EducationListPage> {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: _getTypeColor(education.type).withOpacity(0.1),
+            color: _getTypeColor(education.type).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -471,7 +471,7 @@ class _EducationListPageState extends State<EducationListPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: _getTypeColor(education.type).withOpacity(0.1),
+                    color: _getTypeColor(education.type).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -488,7 +488,7 @@ class _EducationListPageState extends State<EducationListPage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
+                      color: Colors.blue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -530,14 +530,6 @@ class _EducationListPageState extends State<EducationListPage> {
         return Colors.blue;
       case EducationType.certificate:
         return Colors.green;
-      case EducationType.course:
-        return Colors.orange;
-      case EducationType.workshop:
-        return Colors.purple;
-      case EducationType.bootcamp:
-        return Colors.red;
-      case EducationType.other:
-        return Colors.grey;
     }
   }
 
@@ -547,14 +539,6 @@ class _EducationListPageState extends State<EducationListPage> {
         return Icons.school;
       case EducationType.certificate:
         return Icons.verified;
-      case EducationType.course:
-        return Icons.menu_book;
-      case EducationType.workshop:
-        return Icons.work;
-      case EducationType.bootcamp:
-        return Icons.computer;
-      case EducationType.other:
-        return Icons.article;
     }
   }
 

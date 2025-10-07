@@ -70,7 +70,7 @@ class EducationDetailPage extends StatelessWidget {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: _getTypeColor(education.type).withOpacity(0.1),
+                            color: _getTypeColor(education.type).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Icon(
@@ -106,7 +106,7 @@ class EducationDetailPage extends StatelessWidget {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: _getTypeColor(education.type).withOpacity(0.1),
+                                      color: _getTypeColor(education.type).withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Text(
@@ -123,7 +123,7 @@ class EducationDetailPage extends StatelessWidget {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue.withOpacity(0.1),
+                                        color: Colors.blue.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       child: Text(
@@ -247,7 +247,7 @@ class EducationDetailPage extends StatelessWidget {
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.blue.withOpacity(0.1),
+                              color: Colors.blue.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Text(
@@ -443,14 +443,6 @@ class EducationDetailPage extends StatelessWidget {
         return Colors.blue;
       case EducationType.certificate:
         return Colors.green;
-      case EducationType.course:
-        return Colors.orange;
-      case EducationType.workshop:
-        return Colors.purple;
-      case EducationType.bootcamp:
-        return Colors.red;
-      case EducationType.other:
-        return Colors.grey;
     }
   }
 
@@ -460,14 +452,6 @@ class EducationDetailPage extends StatelessWidget {
         return Icons.school;
       case EducationType.certificate:
         return Icons.verified;
-      case EducationType.course:
-        return Icons.menu_book;
-      case EducationType.workshop:
-        return Icons.work;
-      case EducationType.bootcamp:
-        return Icons.computer;
-      case EducationType.other:
-        return Icons.article;
     }
   }
 }
