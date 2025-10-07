@@ -364,7 +364,7 @@ class _FrameworksListPageState extends State<FrameworksListPage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _getTypeColor(framework.type).withOpacity(0.1),
+                      color: _getTypeColor(framework.type).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -426,7 +426,7 @@ class _FrameworksListPageState extends State<FrameworksListPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: _getProficiencyColor(framework.proficiencyLevel!).withOpacity(0.1),
+                        color: _getProficiencyColor(framework.proficiencyLevel!).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -491,7 +491,7 @@ class _FrameworksListPageState extends State<FrameworksListPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: _getTypeColor(framework.type).withOpacity(0.1),
+                    color: _getTypeColor(framework.type).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -508,7 +508,7 @@ class _FrameworksListPageState extends State<FrameworksListPage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: _getProficiencyColor(framework.proficiencyLevel!).withOpacity(0.1),
+                      color: _getProficiencyColor(framework.proficiencyLevel!).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(

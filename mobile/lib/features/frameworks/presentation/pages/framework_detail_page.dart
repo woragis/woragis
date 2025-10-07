@@ -96,7 +96,7 @@ class FrameworkDetailPage extends StatelessWidget {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: _getTypeColor(framework.type).withOpacity(0.1),
+                                      color: _getTypeColor(framework.type).withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Text(
@@ -113,7 +113,7 @@ class FrameworkDetailPage extends StatelessWidget {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                       decoration: BoxDecoration(
-                                        color: _getProficiencyColor(framework.proficiencyLevel!).withOpacity(0.1),
+                                        color: _getProficiencyColor(framework.proficiencyLevel!).withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       child: Text(
