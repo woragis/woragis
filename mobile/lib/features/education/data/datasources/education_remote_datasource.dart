@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../../domain/entities/education_entity.dart';
@@ -64,13 +65,47 @@ abstract class EducationRemoteDataSource {
 }
 
 class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
-  final http.Client client;
-  final String baseUrl;
+  final http.Client _client = http.Client();
+  final String _baseUrl;
+
+  // Simple in-memory cache
+  static final Map<String, dynamic> _cache = {};
+  static final Map<String, DateTime> _cacheTimestamps = {};
+  static const Duration _cacheDuration = Duration(minutes: 5);
 
   EducationRemoteDataSourceImpl({
-    required this.client,
-    required this.baseUrl,
-  });
+    required String baseUrl,
+  }) : _baseUrl = baseUrl;
+
+  // Helper method to get cached data or fetch fresh
+  Future<T> _getCachedOrFetch<T>(
+    String cacheKey,
+    Future<T> Function() fetcher,
+  ) async {
+    final now = DateTime.now();
+    
+    // Check if we have cached data that's still fresh
+    if (_cache.containsKey(cacheKey) && 
+        _cacheTimestamps.containsKey(cacheKey) &&
+        now.difference(_cacheTimestamps[cacheKey]!).compareTo(_cacheDuration) < 0) {
+      log('📦 Using cached data for: $cacheKey');
+      return _cache[cacheKey] as T;
+    }
+    
+    // Fetch fresh data
+    log('🌐 Fetching fresh data for: $cacheKey');
+    final data = await fetcher();
+    _cache[cacheKey] = data;
+    _cacheTimestamps[cacheKey] = now;
+    return data;
+  }
+
+  // Helper method to invalidate cache
+  void _invalidateCache(String pattern) {
+    _cache.removeWhere((key, value) => key.contains(pattern));
+    _cacheTimestamps.removeWhere((key, value) => key.contains(pattern));
+    log('🗑️ Cache invalidated for pattern: $pattern');
+  }
 
   @override
   Future<List<EducationEntity>> getEducationList({
@@ -82,67 +117,79 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
     String? institution,
     String? search,
   }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (page != null) queryParams['page'] = page.toString();
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (visible != null) queryParams['visible'] = visible.toString();
-      if (type != null) queryParams['type'] = type;
-      if (degreeLevel != null) queryParams['degreeLevel'] = degreeLevel;
-      if (institution != null) queryParams['institution'] = institution;
-      if (search != null && search.isNotEmpty) queryParams['search'] = search;
+    final cacheKey = 'education_list_${page}_${limit}_${visible}_${type}_${degreeLevel}_${institution}_${search}';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        final queryParams = <String, String>{};
+        if (page != null) queryParams['page'] = page.toString();
+        if (limit != null) queryParams['limit'] = limit.toString();
+        if (visible != null) queryParams['visible'] = visible.toString();
+        if (type != null) queryParams['type'] = type;
+        if (degreeLevel != null) queryParams['degreeLevel'] = degreeLevel;
+        if (institution != null) queryParams['institution'] = institution;
+        if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
-      final uri = Uri.parse('$baseUrl/admin/education').replace(queryParameters: queryParams);
-      final response = await client.get(uri);
+        log('🔍 Education List API Request: /admin/education');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          final educationList = (data['data']['education'] as List)
-              .map((educationJson) => EducationModel.fromJson(educationJson).toEntity())
-              .toList();
-          return educationList;
+        final uri = Uri.parse('$_baseUrl/admin/education').replace(queryParameters: queryParams);
+        final response = await _client.get(uri);
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final educationList = (data['data']['education'] as List)
+                .map((educationJson) => EducationModel.fromJson(educationJson).toEntity())
+                .toList();
+            return educationList;
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch education list');
+          }
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch education list');
+          throw ServerException('Failed to fetch education list with status ${response.statusCode}');
         }
-      } else {
-        throw ServerException('Failed to fetch education list with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<EducationEntity> getEducationById(String id) async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/education/$id'));
+    final cacheKey = 'education_$id';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Education by ID API Request: /admin/education/$id');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          return EducationModel.fromJson(data['data']).toEntity();
+        final response = await _client.get(Uri.parse('$_baseUrl/admin/education/$id'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            return EducationModel.fromJson(data['data']).toEntity();
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch education');
+          }
+        } else if (response.statusCode == 404) {
+          throw NotFoundException('Education not found');
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch education');
+          throw ServerException('Failed to fetch education with status ${response.statusCode}');
         }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Education not found');
-      } else {
-        throw ServerException('Failed to fetch education with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException || e is NotFoundException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
@@ -168,8 +215,8 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
     required bool visible,
   }) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/admin/education'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/education'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -194,10 +241,15 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return EducationModel.fromJson(data['data']).toEntity();
+          final education = EducationModel.fromJson(data['data']).toEntity();
+          
+          // Invalidate education cache
+          _invalidateCache('education_list_');
+          
+          return education;
         } else {
           throw ServerException(data['message'] ?? 'Failed to create education');
         }
@@ -241,8 +293,8 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
     bool? visible,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/education/$id'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/education/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
@@ -270,7 +322,13 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return EducationModel.fromJson(data['data']).toEntity();
+          final education = EducationModel.fromJson(data['data']).toEntity();
+          
+          // Invalidate education cache
+          _invalidateCache('education_list_');
+          _invalidateCache('education_$id');
+          
+          return education;
         } else {
           throw ServerException(data['message'] ?? 'Failed to update education');
         }
@@ -295,9 +353,13 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
   @override
   Future<void> deleteEducation(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/admin/education/$id'));
+      final response = await _client.delete(Uri.parse('$_baseUrl/admin/education/$id'));
 
-      if (response.statusCode != 200 && response.statusCode != 204) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Invalidate education cache
+        _invalidateCache('education_list_');
+        _invalidateCache('education_$id');
+      } else {
         if (response.statusCode == 404) {
           throw NotFoundException('Education not found');
         } else {
@@ -317,8 +379,8 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
   @override
   Future<void> updateEducationOrder(List<Map<String, dynamic>> educationOrders) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/education/order'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/education/order'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'educationOrders': educationOrders}),
       );
