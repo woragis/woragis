@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../../domain/entities/about_core_entity.dart';
@@ -104,38 +105,78 @@ abstract class AboutRemoteDataSource {
 }
 
 class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
-  final http.Client client;
-  final String baseUrl;
+  final http.Client _client = http.Client();
+  final String _baseUrl;
+
+  // Simple in-memory cache
+  static final Map<String, dynamic> _cache = {};
+  static final Map<String, DateTime> _cacheTimestamps = {};
+  static const Duration _cacheDuration = Duration(minutes: 5);
 
   AboutRemoteDataSourceImpl({
-    required this.client,
-    required this.baseUrl,
-  });
+    required String baseUrl,
+  }) : _baseUrl = baseUrl;
+
+  // Helper method to get cached data or fetch fresh
+  Future<T> _getCachedOrFetch<T>(
+    String cacheKey,
+    Future<T> Function() fetcher,
+  ) async {
+    final now = DateTime.now();
+    
+    // Check if we have cached data that's still fresh
+    if (_cache.containsKey(cacheKey) && 
+        _cacheTimestamps.containsKey(cacheKey) &&
+        now.difference(_cacheTimestamps[cacheKey]!).compareTo(_cacheDuration) < 0) {
+      log('📦 Using cached data for: $cacheKey');
+      return _cache[cacheKey] as T;
+    }
+    
+    // Fetch fresh data
+    log('🌐 Fetching fresh data for: $cacheKey');
+    final data = await fetcher();
+    _cache[cacheKey] = data;
+    _cacheTimestamps[cacheKey] = now;
+    return data;
+  }
+
+  // Helper method to invalidate cache
+  void _invalidateCache(String pattern) {
+    _cache.removeWhere((key, value) => key.contains(pattern));
+    _cacheTimestamps.removeWhere((key, value) => key.contains(pattern));
+    log('🗑️ Cache invalidated for pattern: $pattern');
+  }
 
   // About Core Implementation
   @override
   Future<AboutCoreEntity> getAboutCore() async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/about/core'));
+    final cacheKey = 'about_core';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 About Core API Request: /admin/about/core');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          return AboutCoreModel.fromJson(data['data']).toEntity();
+        final response = await _client.get(Uri.parse('$_baseUrl/admin/about/core'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            return AboutCoreModel.fromJson(data['data']).toEntity();
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch about core');
+          }
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch about core');
+          throw ServerException('Failed to fetch about core with status ${response.statusCode}');
         }
-      } else {
-        throw ServerException('Failed to fetch about core with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
@@ -147,8 +188,8 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
     bool? visible,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/about/core'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/about/core'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (name != null) 'name': name,
@@ -162,7 +203,12 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AboutCoreModel.fromJson(data['data']).toEntity();
+          final aboutCore = AboutCoreModel.fromJson(data['data']).toEntity();
+          
+          // Invalidate about core cache
+          _invalidateCache('about_core');
+          
+          return aboutCore;
         } else {
           throw ServerException(data['message'] ?? 'Failed to update about core');
         }
@@ -185,27 +231,33 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   // Biography Implementation
   @override
   Future<BiographyEntity> getBiography() async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/about/biography'));
+    final cacheKey = 'biography';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Biography API Request: /admin/about/biography');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          return BiographyModel.fromJson(data['data']).toEntity();
+        final response = await _client.get(Uri.parse('$_baseUrl/admin/about/biography'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            return BiographyModel.fromJson(data['data']).toEntity();
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch biography');
+          }
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch biography');
+          throw ServerException('Failed to fetch biography with status ${response.statusCode}');
         }
-      } else {
-        throw ServerException('Failed to fetch biography with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
@@ -215,8 +267,8 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
     bool? visible,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/about/biography'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/about/biography'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (featuredBiography != null) 'featuredBiography': featuredBiography,
@@ -257,44 +309,50 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
     String? status,
     String? search,
   }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (page != null) queryParams['page'] = page.toString();
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (visible != null) queryParams['visible'] = visible.toString();
-      if (status != null) queryParams['status'] = status;
-      if (search != null && search.isNotEmpty) queryParams['search'] = search;
+    final cacheKey = 'anime_list_${page}_${limit}_${visible}_${status}_${search}';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        final queryParams = <String, String>{};
+        if (page != null) queryParams['page'] = page.toString();
+        if (limit != null) queryParams['limit'] = limit.toString();
+        if (visible != null) queryParams['visible'] = visible.toString();
+        if (status != null) queryParams['status'] = status;
+        if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
-      final uri = Uri.parse('$baseUrl/admin/about/anime').replace(queryParameters: queryParams);
-      final response = await client.get(uri);
+        log('🔍 Anime List API Request: /admin/about/anime');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          final animeList = (data['data']['anime'] as List)
-              .map((animeJson) => AnimeModel.fromJson(animeJson).toEntity())
-              .toList();
-          return animeList;
+        final uri = Uri.parse('$_baseUrl/admin/about/anime').replace(queryParameters: queryParams);
+        final response = await _client.get(uri);
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final animeList = (data['data']['anime'] as List)
+                .map((animeJson) => AnimeModel.fromJson(animeJson).toEntity())
+                .toList();
+            return animeList;
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch anime list');
+          }
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch anime list');
+          throw ServerException('Failed to fetch anime list with status ${response.statusCode}');
         }
-      } else {
-        throw ServerException('Failed to fetch anime list with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<AnimeEntity> getAnimeById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/about/anime/$id'));
+      final response = await _client.get(Uri.parse('$_baseUrl/admin/about/anime/$id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -336,8 +394,8 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
     required bool visible,
   }) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/admin/about/anime'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/about/anime'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -357,7 +415,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
           return AnimeModel.fromJson(data['data']).toEntity();
@@ -399,8 +457,8 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
     bool? visible,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/about/anime/$id'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/about/anime/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
@@ -448,7 +506,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   @override
   Future<void> deleteAnime(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/admin/about/anime/$id'));
+      final response = await _client.delete(Uri.parse('$_baseUrl/admin/about/anime/$id'));
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         if (response.statusCode == 404) {
@@ -475,43 +533,49 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
     bool? visible,
     String? search,
   }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (page != null) queryParams['page'] = page.toString();
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (visible != null) queryParams['visible'] = visible.toString();
-      if (search != null && search.isNotEmpty) queryParams['search'] = search;
+    final cacheKey = 'music_genres_${page}_${limit}_${visible}_${search}';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        final queryParams = <String, String>{};
+        if (page != null) queryParams['page'] = page.toString();
+        if (limit != null) queryParams['limit'] = limit.toString();
+        if (visible != null) queryParams['visible'] = visible.toString();
+        if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
-      final uri = Uri.parse('$baseUrl/admin/about/music/genres').replace(queryParameters: queryParams);
-      final response = await client.get(uri);
+        log('🔍 Music Genres API Request: /admin/about/music/genres');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          final musicGenres = (data['data']['musicGenres'] as List)
-              .map((genreJson) => MusicGenreModel.fromJson(genreJson).toEntity())
-              .toList();
-          return musicGenres;
+        final uri = Uri.parse('$_baseUrl/admin/about/music/genres').replace(queryParameters: queryParams);
+        final response = await _client.get(uri);
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final musicGenres = (data['data']['musicGenres'] as List)
+                .map((genreJson) => MusicGenreModel.fromJson(genreJson).toEntity())
+                .toList();
+            return musicGenres;
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch music genres');
+          }
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch music genres');
+          throw ServerException('Failed to fetch music genres with status ${response.statusCode}');
         }
-      } else {
-        throw ServerException('Failed to fetch music genres with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<MusicGenreEntity> getMusicGenreById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/about/music/genres/$id'));
+      final response = await _client.get(Uri.parse('$_baseUrl/admin/about/music/genres/$id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -543,8 +607,8 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
     required bool visible,
   }) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/admin/about/music/genres'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/about/music/genres'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'name': name,
@@ -554,7 +618,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
           return MusicGenreModel.fromJson(data['data']).toEntity();
@@ -586,8 +650,8 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
     bool? visible,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/about/music/genres/$id'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/about/music/genres/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (name != null) 'name': name,
@@ -625,7 +689,7 @@ class AboutRemoteDataSourceImpl implements AboutRemoteDataSource {
   @override
   Future<void> deleteMusicGenre(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/admin/about/music/genres/$id'));
+      final response = await _client.delete(Uri.parse('$_baseUrl/admin/about/music/genres/$id'));
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         if (response.statusCode == 404) {
