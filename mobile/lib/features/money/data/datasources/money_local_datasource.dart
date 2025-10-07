@@ -34,7 +34,7 @@ class MoneyLocalDataSourceImpl implements MoneyLocalDataSource {
     final db = await _dbHelper.database;
     final result = await db.query(
       'ideas',
-      orderBy: 'order ASC, title ASC',
+      orderBy: '`order` ASC, title ASC',
     );
     return result.map((ideaMap) => IdeaModel.fromLocalJson(ideaMap).toEntity()).toList();
   }
