@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/idea_entity.dart';
 import '../../domain/entities/ai_chat_entity.dart';
+import '../../domain/entities/idea_node_entity.dart';
 import '../../domain/repositories/money_repository.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/exceptions.dart';
@@ -419,6 +420,251 @@ class MoneyRepositoryImpl implements MoneyRepository {
   Future<Either<Failure, void>> cacheAiChats(List<AiChatEntity> chats) async {
     try {
       await localDataSource.cacheAiChats(chats);
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  // Idea Nodes Implementation
+  @override
+  Future<Either<Failure, List<IdeaNodeEntity>>> getIdeaNodes({
+    required String ideaId,
+    String? type,
+    bool? visible,
+    int? limit,
+    int? offset,
+  }) async {
+    try {
+      final nodes = await remoteDataSource.getIdeaNodes(
+        ideaId: ideaId,
+        type: type,
+        visible: visible,
+        limit: limit,
+        offset: offset,
+      );
+
+      // Cache the nodes locally
+      await localDataSource.cacheIdeaNodes(nodes);
+
+      return Right(nodes);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Return cached data if available
+      try {
+        final cachedNodes = await localDataSource.getCachedIdeaNodes(ideaId);
+        return Right(cachedNodes);
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, IdeaNodeEntity>> getIdeaNodeById(String id) async {
+    try {
+      final node = await remoteDataSource.getIdeaNodeById(id);
+      // Cache the node locally
+      await localDataSource.cacheIdeaNode(node);
+      return Right(node);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to get from cache
+      try {
+        final cachedNode = await localDataSource.getCachedIdeaNode(id);
+        if (cachedNode != null) {
+          return Right(cachedNode);
+        }
+        return Left(NetworkFailure(e.message));
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, IdeaNodeEntity>> createIdeaNode({
+    required String ideaId,
+    required String title,
+    String? content,
+    required String type,
+    required double positionX,
+    required double positionY,
+    double? width,
+    double? height,
+    String? color,
+    required List<String> connections,
+    required bool visible,
+  }) async {
+    try {
+      final node = await remoteDataSource.createIdeaNode(
+        ideaId: ideaId,
+        title: title,
+        content: content,
+        type: type,
+        positionX: positionX,
+        positionY: positionY,
+        width: width,
+        height: height,
+        color: color,
+        connections: connections,
+        visible: visible,
+      );
+
+      // Cache the new node
+      await localDataSource.cacheIdeaNode(node);
+
+      return Right(node);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, IdeaNodeEntity>> updateIdeaNode({
+    required String id,
+    String? title,
+    String? content,
+    String? type,
+    double? positionX,
+    double? positionY,
+    double? width,
+    double? height,
+    String? color,
+    List<String>? connections,
+    bool? visible,
+  }) async {
+    try {
+      final node = await remoteDataSource.updateIdeaNode(
+        id: id,
+        title: title,
+        content: content,
+        type: type,
+        positionX: positionX,
+        positionY: positionY,
+        width: width,
+        height: height,
+        color: color,
+        connections: connections,
+        visible: visible,
+      );
+
+      // Update cached node
+      await localDataSource.updateCachedIdeaNode(node);
+
+      return Right(node);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteIdeaNode(String id) async {
+    try {
+      await remoteDataSource.deleteIdeaNode(id);
+      await localDataSource.removeCachedIdeaNode(id);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, IdeaNodeEntity>> updateNodePosition({
+    required String id,
+    required double positionX,
+    required double positionY,
+  }) async {
+    try {
+      final node = await remoteDataSource.updateNodePosition(
+        id: id,
+        positionX: positionX,
+        positionY: positionY,
+      );
+
+      // Update cached node
+      await localDataSource.updateCachedIdeaNode(node);
+
+      return Right(node);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateNodePositions(List<Map<String, dynamic>> positions) async {
+    try {
+      await remoteDataSource.updateNodePositions(positions);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, IdeaNodeEntity>> updateNodeConnections({
+    required String id,
+    required List<String> connections,
+  }) async {
+    try {
+      final node = await remoteDataSource.updateNodeConnections(
+        id: id,
+        connections: connections,
+      );
+
+      // Update cached node
+      await localDataSource.updateCachedIdeaNode(node);
+
+      return Right(node);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<IdeaNodeEntity>>> getCachedIdeaNodes(String ideaId) async {
+    try {
+      final nodes = await localDataSource.getCachedIdeaNodes(ideaId);
+      return Right(nodes);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> cacheIdeaNodes(List<IdeaNodeEntity> ideaNodes) async {
+    try {
+      await localDataSource.cacheIdeaNodes(ideaNodes);
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
