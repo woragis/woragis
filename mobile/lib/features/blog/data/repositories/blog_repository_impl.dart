@@ -50,7 +50,13 @@ class BlogRepositoryImpl implements BlogRepository {
     } on NetworkException catch (e) {
       // Return cached data if available
       try {
-        final cachedPosts = await localDataSource.getCachedBlogPosts();
+        final cachedPosts = await localDataSource.getCachedBlogPosts(
+          published: published,
+          featured: featured,
+          visible: visible,
+          public: public,
+          search: search,
+        );
         return Right(cachedPosts);
       } catch (cacheError) {
         return Left(NetworkFailure(e.message));
@@ -64,11 +70,22 @@ class BlogRepositoryImpl implements BlogRepository {
   Future<Either<Failure, BlogPostEntity>> getBlogPostById(String id) async {
     try {
       final post = await remoteDataSource.getBlogPostById(id);
+      // Cache the post locally
+      await localDataSource.cacheBlogPost(post);
       return Right(post);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      // Try to get from cache
+      try {
+        final cachedPost = await localDataSource.getCachedBlogPost(id);
+        if (cachedPost != null) {
+          return Right(cachedPost);
+        }
+        return Left(NetworkFailure(e.message));
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
@@ -78,11 +95,22 @@ class BlogRepositoryImpl implements BlogRepository {
   Future<Either<Failure, BlogPostEntity>> getBlogPostBySlug(String slug) async {
     try {
       final post = await remoteDataSource.getBlogPostBySlug(slug);
+      // Cache the post locally
+      await localDataSource.cacheBlogPost(post);
       return Right(post);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      // Try to get from cache
+      try {
+        final cachedPost = await localDataSource.getCachedBlogPostBySlug(slug);
+        if (cachedPost != null) {
+          return Right(cachedPost);
+        }
+        return Left(NetworkFailure(e.message));
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
@@ -217,7 +245,11 @@ class BlogRepositoryImpl implements BlogRepository {
     } on NetworkException catch (e) {
       // Return cached data if available
       try {
-        final cachedTags = await localDataSource.getCachedBlogTags();
+        final cachedTags = await localDataSource.getCachedBlogTags(
+          limit: limit,
+          visible: visible,
+          search: search,
+        );
         return Right(cachedTags);
       } catch (cacheError) {
         return Left(NetworkFailure(e.message));
@@ -231,11 +263,22 @@ class BlogRepositoryImpl implements BlogRepository {
   Future<Either<Failure, BlogTagEntity>> getBlogTagById(String id) async {
     try {
       final tag = await remoteDataSource.getBlogTagById(id);
+      // Cache the tag locally
+      await localDataSource.cacheBlogTag(tag);
       return Right(tag);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      // Try to get from cache
+      try {
+        final cachedTag = await localDataSource.getCachedBlogTag(id);
+        if (cachedTag != null) {
+          return Right(cachedTag);
+        }
+        return Left(NetworkFailure(e.message));
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
@@ -245,11 +288,22 @@ class BlogRepositoryImpl implements BlogRepository {
   Future<Either<Failure, BlogTagEntity>> getBlogTagBySlug(String slug) async {
     try {
       final tag = await remoteDataSource.getBlogTagBySlug(slug);
+      // Cache the tag locally
+      await localDataSource.cacheBlogTag(tag);
       return Right(tag);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      // Try to get from cache
+      try {
+        final cachedTag = await localDataSource.getCachedBlogTagBySlug(slug);
+        if (cachedTag != null) {
+          return Right(cachedTag);
+        }
+        return Left(NetworkFailure(e.message));
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
