@@ -178,11 +178,22 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserEntity>> getCurrentUser() async {
     try {
       final user = await remoteDataSource.getCurrentUser();
+      // Cache the user data locally
+      await localDataSource.storeUserData(user);
       return Right(user);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      // Try to get from cache
+      try {
+        final cachedUser = await localDataSource.getStoredUserData();
+        if (cachedUser != null) {
+          return Right(cachedUser);
+        }
+        return Left(NetworkFailure(e.message));
+      } catch (cacheError) {
+        return Left(NetworkFailure(e.message));
+      }
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
@@ -198,7 +209,6 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = await remoteDataSource.updateProfile(
         firstName: firstName,
         lastName: lastName,
-        avatar: avatar,
       );
 
       // Update local user data
