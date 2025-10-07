@@ -399,7 +399,7 @@ class _IdeaDetailPageState extends State<IdeaDetailPage> {
                   children: [
                     _buildIdeaDetailContent(idea),
                     Container(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       child: const Center(
                         child: CircularProgressIndicator(),
                       ),

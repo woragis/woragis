@@ -123,7 +123,7 @@ class _IdeaCanvasPageState extends State<IdeaCanvasPage> {
           transformationController: _transformationController,
           minScale: 0.5,
           maxScale: 3.0,
-          child: Container(
+          child: SizedBox(
             width: 2000,
             height: 2000,
             child: Stack(
@@ -176,7 +176,7 @@ class _IdeaCanvasPageState extends State<IdeaCanvasPage> {
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -256,7 +256,7 @@ class _IdeaCanvasPageState extends State<IdeaCanvasPage> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),

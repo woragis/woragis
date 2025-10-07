@@ -187,7 +187,7 @@ class _AdvancedIdeaCanvasPageState extends State<AdvancedIdeaCanvasPage> {
           transformationController: _transformationController,
           minScale: 0.3,
           maxScale: 3.0,
-          child: Container(
+          child: SizedBox(
             width: 2000,
             height: 2000,
             child: CustomPaint(
@@ -201,7 +201,7 @@ class _AdvancedIdeaCanvasPageState extends State<AdvancedIdeaCanvasPage> {
               child: Stack(
                 children: [
                   // Nodes
-                  ..._nodes.map((node) => _buildNode(node)).toList(),
+                  ..._nodes.map((node) => _buildNode(node)),
                 ],
               ),
             ),
@@ -246,7 +246,7 @@ class _AdvancedIdeaCanvasPageState extends State<AdvancedIdeaCanvasPage> {
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -336,7 +336,7 @@ class _AdvancedIdeaCanvasPageState extends State<AdvancedIdeaCanvasPage> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
