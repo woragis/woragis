@@ -16,7 +16,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
   bool _showFeaturedOnly = false;
   bool _showPublicOnly = false;
   bool _isGridView = true;
-  List<String> _selectedTechnologies = [];
+  final List<String> _selectedTechnologies = [];
 
   @override
   void initState() {
