@@ -4,8 +4,10 @@ import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../../domain/entities/idea_entity.dart';
 import '../../domain/entities/ai_chat_entity.dart';
+import '../../domain/entities/idea_node_entity.dart';
 import '../models/idea_model.dart';
 import '../models/ai_chat_model.dart';
+import '../models/idea_node_model.dart';
 
 abstract class MoneyRemoteDataSource {
   // Ideas
@@ -88,6 +90,54 @@ abstract class MoneyRemoteDataSource {
     required String message,
   });
   Future<List<ChatMessageEntity>> getChatMessages(String chatId);
+
+  // Idea Nodes
+  Future<List<IdeaNodeEntity>> getIdeaNodes({
+    required String ideaId,
+    String? type,
+    bool? visible,
+    int? limit,
+    int? offset,
+  });
+
+  Future<IdeaNodeEntity> getIdeaNodeById(String id);
+  Future<IdeaNodeEntity> createIdeaNode({
+    required String ideaId,
+    required String title,
+    String? content,
+    required String type,
+    required double positionX,
+    required double positionY,
+    double? width,
+    double? height,
+    String? color,
+    required List<String> connections,
+    required bool visible,
+  });
+  Future<IdeaNodeEntity> updateIdeaNode({
+    required String id,
+    String? title,
+    String? content,
+    String? type,
+    double? positionX,
+    double? positionY,
+    double? width,
+    double? height,
+    String? color,
+    List<String>? connections,
+    bool? visible,
+  });
+  Future<void> deleteIdeaNode(String id);
+  Future<IdeaNodeEntity> updateNodePosition({
+    required String id,
+    required double positionX,
+    required double positionY,
+  });
+  Future<void> updateNodePositions(List<Map<String, dynamic>> positions);
+  Future<IdeaNodeEntity> updateNodeConnections({
+    required String id,
+    required List<String> connections,
+  });
 }
 
 class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
@@ -673,6 +723,314 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
         throw NotFoundException('AI chat not found');
       } else {
         throw ServerException('Failed to fetch messages with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException || e is NotFoundException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  // Idea Nodes Implementation
+  @override
+  Future<List<IdeaNodeEntity>> getIdeaNodes({
+    required String ideaId,
+    String? type,
+    bool? visible,
+    int? limit,
+    int? offset,
+  }) async {
+    try {
+      final queryParams = <String, String>{
+        'ideaId': ideaId,
+      };
+      if (type != null) queryParams['type'] = type;
+      if (visible != null) queryParams['visible'] = visible.toString();
+      if (limit != null) queryParams['limit'] = limit.toString();
+      if (offset != null) queryParams['offset'] = offset.toString();
+
+      final uri = Uri.parse('$_baseUrl/api/money/idea-nodes').replace(queryParameters: queryParams);
+      final response = await _client.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          final nodes = (data['data'] as List)
+              .map((nodeJson) => IdeaNodeModel.fromApiJson(nodeJson).toEntity())
+              .toList();
+          return nodes;
+        } else {
+          throw ServerException(data['message'] ?? 'Failed to fetch idea nodes');
+        }
+      } else {
+        throw ServerException('Failed to fetch idea nodes with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<IdeaNodeEntity> getIdeaNodeById(String id) async {
+    try {
+      final response = await _client.get(Uri.parse('$_baseUrl/api/money/idea-nodes/$id'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return IdeaNodeModel.fromApiJson(data['data']).toEntity();
+        } else {
+          throw ServerException(data['message'] ?? 'Failed to fetch idea node');
+        }
+      } else if (response.statusCode == 404) {
+        throw NotFoundException('Idea node not found');
+      } else {
+        throw ServerException('Failed to fetch idea node with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException || e is NotFoundException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<IdeaNodeEntity> createIdeaNode({
+    required String ideaId,
+    required String title,
+    String? content,
+    required String type,
+    required double positionX,
+    required double positionY,
+    double? width,
+    double? height,
+    String? color,
+    required List<String> connections,
+    required bool visible,
+  }) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/api/money/idea-nodes'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'ideaId': ideaId,
+          'title': title,
+          if (content != null) 'content': content,
+          'type': type,
+          'positionX': positionX,
+          'positionY': positionY,
+          if (width != null) 'width': width,
+          if (height != null) 'height': height,
+          if (color != null) 'color': color,
+          'connections': connections,
+          'visible': visible,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return IdeaNodeModel.fromApiJson(data['data']).toEntity();
+        } else {
+          throw ServerException(data['message'] ?? 'Failed to create idea node');
+        }
+      } else if (response.statusCode == 422) {
+        final data = json.decode(response.body);
+        throw ValidationException(data['message'] ?? 'Validation failed');
+      } else {
+        throw ServerException('Failed to create idea node with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException || e is ValidationException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<IdeaNodeEntity> updateIdeaNode({
+    required String id,
+    String? title,
+    String? content,
+    String? type,
+    double? positionX,
+    double? positionY,
+    double? width,
+    double? height,
+    String? color,
+    List<String>? connections,
+    bool? visible,
+  }) async {
+    try {
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/api/money/idea-nodes/$id'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          if (title != null) 'title': title,
+          if (content != null) 'content': content,
+          if (type != null) 'type': type,
+          if (positionX != null) 'positionX': positionX,
+          if (positionY != null) 'positionY': positionY,
+          if (width != null) 'width': width,
+          if (height != null) 'height': height,
+          if (color != null) 'color': color,
+          if (connections != null) 'connections': connections,
+          if (visible != null) 'visible': visible,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return IdeaNodeModel.fromApiJson(data['data']).toEntity();
+        } else {
+          throw ServerException(data['message'] ?? 'Failed to update idea node');
+        }
+      } else if (response.statusCode == 404) {
+        throw NotFoundException('Idea node not found');
+      } else if (response.statusCode == 422) {
+        final data = json.decode(response.body);
+        throw ValidationException(data['message'] ?? 'Validation failed');
+      } else {
+        throw ServerException('Failed to update idea node with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException || e is NotFoundException || e is ValidationException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<void> deleteIdeaNode(String id) async {
+    try {
+      final response = await _client.delete(Uri.parse('$_baseUrl/api/money/idea-nodes/$id'));
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return;
+      } else {
+        if (response.statusCode == 404) {
+          throw NotFoundException('Idea node not found');
+        } else {
+          throw ServerException('Failed to delete idea node with status ${response.statusCode}');
+        }
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException || e is NotFoundException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<IdeaNodeEntity> updateNodePosition({
+    required String id,
+    required double positionX,
+    required double positionY,
+  }) async {
+    try {
+      final response = await _client.patch(
+        Uri.parse('$_baseUrl/api/money/idea-nodes/$id/position'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'positionX': positionX,
+          'positionY': positionY,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return IdeaNodeModel.fromApiJson(data['data']).toEntity();
+        } else {
+          throw ServerException(data['message'] ?? 'Failed to update node position');
+        }
+      } else if (response.statusCode == 404) {
+        throw NotFoundException('Idea node not found');
+      } else {
+        throw ServerException('Failed to update node position with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException || e is NotFoundException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<void> updateNodePositions(List<Map<String, dynamic>> positions) async {
+    try {
+      final response = await _client.patch(
+        Uri.parse('$_baseUrl/api/money/idea-nodes/positions'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'positions': positions,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        throw ServerException('Failed to update node positions with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<IdeaNodeEntity> updateNodeConnections({
+    required String id,
+    required List<String> connections,
+  }) async {
+    try {
+      final response = await _client.patch(
+        Uri.parse('$_baseUrl/api/money/idea-nodes/$id/connections'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'connections': connections,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return IdeaNodeModel.fromApiJson(data['data']).toEntity();
+        } else {
+          throw ServerException(data['message'] ?? 'Failed to update node connections');
+        }
+      } else if (response.statusCode == 404) {
+        throw NotFoundException('Idea node not found');
+      } else {
+        throw ServerException('Failed to update node connections with status ${response.statusCode}');
       }
     } on http.ClientException {
       throw NetworkException('Network error occurred');
