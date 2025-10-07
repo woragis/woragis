@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../../domain/entities/blog_post_entity.dart';
@@ -88,13 +89,45 @@ abstract class BlogRemoteDataSource {
 }
 
 class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
-  final http.Client client;
-  final String baseUrl;
+  final http.Client _client = http.Client();
+  final String _baseUrl;
 
-  BlogRemoteDataSourceImpl({
-    required this.client,
-    required this.baseUrl,
-  });
+  // Simple in-memory cache
+  static final Map<String, dynamic> _cache = {};
+  static final Map<String, DateTime> _cacheTimestamps = {};
+  static const Duration _cacheDuration = Duration(minutes: 5);
+
+  BlogRemoteDataSourceImpl({required String baseUrl}) : _baseUrl = baseUrl;
+
+  // Helper method to get cached data or fetch fresh
+  Future<T> _getCachedOrFetch<T>(
+    String cacheKey,
+    Future<T> Function() fetcher,
+  ) async {
+    final now = DateTime.now();
+    
+    // Check if we have cached data that's still fresh
+    if (_cache.containsKey(cacheKey) && 
+        _cacheTimestamps.containsKey(cacheKey) &&
+        now.difference(_cacheTimestamps[cacheKey]!).compareTo(_cacheDuration) < 0) {
+      log('📦 Using cached data for: $cacheKey');
+      return _cache[cacheKey] as T;
+    }
+    
+    // Fetch fresh data
+    log('🌐 Fetching fresh data for: $cacheKey');
+    final data = await fetcher();
+    _cache[cacheKey] = data;
+    _cacheTimestamps[cacheKey] = now;
+    return data;
+  }
+
+  // Helper method to invalidate cache
+  void _invalidateCache(String pattern) {
+    _cache.removeWhere((key, value) => key.contains(pattern));
+    _cacheTimestamps.removeWhere((key, value) => key.contains(pattern));
+    log('🗑️ Cache invalidated for pattern: $pattern');
+  }
 
   @override
   Future<List<BlogPostEntity>> getBlogPosts({
@@ -108,96 +141,114 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
     String? sortBy,
     String? sortOrder,
   }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (page != null) queryParams['page'] = page.toString();
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (published != null) queryParams['published'] = published.toString();
-      if (featured != null) queryParams['featured'] = featured.toString();
-      if (visible != null) queryParams['visible'] = visible.toString();
-      if (public != null) queryParams['public'] = public.toString();
-      if (search != null && search.isNotEmpty) queryParams['search'] = search;
-      if (sortBy != null) queryParams['sortBy'] = sortBy;
-      if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
+    final cacheKey = 'blog_posts_${page}_${limit}_${published}_${featured}_${visible}_${public}_${search}_${sortBy}_${sortOrder}';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        final queryParams = <String, String>{};
+        if (page != null) queryParams['page'] = page.toString();
+        if (limit != null) queryParams['limit'] = limit.toString();
+        if (published != null) queryParams['published'] = published.toString();
+        if (featured != null) queryParams['featured'] = featured.toString();
+        if (visible != null) queryParams['visible'] = visible.toString();
+        if (public != null) queryParams['public'] = public.toString();
+        if (search != null && search.isNotEmpty) queryParams['search'] = search;
+        if (sortBy != null) queryParams['sortBy'] = sortBy;
+        if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
 
-      final uri = Uri.parse('$baseUrl/admin/blog').replace(queryParameters: queryParams);
-      final response = await client.get(uri);
+        log('🔍 Blog Posts API Request: /admin/blog');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          final posts = (data['data']['posts'] as List)
-              .map((postJson) => BlogPostModel.fromJson(postJson).toEntity())
-              .toList();
-          return posts;
+        final uri = Uri.parse('$_baseUrl/admin/blog').replace(queryParameters: queryParams);
+        final response = await _client.get(uri);
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final posts = (data['data']['posts'] as List)
+                .map((postJson) => BlogPostModel.fromJson(postJson).toEntity())
+                .toList();
+            return posts;
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch blog posts');
+          }
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch blog posts');
+          throw ServerException('Failed to fetch blog posts with status ${response.statusCode}');
         }
-      } else {
-        throw ServerException('Failed to fetch blog posts with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<BlogPostEntity> getBlogPostById(String id) async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/blog/$id'));
+    final cacheKey = 'blog_post_$id';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Blog Post by ID API Request: /admin/blog/$id');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          return BlogPostModel.fromJson(data['data']).toEntity();
+        final response = await _client.get(Uri.parse('$_baseUrl/admin/blog/$id'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            return BlogPostModel.fromJson(data['data']).toEntity();
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch blog post');
+          }
+        } else if (response.statusCode == 404) {
+          throw NotFoundException('Blog post not found');
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch blog post');
+          throw ServerException('Failed to fetch blog post with status ${response.statusCode}');
         }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Blog post not found');
-      } else {
-        throw ServerException('Failed to fetch blog post with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException || e is NotFoundException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<BlogPostEntity> getBlogPostBySlug(String slug) async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/blog/slug/$slug'));
+    final cacheKey = 'blog_post_slug_$slug';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Blog Post by Slug API Request: /admin/blog/slug/$slug');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          return BlogPostModel.fromJson(data['data']).toEntity();
+        final response = await _client.get(Uri.parse('$_baseUrl/admin/blog/slug/$slug'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            return BlogPostModel.fromJson(data['data']).toEntity();
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch blog post');
+          }
+        } else if (response.statusCode == 404) {
+          throw NotFoundException('Blog post not found');
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch blog post');
+          throw ServerException('Failed to fetch blog post with status ${response.statusCode}');
         }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Blog post not found');
-      } else {
-        throw ServerException('Failed to fetch blog post with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException || e is NotFoundException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
@@ -216,8 +267,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
     required bool public,
   }) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/admin/blog'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/blog'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': title,
@@ -235,10 +286,15 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return BlogPostModel.fromJson(data['data']).toEntity();
+          final blogPost = BlogPostModel.fromJson(data['data']).toEntity();
+          
+          // Invalidate blog posts cache
+          _invalidateCache('blog_posts_');
+          
+          return blogPost;
         } else {
           throw ServerException(data['message'] ?? 'Failed to create blog post');
         }
@@ -275,8 +331,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
     bool? public,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/blog/$id'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/blog/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (title != null) 'title': title,
@@ -297,7 +353,13 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return BlogPostModel.fromJson(data['data']).toEntity();
+          final blogPost = BlogPostModel.fromJson(data['data']).toEntity();
+          
+          // Invalidate blog posts cache
+          _invalidateCache('blog_posts_');
+          _invalidateCache('blog_post_$id');
+          
+          return blogPost;
         } else {
           throw ServerException(data['message'] ?? 'Failed to update blog post');
         }
@@ -322,9 +384,13 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<void> deleteBlogPost(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/admin/blog/$id'));
+      final response = await _client.delete(Uri.parse('$_baseUrl/admin/blog/$id'));
 
-      if (response.statusCode != 200 && response.statusCode != 204) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Invalidate blog posts cache
+        _invalidateCache('blog_posts_');
+        _invalidateCache('blog_post_$id');
+      } else {
         if (response.statusCode == 404) {
           throw NotFoundException('Blog post not found');
         } else {
@@ -356,8 +422,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
       if (visible != null) queryParams['visible'] = visible.toString();
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
-      final uri = Uri.parse('$baseUrl/admin/blog-tags').replace(queryParameters: queryParams);
-      final response = await client.get(uri);
+      final uri = Uri.parse('$_baseUrl/admin/blog-tags').replace(queryParameters: queryParams);
+      final response = await _client.get(uri);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -385,7 +451,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<BlogTagEntity> getBlogTagById(String id) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/blog-tags/$id'));
+      final response = await _client.get(Uri.parse('$_baseUrl/admin/blog-tags/$id'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -412,7 +478,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<BlogTagEntity> getBlogTagBySlug(String slug) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/blog-tags/slug/$slug'));
+      final response = await _client.get(Uri.parse('$_baseUrl/admin/blog-tags/slug/$slug'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -444,8 +510,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
     String? color,
   }) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/admin/blog-tags'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/blog-tags'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'name': name,
@@ -455,7 +521,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
           return BlogTagModel.fromJson(data['data']).toEntity();
@@ -487,8 +553,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
     String? color,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/blog-tags/$id'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/blog-tags/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (name != null) 'name': name,
@@ -526,7 +592,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<void> deleteBlogTag(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/admin/blog-tags/$id'));
+      final response = await _client.delete(Uri.parse('$_baseUrl/admin/blog-tags/$id'));
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         if (response.statusCode == 404) {
@@ -549,8 +615,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<void> assignTagToPost({required String postId, required String tagId}) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/admin/blog/$postId/tags'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/blog/$postId/tags'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'tagId': tagId}),
       );
@@ -571,8 +637,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<void> removeTagFromPost({required String postId, required String tagId}) async {
     try {
-      final response = await client.delete(
-        Uri.parse('$baseUrl/admin/blog/$postId/tags/$tagId'),
+      final response = await _client.delete(
+        Uri.parse('$_baseUrl/admin/blog/$postId/tags/$tagId'),
       );
 
       if (response.statusCode != 200 && response.statusCode != 204) {
@@ -591,7 +657,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<List<BlogTagEntity>> getPostTags(String postId) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/blog/$postId/tags'));
+      final response = await _client.get(Uri.parse('$_baseUrl/admin/blog/$postId/tags'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -619,8 +685,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<void> incrementViewCount(String postId) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/admin/blog/$postId/view'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/blog/$postId/view'),
       );
 
       if (response.statusCode != 200) {
@@ -639,8 +705,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<void> incrementLikeCount(String postId) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/admin/blog/$postId/like'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/blog/$postId/like'),
       );
 
       if (response.statusCode != 200) {
