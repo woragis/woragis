@@ -16,7 +16,6 @@ abstract class ProjectsLocalDataSource {
   });
 
   Future<ProjectEntity?> getCachedProject(String id);
-  Future<ProjectEntity?> getCachedProjectBySlug(String slug);
   Future<void> cacheProject(ProjectEntity project);
   Future<void> cacheProjects(List<ProjectEntity> projects);
   Future<void> updateCachedProject(ProjectEntity project);
@@ -77,7 +76,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
       'projects',
       where: whereClause,
       whereArgs: whereArgs,
-      orderBy: 'order ASC, created_at DESC',
+      orderBy: '`order` ASC, created_at DESC',
       limit: limit,
       offset: offset,
     );
@@ -98,18 +97,6 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     return ProjectModel.fromDatabaseJson(result.first).toEntity();
   }
 
-  @override
-  Future<ProjectEntity?> getCachedProjectBySlug(String slug) async {
-    final db = await _dbHelper.database;
-    final result = await db.query(
-      'projects',
-      where: 'slug = ?',
-      whereArgs: [slug],
-    );
-
-    if (result.isEmpty) return null;
-    return ProjectModel.fromDatabaseJson(result.first).toEntity();
-  }
 
   @override
   Future<void> cacheProject(ProjectEntity project) async {
@@ -208,6 +195,8 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
         'id': '${projectId}_${frameworkId}_${DateTime.now().millisecondsSinceEpoch}',
         'project_id': projectId,
         'framework_id': frameworkId,
+        'version': null, // Optional version field
+        'proficiency': null, // Optional proficiency field
         'created_at': DateTime.now().millisecondsSinceEpoch,
       },
       conflictAlgorithm: ConflictAlgorithm.ignore,
