@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-enum EducationType { degree, certificate, course, workshop, bootcamp, other }
-enum DegreeLevel { associate, bachelor, master, doctorate, diploma, certificate }
+enum EducationType { degree, certificate }
+enum DegreeLevel { associate, bachelor, master, doctorate, diploma }
 
 class EducationEntity extends Equatable {
   final String id;
