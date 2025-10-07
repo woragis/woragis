@@ -1,6 +1,25 @@
 import 'package:equatable/equatable.dart';
 
-enum AiAgent { gpt4, gpt4Turbo, gpt35Turbo, claude3Opus, claude3Sonnet, claude3Haiku, geminiPro, custom }
+enum AiAgent { 
+  gpt4('gpt-4'), 
+  gpt4Turbo('gpt-4-turbo'), 
+  gpt35Turbo('gpt-3.5-turbo'), 
+  claude3Opus('claude-3-opus'), 
+  claude3Sonnet('claude-3-sonnet'), 
+  claude3Haiku('claude-3-haiku'), 
+  geminiPro('gemini-pro'), 
+  custom('custom');
+
+  const AiAgent(this.value);
+  final String value;
+
+  static AiAgent fromString(String value) {
+    return AiAgent.values.firstWhere(
+      (agent) => agent.value == value,
+      orElse: () => AiAgent.custom,
+    );
+  }
+}
 
 class ChatMessageEntity extends Equatable {
   final String id;
