@@ -25,7 +25,86 @@ class TestimonialModel extends TestimonialEntity {
   factory TestimonialModel.fromJson(Map<String, dynamic> json) =>
       _$TestimonialModelFromJson(json);
 
+  // Custom methods for API (camelCase) and Local Storage (snake_case) conversion
+  factory TestimonialModel.fromApiJson(Map<String, dynamic> json) {
+    return TestimonialModel(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      name: json['name'] as String,
+      position: json['position'] as String,
+      company: json['company'] as String,
+      content: json['content'] as String,
+      avatar: json['avatar'] as String?,
+      rating: (json['rating'] as num).toInt(),
+      featured: json['featured'] as bool,
+      order: (json['order'] as num).toInt(),
+      visible: json['visible'] as bool,
+      public: json['public'] as bool,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toApiJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'name': name,
+      'position': position,
+      'company': company,
+      'content': content,
+      'avatar': avatar,
+      'rating': rating,
+      'featured': featured,
+      'order': order,
+      'visible': visible,
+      'public': public,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
+  /// Creates a TestimonialModel from database JSON with snake_case field names
+  factory TestimonialModel.fromDatabaseJson(Map<String, dynamic> json) {
+    return TestimonialModel(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      name: json['name'] as String,
+      position: json['position'] as String,
+      company: json['company'] as String,
+      content: json['content'] as String,
+      avatar: json['avatar'] as String?,
+      rating: json['rating'] as int,
+      featured: (json['featured'] as int) == 1,
+      order: json['order'] as int,
+      visible: (json['visible'] as int) == 1,
+      public: (json['public'] as int) == 1,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updated_at'] as int),
+    );
+  }
+
   Map<String, dynamic> toJson() => _$TestimonialModelToJson(this);
+
+  /// Converts to database format with snake_case field names
+  Map<String, dynamic> toDatabaseJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'name': name,
+      'position': position,
+      'company': company,
+      'content': content,
+      'avatar': avatar,
+      'rating': rating,
+      'featured': featured ? 1 : 0,
+      'order': order,
+      'visible': visible ? 1 : 0,
+      'public': public ? 1 : 0,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
+    };
+  }
 
   factory TestimonialModel.fromEntity(TestimonialEntity entity) {
     return TestimonialModel(
