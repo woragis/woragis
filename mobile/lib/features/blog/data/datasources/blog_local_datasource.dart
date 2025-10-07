@@ -3,6 +3,9 @@ import '../../../../core/database/database_helper.dart';
 import '../../../../core/database/sync_manager.dart';
 import '../../domain/entities/blog_post_entity.dart';
 import '../../domain/entities/blog_tag_entity.dart';
+import '../../domain/entities/blog_stats_entity.dart';
+import '../../domain/entities/blog_tag_with_count_entity.dart';
+import '../../domain/entities/blog_order_update_entity.dart';
 import '../models/blog_post_model.dart';
 import '../models/blog_tag_model.dart';
 
@@ -44,6 +47,20 @@ abstract class BlogLocalDataSource {
   Future<void> assignTagToPost(String postId, String tagId);
   Future<void> removeTagFromPost(String postId, String tagId);
   Future<List<BlogTagEntity>> getPostTags(String postId);
+
+  // Order management
+  Future<void> updateBlogPostOrder(List<BlogPostOrderUpdateEntity> orders);
+  Future<void> updateBlogTagOrder(List<BlogTagOrderUpdateEntity> orders);
+
+  // Toggle convenience methods
+  Future<BlogPostEntity> toggleBlogPostVisibility(String id);
+  Future<BlogPostEntity> toggleBlogPostFeatured(String id);
+  Future<BlogPostEntity> toggleBlogPostPublished(String id);
+
+  // Statistics
+  Future<BlogStatsEntity> getBlogStats();
+  Future<List<BlogTagWithCountEntity>> getBlogTagsWithCount();
+  Future<List<BlogTagWithCountEntity>> getPopularBlogTags({int? limit});
 
   // Offline operations
   Future<List<BlogPostEntity>> getDirtyBlogPosts();
@@ -501,5 +518,212 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
       where: 'id = ?',
       whereArgs: [tagId],
     );
+  }
+
+  @override
+  Future<void> updateBlogPostOrder(List<BlogPostOrderUpdateEntity> orders) async {
+    final db = await _dbHelper.database;
+    
+    for (final order in orders) {
+      await db.update(
+        'blog_posts',
+        {
+          'order': order.order,
+          'updated_at': DateTime.now().millisecondsSinceEpoch,
+          'is_dirty': 1,
+        },
+        where: 'id = ?',
+        whereArgs: [order.id],
+      );
+    }
+  }
+
+  @override
+  Future<void> updateBlogTagOrder(List<BlogTagOrderUpdateEntity> orders) async {
+    final db = await _dbHelper.database;
+    
+    for (final order in orders) {
+      await db.update(
+        'blog_tags',
+        {
+          'order': order.order,
+          'updated_at': DateTime.now().millisecondsSinceEpoch,
+          'is_dirty': 1,
+        },
+        where: 'id = ?',
+        whereArgs: [order.id],
+      );
+    }
+  }
+
+  @override
+  Future<BlogPostEntity> toggleBlogPostVisibility(String id) async {
+    final db = await _dbHelper.database;
+    
+    // Get current post
+    final post = await getCachedBlogPost(id);
+    if (post == null) {
+      throw Exception('Blog post not found');
+    }
+    
+    // Toggle visibility
+    final newVisibility = !post.visible;
+    await db.update(
+      'blog_posts',
+      {
+        'visible': newVisibility ? 1 : 0,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+        'is_dirty': 1,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    
+    // Return updated post
+    return post.copyWith(visible: newVisibility);
+  }
+
+  @override
+  Future<BlogPostEntity> toggleBlogPostFeatured(String id) async {
+    final db = await _dbHelper.database;
+    
+    // Get current post
+    final post = await getCachedBlogPost(id);
+    if (post == null) {
+      throw Exception('Blog post not found');
+    }
+    
+    // Toggle featured
+    final newFeatured = !post.featured;
+    await db.update(
+      'blog_posts',
+      {
+        'featured': newFeatured ? 1 : 0,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+        'is_dirty': 1,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    
+    // Return updated post
+    return post.copyWith(featured: newFeatured);
+  }
+
+  @override
+  Future<BlogPostEntity> toggleBlogPostPublished(String id) async {
+    final db = await _dbHelper.database;
+    
+    // Get current post
+    final post = await getCachedBlogPost(id);
+    if (post == null) {
+      throw Exception('Blog post not found');
+    }
+    
+    // Toggle published
+    final newPublished = !post.published;
+    final publishedAt = newPublished ? DateTime.now() : null;
+    
+    await db.update(
+      'blog_posts',
+      {
+        'published': newPublished ? 1 : 0,
+        'published_at': publishedAt?.millisecondsSinceEpoch,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+        'is_dirty': 1,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    
+    // Return updated post
+    return post.copyWith(published: newPublished, publishedAt: publishedAt);
+  }
+
+  @override
+  Future<BlogStatsEntity> getBlogStats() async {
+    final db = await _dbHelper.database;
+    
+    // Get total count
+    final totalResult = await db.rawQuery('SELECT COUNT(*) as count FROM blog_posts');
+    final total = totalResult.first['count'] as int;
+    
+    // Get published count
+    final publishedResult = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM blog_posts WHERE published = 1'
+    );
+    final published = publishedResult.first['count'] as int;
+    
+    // Get total views
+    final viewsResult = await db.rawQuery(
+      'SELECT COALESCE(SUM(view_count), 0) as total_views FROM blog_posts'
+    );
+    final totalViews = viewsResult.first['total_views'] as int;
+    
+    // Get total likes
+    final likesResult = await db.rawQuery(
+      'SELECT COALESCE(SUM(like_count), 0) as total_likes FROM blog_posts'
+    );
+    final totalLikes = likesResult.first['total_likes'] as int;
+    
+    // Get featured count
+    final featuredResult = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM blog_posts WHERE featured = 1'
+    );
+    final featuredCount = featuredResult.first['count'] as int;
+    
+    return BlogStatsEntity(
+      total: total,
+      published: published,
+      totalViews: totalViews,
+      totalLikes: totalLikes,
+      featuredCount: featuredCount,
+    );
+  }
+
+  @override
+  Future<List<BlogTagWithCountEntity>> getBlogTagsWithCount() async {
+    final db = await _dbHelper.database;
+    
+    final result = await db.rawQuery('''
+      SELECT 
+        bt.*,
+        COALESCE(COUNT(bpt.blog_post_id), 0) as post_count
+      FROM blog_tags bt
+      LEFT JOIN blog_post_tags bpt ON bt.id = bpt.tag_id
+      GROUP BY bt.id
+      ORDER BY bt.order ASC, bt.name ASC
+    ''');
+    
+    return result.map((row) {
+      final tag = BlogTagModel.fromDatabaseJson(row).toEntity();
+      final postCount = row['post_count'] as int;
+      return BlogTagWithCountEntity(tag: tag, postCount: postCount);
+    }).toList();
+  }
+
+  @override
+  Future<List<BlogTagWithCountEntity>> getPopularBlogTags({int? limit}) async {
+    final db = await _dbHelper.database;
+    
+    final limitClause = limit != null ? 'LIMIT $limit' : '';
+    
+    final result = await db.rawQuery('''
+      SELECT 
+        bt.*,
+        COUNT(bpt.blog_post_id) as post_count
+      FROM blog_tags bt
+      INNER JOIN blog_post_tags bpt ON bt.id = bpt.tag_id
+      WHERE bt.visible = 1
+      GROUP BY bt.id
+      ORDER BY post_count DESC
+      $limitClause
+    ''');
+    
+    return result.map((row) {
+      final tag = BlogTagModel.fromDatabaseJson(row).toEntity();
+      final postCount = row['post_count'] as int;
+      return BlogTagWithCountEntity(tag: tag, postCount: postCount);
+    }).toList();
   }
 }

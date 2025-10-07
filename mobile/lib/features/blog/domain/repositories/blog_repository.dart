@@ -1,6 +1,9 @@
 import 'package:dartz/dartz.dart';
 import '../entities/blog_post_entity.dart';
 import '../entities/blog_tag_entity.dart';
+import '../entities/blog_stats_entity.dart';
+import '../entities/blog_tag_with_count_entity.dart';
+import '../entities/blog_order_update_entity.dart';
 import '../../../../core/error/failures.dart';
 
 abstract class BlogRepository {
@@ -94,9 +97,24 @@ abstract class BlogRepository {
 
   Future<Either<Failure, List<BlogTagEntity>>> getPostTags(String postId);
 
+  // Order management methods
+  Future<Either<Failure, void>> updateBlogPostOrder(List<BlogPostOrderUpdateEntity> orders);
+  Future<Either<Failure, void>> updateBlogTagOrder(List<BlogTagOrderUpdateEntity> orders);
+
+  // Toggle convenience methods
+  Future<Either<Failure, BlogPostEntity>> toggleBlogPostVisibility(String id);
+  Future<Either<Failure, BlogPostEntity>> toggleBlogPostFeatured(String id);
+  Future<Either<Failure, BlogPostEntity>> toggleBlogPostPublished(String id);
+
   // Statistics methods
   Future<Either<Failure, void>> incrementViewCount(String postId);
   Future<Either<Failure, void>> incrementLikeCount(String postId);
+  Future<Either<Failure, BlogStatsEntity>> getBlogStats();
+  Future<Either<Failure, BlogStatsEntity>> getPublicBlogStats();
+
+  // Enhanced tag methods
+  Future<Either<Failure, List<BlogTagWithCountEntity>>> getBlogTagsWithCount();
+  Future<Either<Failure, List<BlogTagWithCountEntity>>> getPopularBlogTags({int? limit});
 
   // Offline/Cache methods
   Future<Either<Failure, List<BlogPostEntity>>> getCachedBlogPosts();

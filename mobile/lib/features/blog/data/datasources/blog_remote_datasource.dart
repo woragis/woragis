@@ -4,8 +4,14 @@ import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../../domain/entities/blog_post_entity.dart';
 import '../../domain/entities/blog_tag_entity.dart';
+import '../../domain/entities/blog_stats_entity.dart';
+import '../../domain/entities/blog_tag_with_count_entity.dart';
+import '../../domain/entities/blog_order_update_entity.dart';
 import '../models/blog_post_model.dart';
 import '../models/blog_tag_model.dart';
+import '../models/blog_stats_model.dart';
+import '../models/blog_tag_with_count_model.dart';
+import '../models/blog_order_update_model.dart';
 
 abstract class BlogRemoteDataSource {
   // Blog posts
@@ -83,9 +89,24 @@ abstract class BlogRemoteDataSource {
   Future<void> removeTagFromPost({required String postId, required String tagId});
   Future<List<BlogTagEntity>> getPostTags(String postId);
 
+  // Order management
+  Future<void> updateBlogPostOrder(List<BlogPostOrderUpdateEntity> orders);
+  Future<void> updateBlogTagOrder(List<BlogTagOrderUpdateEntity> orders);
+
+  // Toggle convenience methods
+  Future<BlogPostEntity> toggleBlogPostVisibility(String id);
+  Future<BlogPostEntity> toggleBlogPostFeatured(String id);
+  Future<BlogPostEntity> toggleBlogPostPublished(String id);
+
   // Statistics
   Future<void> incrementViewCount(String postId);
   Future<void> incrementLikeCount(String postId);
+  Future<BlogStatsEntity> getBlogStats();
+  Future<BlogStatsEntity> getPublicBlogStats();
+
+  // Enhanced tag methods
+  Future<List<BlogTagWithCountEntity>> getBlogTagsWithCount();
+  Future<List<BlogTagWithCountEntity>> getPopularBlogTags({int? limit});
 }
 
 class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
@@ -711,6 +732,216 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
 
       if (response.statusCode != 200) {
         throw ServerException('Failed to increment like count with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<void> updateBlogPostOrder(List<BlogPostOrderUpdateEntity> orders) async {
+    try {
+      final orderModels = orders.map((order) => BlogPostOrderUpdateModel.fromEntity(order)).toList();
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/blog/order'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(orderModels.map((model) => model.toJson()).toList()),
+      );
+
+      if (response.statusCode != 200) {
+        throw ServerException('Failed to update blog post order with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<void> updateBlogTagOrder(List<BlogTagOrderUpdateEntity> orders) async {
+    try {
+      final orderModels = orders.map((order) => BlogTagOrderUpdateModel.fromEntity(order)).toList();
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/blog-tags/order'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(orderModels.map((model) => model.toJson()).toList()),
+      );
+
+      if (response.statusCode != 200) {
+        throw ServerException('Failed to update blog tag order with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<BlogPostEntity> toggleBlogPostVisibility(String id) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/blog/$id/toggle-visibility'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return BlogPostModel.fromJson(jsonData['data']).toEntity();
+      } else {
+        throw ServerException('Failed to toggle blog post visibility with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<BlogPostEntity> toggleBlogPostFeatured(String id) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/blog/$id/toggle-featured'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return BlogPostModel.fromJson(jsonData['data']).toEntity();
+      } else {
+        throw ServerException('Failed to toggle blog post featured with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<BlogPostEntity> toggleBlogPostPublished(String id) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/blog/$id/toggle-published'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return BlogPostModel.fromJson(jsonData['data']).toEntity();
+      } else {
+        throw ServerException('Failed to toggle blog post published with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<BlogStatsEntity> getBlogStats() async {
+    try {
+      final response = await _client.get(
+        Uri.parse('$_baseUrl/admin/blog/stats'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return BlogStatsModel.fromJson(jsonData['data']).toEntity();
+      } else {
+        throw ServerException('Failed to get blog stats with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<BlogStatsEntity> getPublicBlogStats() async {
+    try {
+      final response = await _client.get(
+        Uri.parse('$_baseUrl/blog/stats'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return BlogStatsModel.fromJson(jsonData['data']).toEntity();
+      } else {
+        throw ServerException('Failed to get public blog stats with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<List<BlogTagWithCountEntity>> getBlogTagsWithCount() async {
+    try {
+      final response = await _client.get(
+        Uri.parse('$_baseUrl/admin/blog-tags/with-count'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        final List<dynamic> tagsJson = jsonData['data'];
+        return tagsJson.map((json) => BlogTagWithCountModel.fromJson(json).toEntity()).toList();
+      } else {
+        throw ServerException('Failed to get blog tags with count with status ${response.statusCode}');
+      }
+    } on http.ClientException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<List<BlogTagWithCountEntity>> getPopularBlogTags({int? limit}) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/blog-tags/popular').replace(
+        queryParameters: limit != null ? {'limit': limit.toString()} : null,
+      );
+      final response = await _client.get(uri);
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        final List<dynamic> tagsJson = jsonData['data'];
+        return tagsJson.map((json) => BlogTagWithCountModel.fromJson(json).toEntity()).toList();
+      } else {
+        throw ServerException('Failed to get popular blog tags with status ${response.statusCode}');
       }
     } on http.ClientException {
       throw NetworkException('Network error occurred');

@@ -1,6 +1,9 @@
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/blog_post_entity.dart';
 import '../../domain/entities/blog_tag_entity.dart';
+import '../../domain/entities/blog_stats_entity.dart';
+import '../../domain/entities/blog_tag_with_count_entity.dart';
+import '../../domain/entities/blog_order_update_entity.dart';
 import '../../domain/repositories/blog_repository.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/exceptions.dart';
@@ -495,6 +498,196 @@ class BlogRepositoryImpl implements BlogRepository {
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateBlogPostOrder(List<BlogPostOrderUpdateEntity> orders) async {
+    try {
+      await remoteDataSource.updateBlogPostOrder(orders);
+      // Update local cache
+      await localDataSource.updateBlogPostOrder(orders);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to update locally and queue for sync
+      try {
+        await localDataSource.updateBlogPostOrder(orders);
+        return const Right(null);
+      } catch (localError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateBlogTagOrder(List<BlogTagOrderUpdateEntity> orders) async {
+    try {
+      await remoteDataSource.updateBlogTagOrder(orders);
+      // Update local cache
+      await localDataSource.updateBlogTagOrder(orders);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to update locally and queue for sync
+      try {
+        await localDataSource.updateBlogTagOrder(orders);
+        return const Right(null);
+      } catch (localError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BlogPostEntity>> toggleBlogPostVisibility(String id) async {
+    try {
+      final post = await remoteDataSource.toggleBlogPostVisibility(id);
+      // Update local cache
+      await localDataSource.cacheBlogPost(post);
+      return Right(post);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to toggle locally
+      try {
+        final post = await localDataSource.toggleBlogPostVisibility(id);
+        return Right(post);
+      } catch (localError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BlogPostEntity>> toggleBlogPostFeatured(String id) async {
+    try {
+      final post = await remoteDataSource.toggleBlogPostFeatured(id);
+      // Update local cache
+      await localDataSource.cacheBlogPost(post);
+      return Right(post);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to toggle locally
+      try {
+        final post = await localDataSource.toggleBlogPostFeatured(id);
+        return Right(post);
+      } catch (localError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BlogPostEntity>> toggleBlogPostPublished(String id) async {
+    try {
+      final post = await remoteDataSource.toggleBlogPostPublished(id);
+      // Update local cache
+      await localDataSource.cacheBlogPost(post);
+      return Right(post);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to toggle locally
+      try {
+        final post = await localDataSource.toggleBlogPostPublished(id);
+        return Right(post);
+      } catch (localError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BlogStatsEntity>> getBlogStats() async {
+    try {
+      final stats = await remoteDataSource.getBlogStats();
+      return Right(stats);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to get from local cache
+      try {
+        final stats = await localDataSource.getBlogStats();
+        return Right(stats);
+      } catch (localError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BlogStatsEntity>> getPublicBlogStats() async {
+    try {
+      final stats = await remoteDataSource.getPublicBlogStats();
+      return Right(stats);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to get from local cache
+      try {
+        final stats = await localDataSource.getBlogStats();
+        return Right(stats);
+      } catch (localError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<BlogTagWithCountEntity>>> getBlogTagsWithCount() async {
+    try {
+      final tags = await remoteDataSource.getBlogTagsWithCount();
+      return Right(tags);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to get from local cache
+      try {
+        final tags = await localDataSource.getBlogTagsWithCount();
+        return Right(tags);
+      } catch (localError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<BlogTagWithCountEntity>>> getPopularBlogTags({int? limit}) async {
+    try {
+      final tags = await remoteDataSource.getPopularBlogTags(limit: limit);
+      return Right(tags);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      // Try to get from local cache
+      try {
+        final tags = await localDataSource.getPopularBlogTags(limit: limit);
+        return Right(tags);
+      } catch (localError) {
+        return Left(NetworkFailure(e.message));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 }
