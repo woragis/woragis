@@ -70,7 +70,7 @@ class FrameworksLocalDataSourceImpl implements FrameworksLocalDataSource {
       'frameworks',
       where: whereClause,
       whereArgs: whereArgs,
-      orderBy: 'order ASC, name ASC',
+      orderBy: '`order` ASC, name ASC',
       limit: limit,
       offset: offset,
     );
