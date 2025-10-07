@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../../domain/entities/framework_entity.dart';
@@ -55,13 +56,47 @@ abstract class FrameworksRemoteDataSource {
 }
 
 class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
-  final http.Client client;
-  final String baseUrl;
+  final http.Client _client = http.Client();
+  final String _baseUrl;
+
+  // Simple in-memory cache
+  static final Map<String, dynamic> _cache = {};
+  static final Map<String, DateTime> _cacheTimestamps = {};
+  static const Duration _cacheDuration = Duration(minutes: 5);
 
   FrameworksRemoteDataSourceImpl({
-    required this.client,
-    required this.baseUrl,
-  });
+    required String baseUrl,
+  }) : _baseUrl = baseUrl;
+
+  // Helper method to get cached data or fetch fresh
+  Future<T> _getCachedOrFetch<T>(
+    String cacheKey,
+    Future<T> Function() fetcher,
+  ) async {
+    final now = DateTime.now();
+    
+    // Check if we have cached data that's still fresh
+    if (_cache.containsKey(cacheKey) && 
+        _cacheTimestamps.containsKey(cacheKey) &&
+        now.difference(_cacheTimestamps[cacheKey]!).compareTo(_cacheDuration) < 0) {
+      log('📦 Using cached data for: $cacheKey');
+      return _cache[cacheKey] as T;
+    }
+    
+    // Fetch fresh data
+    log('🌐 Fetching fresh data for: $cacheKey');
+    final data = await fetcher();
+    _cache[cacheKey] = data;
+    _cacheTimestamps[cacheKey] = now;
+    return data;
+  }
+
+  // Helper method to invalidate cache
+  void _invalidateCache(String pattern) {
+    _cache.removeWhere((key, value) => key.contains(pattern));
+    _cacheTimestamps.removeWhere((key, value) => key.contains(pattern));
+    log('🗑️ Cache invalidated for pattern: $pattern');
+  }
   
   @override
   Future<List<FrameworkEntity>> getFrameworks({
@@ -74,95 +109,113 @@ class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
     String? sortBy,
     String? sortOrder,
   }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (page != null) queryParams['page'] = page.toString();
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (visible != null) queryParams['visible'] = visible.toString();
-      if (public != null) queryParams['public'] = public.toString();
-      if (type != null) queryParams['type'] = type;
-      if (search != null && search.isNotEmpty) queryParams['search'] = search;
-      if (sortBy != null) queryParams['sortBy'] = sortBy;
-      if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
+    final cacheKey = 'frameworks_${page}_${limit}_${visible}_${public}_${type}_${search}_${sortBy}_${sortOrder}';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        final queryParams = <String, String>{};
+        if (page != null) queryParams['page'] = page.toString();
+        if (limit != null) queryParams['limit'] = limit.toString();
+        if (visible != null) queryParams['visible'] = visible.toString();
+        if (public != null) queryParams['public'] = public.toString();
+        if (type != null) queryParams['type'] = type;
+        if (search != null && search.isNotEmpty) queryParams['search'] = search;
+        if (sortBy != null) queryParams['sortBy'] = sortBy;
+        if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
 
-      final uri = Uri.parse('$baseUrl/admin/frameworks').replace(queryParameters: queryParams);
-      final response = await client.get(uri);
+        log('🔍 Frameworks API Request: /admin/frameworks');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          final frameworks = (data['data']['frameworks'] as List)
-              .map((frameworkJson) => FrameworkModel.fromJson(frameworkJson).toEntity())
-              .toList();
-          return frameworks;
+        final uri = Uri.parse('$_baseUrl/admin/frameworks').replace(queryParameters: queryParams);
+        final response = await _client.get(uri);
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final frameworks = (data['data']['frameworks'] as List)
+                .map((frameworkJson) => FrameworkModel.fromJson(frameworkJson).toEntity())
+                .toList();
+            return frameworks;
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch frameworks');
+          }
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch frameworks');
+          throw ServerException('Failed to fetch frameworks with status ${response.statusCode}');
         }
-      } else {
-        throw ServerException('Failed to fetch frameworks with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<FrameworkEntity> getFrameworkById(String id) async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/frameworks/$id'));
+    final cacheKey = 'framework_$id';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Framework by ID API Request: /admin/frameworks/$id');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          return FrameworkModel.fromJson(data['data']).toEntity();
+        final response = await _client.get(Uri.parse('$_baseUrl/admin/frameworks/$id'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            return FrameworkModel.fromJson(data['data']).toEntity();
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch framework');
+          }
+        } else if (response.statusCode == 404) {
+          throw NotFoundException('Framework not found');
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch framework');
+          throw ServerException('Failed to fetch framework with status ${response.statusCode}');
         }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Framework not found');
-      } else {
-        throw ServerException('Failed to fetch framework with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException || e is NotFoundException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<FrameworkEntity> getFrameworkBySlug(String slug) async {
-    try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/frameworks/slug/$slug'));
+    final cacheKey = 'framework_slug_$slug';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Framework by Slug API Request: /admin/frameworks/slug/$slug');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          return FrameworkModel.fromJson(data['data']).toEntity();
+        final response = await _client.get(Uri.parse('$_baseUrl/admin/frameworks/slug/$slug'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            return FrameworkModel.fromJson(data['data']).toEntity();
+          } else {
+            throw ServerException(data['message'] ?? 'Failed to fetch framework');
+          }
+        } else if (response.statusCode == 404) {
+          throw NotFoundException('Framework not found');
         } else {
-          throw ServerException(data['message'] ?? 'Failed to fetch framework');
+          throw ServerException('Failed to fetch framework with status ${response.statusCode}');
         }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Framework not found');
-      } else {
-        throw ServerException('Failed to fetch framework with status ${response.statusCode}');
+      } on http.ClientException {
+        throw NetworkException('Network error occurred');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException || e is NotFoundException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
       }
-    } on http.ClientException {
-      throw NetworkException('Network error occurred');
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
@@ -180,8 +233,8 @@ class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
     required bool public,
   }) async {
     try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/admin/frameworks'),
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/admin/frameworks'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'name': name,
@@ -198,10 +251,15 @@ class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return FrameworkModel.fromJson(data['data']).toEntity();
+          final framework = FrameworkModel.fromJson(data['data']).toEntity();
+          
+          // Invalidate frameworks cache
+          _invalidateCache('frameworks_');
+          
+          return framework;
         } else {
           throw ServerException(data['message'] ?? 'Failed to create framework');
         }
@@ -237,8 +295,8 @@ class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
     bool? public,
   }) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/frameworks/$id'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/frameworks/$id'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           if (name != null) 'name': name,
@@ -258,7 +316,13 @@ class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return FrameworkModel.fromJson(data['data']).toEntity();
+          final framework = FrameworkModel.fromJson(data['data']).toEntity();
+          
+          // Invalidate frameworks cache
+          _invalidateCache('frameworks_');
+          _invalidateCache('framework_$id');
+          
+          return framework;
         } else {
           throw ServerException(data['message'] ?? 'Failed to update framework');
         }
@@ -283,9 +347,13 @@ class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
   @override
   Future<void> deleteFramework(String id) async {
     try {
-      final response = await client.delete(Uri.parse('$baseUrl/admin/frameworks/$id'));
+      final response = await _client.delete(Uri.parse('$_baseUrl/admin/frameworks/$id'));
 
-      if (response.statusCode != 200 && response.statusCode != 204) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Invalidate frameworks cache
+        _invalidateCache('frameworks_');
+        _invalidateCache('framework_$id');
+      } else {
         if (response.statusCode == 404) {
           throw NotFoundException('Framework not found');
         } else {
@@ -305,8 +373,8 @@ class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
   @override
   Future<void> updateFrameworkOrder(List<Map<String, dynamic>> frameworkOrders) async {
     try {
-      final response = await client.put(
-        Uri.parse('$baseUrl/admin/frameworks/order'),
+      final response = await _client.put(
+        Uri.parse('$_baseUrl/admin/frameworks/order'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'frameworkOrders': frameworkOrders}),
       );
@@ -327,7 +395,7 @@ class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
   @override
   Future<int> getFrameworkProjectCount(String frameworkId) async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/frameworks/$frameworkId/project-count'));
+      final response = await _client.get(Uri.parse('$_baseUrl/admin/frameworks/$frameworkId/project-count'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -352,7 +420,7 @@ class FrameworksRemoteDataSourceImpl implements FrameworksRemoteDataSource {
   @override
   Future<List<FrameworkEntity>> getFrameworksWithProjectCount() async {
     try {
-      final response = await client.get(Uri.parse('$baseUrl/admin/frameworks/with-count'));
+      final response = await _client.get(Uri.parse('$_baseUrl/admin/frameworks/with-count'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
