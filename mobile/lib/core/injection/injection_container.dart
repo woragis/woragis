@@ -9,8 +9,6 @@ import '../config/env_config.dart';
 import '../database/database_helper.dart';
 import '../database/sync_manager.dart';
 import '../network/network_info.dart';
-import '../query/query_client.dart';
-import '../query/flutter_query_client.dart';
 
 // Core BLoCs
 import '../presentation/bloc/theme/theme_bloc.dart';
@@ -59,6 +57,10 @@ import '../../features/about/domain/repositories/about_repository.dart';
 import '../../features/about/domain/usecases/usecases.dart';
 import '../../features/about/presentation/bloc/about_bloc.dart';
 
+// Experience
+
+// Frameworks
+
 // Education
 import '../../features/education/data/datasources/education_local_datasource.dart';
 import '../../features/education/data/datasources/education_remote_datasource.dart';
@@ -77,7 +79,7 @@ import '../../features/experience/presentation/bloc/experience_bloc.dart';
 
 // Money
 import '../../features/money/data/datasources/money_local_datasource.dart';
-import '../../features/money/data/datasources/money_remote_datasource_dio.dart';
+import '../../features/money/data/datasources/money_remote_datasource.dart';
 import '../../features/money/data/repositories/money_repository_impl.dart';
 import '../../features/money/domain/repositories/money_repository.dart';
 import '../../features/money/domain/usecases/usecases.dart';
@@ -118,22 +120,12 @@ Future<void> init() async {
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   
   // Core - Query Client Manager (Dio wrapper)
-  sl.registerLazySingleton<QueryClientManager>(() => QueryClientManager());
   
-  // Core - Flutter Query Client Manager
-  sl.registerLazySingleton<FlutterQueryClientManager>(() => FlutterQueryClientManager());
   
   // Core - Auth Store
   sl.registerLazySingleton<AuthStoreBloc>(() => AuthStoreBloc());
   
-  // Initialize Query Client Manager
-  await sl<QueryClientManager>().initialize();
   
-  // Set auth store in query client manager
-  sl<QueryClientManager>().setAuthStore(sl<AuthStoreBloc>());
-  
-  // Set Dio in Flutter Query client manager
-  sl<FlutterQueryClientManager>().setDio(sl<QueryClientManager>().dio);
 
   // Core BLoCs (for local UI state only)
   _initCoreBLoCs();
@@ -190,7 +182,6 @@ void _initAuth() {
   
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(
-      queryClientManager: sl(),
       baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
@@ -237,7 +228,6 @@ void _initBlog() {
   
   sl.registerLazySingleton<BlogRemoteDataSource>(
     () => BlogRemoteDataSourceImpl(
-      client: sl(),
       baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
@@ -279,10 +269,10 @@ void _initProjects() {
   
   sl.registerLazySingleton<ProjectsRemoteDataSource>(
     () => ProjectsRemoteDataSourceImpl(
-      queryClientManager: sl(),
       baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
+
 
   // Repository
   sl.registerLazySingleton<ProjectsRepository>(
@@ -315,6 +305,7 @@ void _initProjects() {
     incrementViewCountUseCase: sl(),
     incrementLikeCountUseCase: sl(),
   ));
+
 }
 
 // Frameworks
@@ -326,10 +317,10 @@ void _initFrameworks() {
   
   sl.registerLazySingleton<FrameworksRemoteDataSource>(
     () => FrameworksRemoteDataSourceImpl(
-      client: sl(),
       baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
+
 
   // Repository
   sl.registerLazySingleton<FrameworksRepository>(
@@ -363,10 +354,10 @@ void _initAbout() {
   
   sl.registerLazySingleton<AboutRemoteDataSource>(
     () => AboutRemoteDataSourceImpl(
-      client: sl(),
       baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
+
 
   // Repository
   sl.registerLazySingleton<AboutRepository>(
@@ -407,7 +398,9 @@ void _initAbout() {
     updateMusicGenreUseCase: sl(),
     deleteMusicGenreUseCase: sl(),
   ));
+
 }
+
 
 // Education
 void _initEducation() {
@@ -418,10 +411,10 @@ void _initEducation() {
   
   sl.registerLazySingleton<EducationRemoteDataSource>(
     () => EducationRemoteDataSourceImpl(
-      client: sl(),
       baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
+
 
   // Repository
   sl.registerLazySingleton<EducationRepository>(
@@ -459,7 +452,6 @@ void _initExperience() {
   
   sl.registerLazySingleton<ExperienceRemoteDataSource>(
     () => ExperienceRemoteDataSourceImpl(
-      client: sl(),
       baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
@@ -498,9 +490,9 @@ void _initMoney() {
     () => MoneyLocalDataSourceImpl(),
   );
   
-  sl.registerLazySingleton<MoneyRemoteDataSourceDio>(
-    () => MoneyRemoteDataSourceDioImpl(
-      dio: sl<QueryClientManager>().dio,
+  sl.registerLazySingleton<MoneyRemoteDataSource>(
+    () => MoneyRemoteDataSourceImpl(
+      baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
 
@@ -543,6 +535,7 @@ void _initMoney() {
     sendMessageUseCase: sl(),
     getChatMessagesUseCase: sl(),
   ));
+
 }
 
 // Testimonials
@@ -554,7 +547,6 @@ void _initTestimonials() {
   
   sl.registerLazySingleton<TestimonialsRemoteDataSource>(
     () => TestimonialsRemoteDataSourceImpl(
-      client: sl(),
       baseUrl: EnvConfig.apiBaseUrl,
     ),
   );
