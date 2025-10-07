@@ -14,8 +14,6 @@ presentation/
 │   ├── anime_management_page.dart   # Anime and shows management
 │   ├── music_genres_page.dart       # Music genres management
 │   └── pages.dart                   # Export file for all pages
-├── queries/
-│   └── about_queries.dart          # Query utility functions
 └── README.md                        # This documentation
 ```
 
@@ -67,22 +65,22 @@ The about domain uses the BLoC (Business Logic Component) pattern for state mana
 - **Loading States**: Proper loading indicators and state management
 - **Update Operations**: Real-time updates for personal information
 
-### **Query Integration**
+### **Data Access**
 
-The `AboutQueries` class provides utility functions for direct use case calls:
+The about domain uses the repository pattern with proper caching for efficient data access:
 
 ```dart
-// Get about core information
-final aboutCore = await AboutQueries.getAboutCore();
+// Get about core information through BLoC
+context.read<AboutBloc>().add(const LoadAboutCore());
 
-// Get biography information
-final biography = await AboutQueries.getBiography();
+// Get biography through BLoC
+context.read<AboutBloc>().add(const LoadBiography());
 
-// Get anime list
-final animeList = await AboutQueries.getAnimeList();
+// Get anime list through BLoC
+context.read<AboutBloc>().add(const LoadAnimeList());
 
-// Get music genres
-final musicGenres = await AboutQueries.getMusicGenres();
+// Get music genres through BLoC
+context.read<AboutBloc>().add(const LoadMusicGenres());
 ```
 
 ## 📱 Pages Overview
@@ -225,16 +223,16 @@ context.read<AboutBloc>().add(UpdateAboutCore(
 context.read<AboutBloc>().add(const RefreshAboutCore());
 ```
 
-### **Query Usage**
+### **BLoC Usage**
 ```dart
 // Get about core information
-final aboutCore = await AboutQueries.getAboutCore();
+context.read<AboutBloc>().add(const LoadAboutCore());
 
 // Get biography
-final biography = await AboutQueries.getBiography();
+context.read<AboutBloc>().add(const LoadBiography());
 
 // Get anime list
-final animeList = await AboutQueries.getAnimeList();
+context.read<AboutBloc>().add(const LoadAnimeList());
 ```
 
 ## 🔄 Integration Points
@@ -268,7 +266,7 @@ final animeList = await AboutQueries.getAnimeList();
 
 ### **Unit Tests**
 - **BLoC Tests**: Test all events and state transitions
-- **Query Tests**: Test utility functions and error handling
+- **Repository Tests**: Test data access and caching logic
 - **Validation Tests**: Test form validation logic
 
 ### **Widget Tests**
