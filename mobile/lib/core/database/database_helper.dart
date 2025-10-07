@@ -321,9 +321,7 @@ class DatabaseHelper {
         `order` INTEGER DEFAULT 0,
         visible INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL,
-        synced_at INTEGER,
-        is_dirty INTEGER NOT NULL DEFAULT 0
+        updated_at INTEGER NOT NULL
       )
     ''');
   }
