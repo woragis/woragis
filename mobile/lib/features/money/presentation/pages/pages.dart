@@ -8,7 +8,8 @@ export 'create_ai_chat_page.dart';
 export 'idea_canvas_page.dart';
 export 'advanced_idea_canvas_page.dart';
 
-// Flutter Query Pages
-export 'money_home_page_query.dart';
-export 'ideas_list_page_query.dart';
-export 'idea_detail_page_query.dart';
+
+// Simple Pages
+export 'money_home_page_simple.dart';
+export 'ideas_list_page_simple.dart';
+export 'idea_detail_page_simple.dart';
