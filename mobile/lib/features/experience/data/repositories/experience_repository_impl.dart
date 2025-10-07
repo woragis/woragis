@@ -91,14 +91,11 @@ class ExperienceRepositoryImpl implements ExperienceRepository {
       final experience = await remoteDataSource.createExperience(
         title: title,
         company: company,
-        period: period,
-        location: location,
         description: description,
-        achievements: achievements,
-        technologies: technologies,
-        icon: icon,
-        order: order,
+        startDate: period, // Using period as startDate for now
+        endDate: period, // Using period as endDate for now
         visible: visible,
+        order: order,
       );
 
       // Cache the new experience
@@ -133,12 +130,9 @@ class ExperienceRepositoryImpl implements ExperienceRepository {
         id: id,
         title: title,
         company: company,
-        period: period,
-        location: location,
         description: description,
-        achievements: achievements,
-        technologies: technologies,
-        icon: icon,
+        startDate: period, // Using period as startDate for now
+        endDate: period, // Using period as endDate for now
         order: order,
         visible: visible,
       );
@@ -176,7 +170,13 @@ class ExperienceRepositoryImpl implements ExperienceRepository {
     List<Map<String, dynamic>> experienceOrders,
   ) async {
     try {
-      await remoteDataSource.updateExperienceOrder(experienceOrders);
+      // Update each experience order individually
+      for (final orderData in experienceOrders) {
+        await remoteDataSource.updateExperienceOrder(
+          id: orderData['id'] as String,
+          order: orderData['order'] as int,
+        );
+      }
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
