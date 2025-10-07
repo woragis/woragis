@@ -23,9 +23,9 @@ class TestimonialsLocalDataSourceImpl implements TestimonialsLocalDataSource {
     final db = await _dbHelper.database;
     final result = await db.query(
       'testimonials',
-      orderBy: 'order ASC, name ASC',
+      orderBy: '`order` ASC, name ASC',
     );
-    return result.map((testimonialMap) => TestimonialModel.fromJson(testimonialMap)).toList();
+    return result.map((testimonialMap) => TestimonialModel.fromDatabaseJson(testimonialMap).toEntity()).toList();
   }
 
   @override
@@ -36,7 +36,7 @@ class TestimonialsLocalDataSourceImpl implements TestimonialsLocalDataSource {
       where: 'id = ?',
       whereArgs: [id],
     );
-    return result.isEmpty ? null : TestimonialModel.fromJson(result.first);
+    return result.isEmpty ? null : TestimonialModel.fromDatabaseJson(result.first).toEntity();
   }
 
   @override
@@ -46,15 +46,15 @@ class TestimonialsLocalDataSourceImpl implements TestimonialsLocalDataSource {
       'testimonials',
       where: 'featured = ? AND visible = ?',
       whereArgs: [1, 1],
-      orderBy: 'order ASC, name ASC',
+      orderBy: '`order` ASC, name ASC',
     );
-    return result.map((testimonialMap) => TestimonialModel.fromJson(testimonialMap)).toList();
+    return result.map((testimonialMap) => TestimonialModel.fromDatabaseJson(testimonialMap).toEntity()).toList();
   }
 
   @override
   Future<void> cacheTestimonial(TestimonialEntity testimonial) async {
     final db = await _dbHelper.database;
-    final testimonialMap = TestimonialModel.fromEntity(testimonial).toJson();
+    final testimonialMap = TestimonialModel.fromEntity(testimonial).toDatabaseJson();
     testimonialMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
     testimonialMap['is_dirty'] = 0;
 
@@ -71,7 +71,7 @@ class TestimonialsLocalDataSourceImpl implements TestimonialsLocalDataSource {
     final batch = db.batch();
 
     for (final testimonial in testimonials) {
-      final testimonialMap = TestimonialModel.fromEntity(testimonial).toJson();
+      final testimonialMap = TestimonialModel.fromEntity(testimonial).toDatabaseJson();
       testimonialMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
       testimonialMap['is_dirty'] = 0;
 
@@ -88,7 +88,7 @@ class TestimonialsLocalDataSourceImpl implements TestimonialsLocalDataSource {
   @override
   Future<void> updateCachedTestimonial(TestimonialEntity testimonial) async {
     final db = await _dbHelper.database;
-    final testimonialMap = TestimonialModel.fromEntity(testimonial).toJson();
+    final testimonialMap = TestimonialModel.fromEntity(testimonial).toDatabaseJson();
     testimonialMap['updated_at'] = DateTime.now().millisecondsSinceEpoch;
     testimonialMap['is_dirty'] = 1;
 
