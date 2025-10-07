@@ -55,6 +55,10 @@ abstract class ProjectsRepository {
   });
 
   Future<Either<Failure, void>> deleteProject(String id);
+  
+  // Project interaction methods
+  Future<Either<Failure, void>> incrementViewCount(String id);
+  Future<Either<Failure, void>> incrementLikeCount(String id);
 
   // Project ordering methods
   Future<Either<Failure, void>> updateProjectOrder(
@@ -74,9 +78,6 @@ abstract class ProjectsRepository {
 
   Future<Either<Failure, List<String>>> getProjectFrameworkIds(String projectId);
 
-  // Statistics methods
-  Future<Either<Failure, void>> incrementViewCount(String projectId);
-  Future<Either<Failure, void>> incrementLikeCount(String projectId);
 
   // Offline/Cache methods
   Future<Either<Failure, List<ProjectEntity>>> getCachedProjects();
