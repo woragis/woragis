@@ -1,9 +1,7 @@
+import 'dart:convert';
 import 'dart:developer';
-import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
-import '../../../../core/query/query_client.dart';
-import '../../../../core/injection/injection_container.dart';
-import '../../../../core/stores/auth_store.dart';
 import '../../domain/entities/project_entity.dart';
 import '../models/project_model.dart';
 
@@ -14,31 +12,115 @@ abstract class ProjectsRemoteDataSource {
     bool? featured,
     bool? visible,
     bool? public,
-    List<String>? technologies,
     String? search,
-    String? sortBy,
-    String? sortOrder,
   });
+
   Future<ProjectEntity> getProjectById(String id);
   Future<ProjectEntity> getProjectBySlug(String slug);
-  Future<ProjectEntity> createProject(Map<String, dynamic> projectData);
-  Future<ProjectEntity> updateProject(String id, Map<String, dynamic> projectData);
+
+  Future<ProjectEntity> createProject({
+    required String title,
+    required String slug,
+    required String description,
+    String? longDescription,
+    String? content,
+    String? videoUrl,
+    required String image,
+    String? githubUrl,
+    String? liveUrl,
+    required bool featured,
+    required int order,
+    required bool visible,
+    required bool public,
+    List<String>? frameworkIds,
+  });
+
+  Future<ProjectEntity> updateProject({
+    required String id,
+    String? title,
+    String? slug,
+    String? description,
+    String? longDescription,
+    String? content,
+    String? videoUrl,
+    String? image,
+    String? githubUrl,
+    String? liveUrl,
+    bool? featured,
+    int? order,
+    bool? visible,
+    bool? public,
+    List<String>? frameworkIds,
+  });
+
   Future<void> deleteProject(String id);
-  Future<List<ProjectEntity>> updateProjectOrder(List<Map<String, dynamic>> projectOrders);
-  Future<void> incrementProjectViewCount(String id);
-  Future<void> incrementProjectLikeCount(String id);
+  
+  // Project interaction methods
+  Future<void> incrementViewCount(String id);
+  Future<void> incrementLikeCount(String id);
+
+
+  Future<void> updateProjectOrder({
+    required String id,
+    required int order,
+  });
+
+  // Project frameworks relationship methods
+  Future<void> assignFrameworkToProject({
+    required String projectId,
+    required String frameworkId,
+  });
+
+  Future<void> removeFrameworkFromProject({
+    required String projectId,
+    required String frameworkId,
+  });
+
+  Future<List<String>> getProjectFrameworkIds(String projectId);
 }
 
 class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
-  final QueryClientManager queryClientManager;
-  final String baseUrl;
+  final http.Client _client = http.Client();
+  final String _baseUrl;
+
+  // Simple in-memory cache
+  static final Map<String, dynamic> _cache = {};
+  static final Map<String, DateTime> _cacheTimestamps = {};
+  static const Duration _cacheDuration = Duration(minutes: 5);
 
   ProjectsRemoteDataSourceImpl({
-    required this.queryClientManager,
-    required this.baseUrl,
-  });
+    required String baseUrl,
+  }) : _baseUrl = baseUrl;
 
-  Dio get _dio => queryClientManager.dio;
+  // Helper method to get cached data or fetch fresh
+  Future<T> _getCachedOrFetch<T>(
+    String cacheKey,
+    Future<T> Function() fetcher,
+  ) async {
+    final now = DateTime.now();
+    
+    // Check if we have cached data that's still fresh
+    if (_cache.containsKey(cacheKey) && 
+        _cacheTimestamps.containsKey(cacheKey) &&
+        now.difference(_cacheTimestamps[cacheKey]!).compareTo(_cacheDuration) < 0) {
+      log('📦 Using cached data for: $cacheKey');
+      return _cache[cacheKey] as T;
+    }
+    
+    // Fetch fresh data
+    log('🌐 Fetching fresh data for: $cacheKey');
+    final data = await fetcher();
+    _cache[cacheKey] = data;
+    _cacheTimestamps[cacheKey] = now;
+    return data;
+  }
+
+  // Helper method to invalidate cache
+  void _invalidateCache(String pattern) {
+    _cache.removeWhere((key, value) => key.contains(pattern));
+    _cacheTimestamps.removeWhere((key, value) => key.contains(pattern));
+    log('🗑️ Cache invalidated for pattern: $pattern');
+  }
 
   @override
   Future<List<ProjectEntity>> getProjects({
@@ -47,64 +129,153 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
     bool? featured,
     bool? visible,
     bool? public,
-    List<String>? technologies,
     String? search,
-    String? sortBy,
-    String? sortOrder,
+  }) async {
+    final cacheKey = 'projects_${page}_${limit}_${featured}_${visible}_${public}_${search}';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        final queryParams = <String, dynamic>{};
+        if (page != null) queryParams['page'] = page;
+        if (limit != null) queryParams['limit'] = limit;
+        if (featured != null) queryParams['featured'] = featured;
+        if (visible != null) queryParams['visible'] = visible;
+        if (public != null) queryParams['public'] = public;
+        if (search != null && search.isNotEmpty) queryParams['search'] = search;
+
+        log('🔍 Projects List API Request: /admin/projects');
+
+        final uri = Uri.parse('$_baseUrl/admin/projects').replace(
+          queryParameters: queryParams.map((key, value) => MapEntry(key, value.toString())),
+        );
+
+        final response = await _client.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final projectsList = (data['data'] as List)
+                .map((projectJson) => ProjectModel.fromApiJson(projectJson).toEntity())
+                .toList();
+            return projectsList;
+          } else {
+            throw ServerException(data['error'] ?? data['message'] ?? 'Failed to fetch projects');
+          }
+        } else {
+          throw ServerException('Failed to fetch projects with status ${response.statusCode}');
+        }
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
+      }
+    });
+  }
+
+  @override
+  Future<ProjectEntity> getProjectById(String id) async {
+    final cacheKey = 'project_$id';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Project by ID API Request: /admin/projects/$id');
+
+        final uri = Uri.parse('$_baseUrl/admin/projects/$id');
+        final response = await _client.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final project = ProjectModel.fromApiJson(data['data']);
+            return project.toEntity();
+          } else {
+            throw ServerException(data['error'] ?? data['message'] ?? 'Failed to fetch project');
+          }
+        } else {
+          throw ServerException('Failed to fetch project with status ${response.statusCode}');
+        }
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
+      }
+    });
+  }
+
+
+  @override
+  Future<ProjectEntity> createProject({
+    required String title,
+    required String slug,
+    required String description,
+    String? longDescription,
+    String? content,
+    String? videoUrl,
+    required String image,
+    String? githubUrl,
+    String? liveUrl,
+    required bool featured,
+    required int order,
+    required bool visible,
+    required bool public,
+    List<String>? frameworkIds,
   }) async {
     try {
-      // Build query parameters exactly like the frontend
-      final queryParams = <String, String>{};
+      log('🔍 Create Project API Request: /admin/projects');
 
-      // Convert page to offset (frontend uses offset, not page)
-      if (page != null) {
-        final offset = (page - 1) * (limit ?? 10);
-        queryParams['offset'] = offset.toString();
-      }
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (featured != null) queryParams['featured'] = featured.toString();
-      if (visible != null) queryParams['visible'] = visible.toString();
-      if (technologies != null && technologies.isNotEmpty) {
-        queryParams['technologies'] = technologies.join(',');
-      }
-      if (search != null && search.isNotEmpty) queryParams['search'] = search;
-
-      log('🔍 Projects API Request: /admin/projects');
-      log('🔍 Query Parameters: $queryParams');
-
-      final response = await _dio.get(
-        '/admin/projects',
-        queryParameters: queryParams,
+      final uri = Uri.parse('$_baseUrl/admin/projects');
+      final response = await _client.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'title': title,
+          'slug': slug,
+          'description': description,
+          'longDescription': longDescription,
+          'content': content,
+          'videoUrl': videoUrl,
+          'image': image,
+          'githubUrl': githubUrl,
+          'liveUrl': liveUrl,
+          'featured': featured,
+          'order': order,
+          'visible': visible,
+          'public': public,
+          if (frameworkIds != null) 'frameworkIds': frameworkIds,
+        }),
       );
 
-      log('📡 Projects API Response Status: ${response.statusCode}');
-      log('📡 Projects API Response Headers: ${response.headers}');
-      log('📡 Projects API Response Body: ${response.data.toString().substring(0, response.data.toString().length > 500 ? 500 : response.data.toString().length)}...');
-
-      if (response.statusCode == 200) {
-        final data = response.data;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
         if (data['success'] == true) {
-          // Frontend returns data directly, not wrapped in 'projects' key
-          final projects = (data['data'] as List)
-              .map((projectJson) => ProjectModel.fromJson(projectJson).toEntity())
-              .toList();
-          return projects;
+          final project = ProjectModel.fromApiJson(data['data']);
+          
+          // Invalidate projects cache
+          _invalidateCache('projects_');
+          
+          return project.toEntity();
         } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to fetch projects');
+          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to create project');
         }
       } else {
-        log('🚨 Projects API Error: ${response.statusCode} - ${response.data}');
-        throw ServerException('Failed to fetch projects with status ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw ServerException('Authentication required. Please login again.');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
+        throw ServerException('Failed to create project with status ${response.statusCode}');
       }
     } catch (e) {
       if (e is ServerException || e is NetworkException) {
@@ -115,180 +286,69 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   }
 
   @override
-  Future<ProjectEntity> getProjectById(String id) async {
-    // UNIQUE_IDENTIFIER_FOR_GET_PROJECT_BY_ID
+  Future<ProjectEntity> updateProject({
+    required String id,
+    String? title,
+    String? slug,
+    String? description,
+    String? longDescription,
+    String? content,
+    String? videoUrl,
+    String? image,
+    String? githubUrl,
+    String? liveUrl,
+    bool? featured,
+    int? order,
+    bool? visible,
+    bool? public,
+    List<String>? frameworkIds,
+  }) async {
     try {
-      log('🔍 Project by ID API Request: /admin/projects/$id');
-      
-      // Debug: Check auth state before making request
-      final authStore = sl<AuthStoreBloc>();
-      final currentState = authStore.state;
-      log('🔍 Auth state before request:');
-      log('  - accessToken: ${currentState.accessToken != null ? 'Present (${currentState.accessToken!.substring(0, 20)}...)' : 'NULL'}');
-      log('  - hasValidToken: ${currentState.hasValidToken}');
-      log('  - isAuthenticated: ${currentState.isAuthenticated}');
+      log('🔍 Update Project API Request: /admin/projects/$id');
 
-      final response = await _dio.get('/admin/projects/$id');
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data['success'] == true) {
-          return ProjectModel.fromJson(data['data']).toEntity();
-        } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to fetch project');
-        }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else {
-        throw ServerException('Failed to fetch project with status ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      log('❌ Project by ID DioException:');
-      log('  - Type: ${e.type}');
-      log('  - Status Code: ${e.response?.statusCode}');
-      log('  - Message: ${e.message}');
-      log('  - Response Data: ${e.response?.data}');
-      log('  - Request Headers: ${e.requestOptions.headers}');
-      log('  - Request URL: ${e.requestOptions.uri}');
-      log('');
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw ServerException('Authentication required. Please login again.');
-      } else if (e.response?.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else {
-        throw ServerException('Network error: ${e.message}');
-      }
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
-  }
-
-  @override
-  Future<ProjectEntity> getProjectBySlug(String slug) async {
-    try {
-      final response = await _dio.get('/admin/projects/slug/$slug');
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data['success'] == true) {
-          return ProjectModel.fromJson(data['data']).toEntity();
-        } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to fetch project');
-        }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else {
-        throw ServerException('Failed to fetch project with status ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw ServerException('Authentication required. Please login again.');
-      } else if (e.response?.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else {
-        throw ServerException('Network error: ${e.message}');
-      }
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
-  }
-
-  @override
-  Future<ProjectEntity> createProject(Map<String, dynamic> projectData) async {
-    try {
-      final response = await _dio.post(
-        '/admin/projects',
-        data: projectData,
-      );
-
-      if (response.statusCode == 201) {
-        final data = response.data;
-        if (data['success'] == true) {
-          return ProjectModel.fromJson(data['data']).toEntity();
-        } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to create project');
-        }
-      } else if (response.statusCode == 422) {
-        final data = response.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
-      } else {
-        throw ServerException('Failed to create project with status ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw ServerException('Authentication required. Please login again.');
-      } else if (e.response?.statusCode == 422) {
-        final data = e.response?.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
-      } else {
-        throw ServerException('Network error: ${e.message}');
-      }
-    } catch (e) {
-      if (e is ServerException || e is ValidationException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
-  }
-
-  @override
-  Future<ProjectEntity> updateProject(String id, Map<String, dynamic> projectData) async {
-    try {
-      final response = await _dio.put(
-        '/admin/projects/$id',
-        data: projectData,
+      final uri = Uri.parse('$_baseUrl/admin/projects/$id');
+      final response = await _client.put(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          if (title != null) 'title': title,
+          if (slug != null) 'slug': slug,
+          if (description != null) 'description': description,
+          if (longDescription != null) 'longDescription': longDescription,
+          if (content != null) 'content': content,
+          if (videoUrl != null) 'videoUrl': videoUrl,
+          if (image != null) 'image': image,
+          if (githubUrl != null) 'githubUrl': githubUrl,
+          if (liveUrl != null) 'liveUrl': liveUrl,
+          if (featured != null) 'featured': featured,
+          if (order != null) 'order': order,
+          if (visible != null) 'visible': visible,
+          if (public != null) 'public': public,
+          if (frameworkIds != null) 'frameworkIds': frameworkIds,
+        }),
       );
 
       if (response.statusCode == 200) {
-        final data = response.data;
+        final data = json.decode(response.body);
         if (data['success'] == true) {
-          return ProjectModel.fromJson(data['data']).toEntity();
+          final project = ProjectModel.fromApiJson(data['data']);
+          
+          // Invalidate projects cache
+          _invalidateCache('projects_');
+          _invalidateCache('project_$id');
+          
+          return project.toEntity();
         } else {
           throw ServerException(data['error'] ?? data['message'] ?? 'Failed to update project');
         }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else if (response.statusCode == 422) {
-        final data = response.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
       } else {
         throw ServerException('Failed to update project with status ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw ServerException('Authentication required. Please login again.');
-      } else if (e.response?.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else if (e.response?.statusCode == 422) {
-        final data = e.response?.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
-      } else {
-        throw ServerException('Network error: ${e.message}');
-      }
     } catch (e) {
-      if (e is ServerException || e is ValidationException || e is NotFoundException) {
+      if (e is ServerException || e is NetworkException) {
         rethrow;
       }
       throw ServerException('Unexpected error: $e');
@@ -298,79 +358,102 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   @override
   Future<void> deleteProject(String id) async {
     try {
-      final response = await _dio.delete('/admin/projects/$id');
+      log('🔍 Delete Project API Request: /admin/projects/$id');
 
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data['success'] == true) {
-          return;
-        } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to delete project');
-        }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else {
-        throw ServerException('Failed to delete project with status ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw ServerException('Authentication required. Please login again.');
-      } else if (e.response?.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else {
-        throw ServerException('Network error: ${e.message}');
-      }
-    } catch (e) {
-      if (e is ServerException || e is NotFoundException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
-  }
-
-  @override
-  Future<List<ProjectEntity>> updateProjectOrder(List<Map<String, dynamic>> projectOrders) async {
-    try {
-      final response = await _dio.put(
-        '/admin/projects/order',
-        data: {'projects': projectOrders},
+      final uri = Uri.parse('$_baseUrl/admin/projects/$id');
+      final response = await _client.delete(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
       );
 
       if (response.statusCode == 200) {
-        final data = response.data;
-        if (data['success'] == true) {
-          final projects = (data['data'] as List)
-              .map((projectJson) => ProjectModel.fromJson(projectJson).toEntity())
-              .toList();
-          return projects;
-        } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to update project order');
-        }
-      } else if (response.statusCode == 422) {
-        final data = response.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
+        // Invalidate projects cache
+        _invalidateCache('projects_');
+        _invalidateCache('project_$id');
+        
+        log('✅ Project deleted successfully');
+      } else {
+        throw ServerException('Failed to delete project with status ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+
+  @override
+  Future<void> updateProjectOrder({
+    required String id,
+    required int order,
+  }) async {
+    try {
+      log('🔍 Update Project Order API Request: /admin/projects/$id/order');
+
+      final uri = Uri.parse('$_baseUrl/admin/projects/$id/order');
+      final response = await _client.put(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'order': order,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Invalidate projects cache
+        _invalidateCache('projects_');
+        _invalidateCache('project_$id');
+        
+        log('✅ Project order updated successfully');
       } else {
         throw ServerException('Failed to update project order with status ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw ServerException('Authentication required. Please login again.');
-      } else if (e.response?.statusCode == 422) {
-        final data = e.response?.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  // Project frameworks relationship methods
+  @override
+  Future<void> assignFrameworkToProject({
+    required String projectId,
+    required String frameworkId,
+  }) async {
+    try {
+      log('🔍 Assign Framework to Project API Request: /api/admin/projects/$projectId/frameworks');
+
+      final uri = Uri.parse('$_baseUrl/api/admin/projects/$projectId/frameworks');
+      final response = await _client.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'frameworkId': frameworkId,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        log('✅ Framework assigned to project successfully');
+        // Invalidate cache for this project
+        _invalidateCache('project_$projectId');
       } else {
-        throw ServerException('Network error: ${e.message}');
+        throw ServerException('Failed to assign framework to project with status ${response.statusCode}');
       }
     } catch (e) {
-      if (e is ServerException || e is ValidationException) {
+      if (e is ServerException || e is NetworkException) {
         rethrow;
       }
       throw ServerException('Unexpected error: $e');
@@ -378,36 +461,130 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   }
 
   @override
-  Future<void> incrementProjectViewCount(String id) async {
+  Future<void> removeFrameworkFromProject({
+    required String projectId,
+    required String frameworkId,
+  }) async {
     try {
-      final response = await _dio.post('/admin/projects/$id/view');
+      log('🔍 Remove Framework from Project API Request: /api/admin/projects/$projectId/frameworks/$frameworkId');
+
+      final uri = Uri.parse('$_baseUrl/api/admin/projects/$projectId/frameworks/$frameworkId');
+      final response = await _client.delete(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        log('✅ Framework removed from project successfully');
+        // Invalidate cache for this project
+        _invalidateCache('project_$projectId');
+      } else {
+        throw ServerException('Failed to remove framework from project with status ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<List<String>> getProjectFrameworkIds(String projectId) async {
+    try {
+      log('🔍 Get Project Framework IDs API Request: /api/admin/projects/$projectId/frameworks');
+
+      final uri = Uri.parse('$_baseUrl/api/admin/projects/$projectId/frameworks');
+      final response = await _client.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
-        final data = response.data;
+        final data = json.decode(response.body);
         if (data['success'] == true) {
-          return;
+          final frameworks = (data['data'] as List)
+              .map((framework) => framework['id'] as String)
+              .toList();
+          return frameworks;
         } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to increment view count');
+          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to get project frameworks');
         }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Project not found');
+      } else {
+        throw ServerException('Failed to get project frameworks with status ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is ServerException || e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<ProjectEntity> getProjectBySlug(String slug) async {
+    final cacheKey = 'project_slug_$slug';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Project by Slug API Request: /admin/projects/slug/$slug');
+
+        final uri = Uri.parse('$_baseUrl/admin/projects/slug/$slug');
+        final response = await _client.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final project = ProjectModel.fromApiJson(data['data']);
+            return project.toEntity();
+          } else {
+            throw ServerException(data['error'] ?? data['message'] ?? 'Failed to fetch project');
+          }
+        } else {
+          throw ServerException('Failed to fetch project with status ${response.statusCode}');
+        }
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error: $e');
+      }
+    });
+  }
+
+  @override
+  Future<void> incrementViewCount(String id) async {
+    try {
+      log('🔍 Increment View Count API Request: /admin/projects/$id/view');
+
+      final uri = Uri.parse('$_baseUrl/admin/projects/$id/view');
+      final response = await _client.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        log('✅ Project view count incremented successfully');
       } else {
         throw ServerException('Failed to increment view count with status ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw ServerException('Authentication required. Please login again.');
-      } else if (e.response?.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else {
-        throw ServerException('Network error: ${e.message}');
-      }
     } catch (e) {
-      if (e is ServerException || e is NotFoundException) {
+      if (e is ServerException || e is NetworkException) {
         rethrow;
       }
       throw ServerException('Unexpected error: $e');
@@ -415,39 +592,30 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   }
 
   @override
-  Future<void> incrementProjectLikeCount(String id) async {
+  Future<void> incrementLikeCount(String id) async {
     try {
-      final response = await _dio.post('/admin/projects/$id/like');
+      log('🔍 Increment Like Count API Request: /admin/projects/$id/like');
+
+      final uri = Uri.parse('$_baseUrl/admin/projects/$id/like');
+      final response = await _client.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
-        final data = response.data;
-        if (data['success'] == true) {
-          return;
-        } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to increment like count');
-        }
-      } else if (response.statusCode == 404) {
-        throw NotFoundException('Project not found');
+        log('✅ Project like count incremented successfully');
       } else {
         throw ServerException('Failed to increment like count with status ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw ServerException('Authentication required. Please login again.');
-      } else if (e.response?.statusCode == 404) {
-        throw NotFoundException('Project not found');
-      } else {
-        throw ServerException('Network error: ${e.message}');
-      }
     } catch (e) {
-      if (e is ServerException || e is NotFoundException) {
+      if (e is ServerException || e is NetworkException) {
         rethrow;
       }
       throw ServerException('Unexpected error: $e');
     }
   }
+
 }
