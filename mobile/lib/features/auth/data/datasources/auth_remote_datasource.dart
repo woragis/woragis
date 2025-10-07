@@ -1,7 +1,7 @@
+import 'dart:convert';
 import 'dart:developer';
-import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
-import '../../../../core/query/query_client.dart';
 import '../../domain/entities/auth_response_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../models/auth_response_model.dart';
@@ -29,15 +29,6 @@ abstract class AuthRemoteDataSource {
     required String refreshToken,
   });
 
-  Future<void> forgotPassword({
-    required String email,
-  });
-
-  Future<void> resetPassword({
-    required String token,
-    required String password,
-  });
-
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,
@@ -46,20 +37,53 @@ abstract class AuthRemoteDataSource {
   Future<UserEntity> updateProfile({
     String? firstName,
     String? lastName,
-    String? avatar,
+    String? email,
+    String? username,
   });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final QueryClientManager queryClientManager;
-  final String baseUrl;
+  final http.Client _client = http.Client();
+  final String _baseUrl;
+
+  // Simple in-memory cache
+  static final Map<String, dynamic> _cache = {};
+  static final Map<String, DateTime> _cacheTimestamps = {};
+  static const Duration _cacheDuration = Duration(minutes: 5);
 
   AuthRemoteDataSourceImpl({
-    required this.queryClientManager,
-    required this.baseUrl,
-  });
+    required String baseUrl,
+  }) : _baseUrl = baseUrl;
 
-  Dio get _dio => queryClientManager.dio;
+  // Helper method to get cached data or fetch fresh
+  Future<T> _getCachedOrFetch<T>(
+    String cacheKey,
+    Future<T> Function() fetcher,
+  ) async {
+    final now = DateTime.now();
+    
+    // Check if we have cached data that's still fresh
+    if (_cache.containsKey(cacheKey) && 
+        _cacheTimestamps.containsKey(cacheKey) &&
+        now.difference(_cacheTimestamps[cacheKey]!).compareTo(_cacheDuration) < 0) {
+      log('📦 Using cached data for: $cacheKey');
+      return _cache[cacheKey] as T;
+    }
+    
+    // Fetch fresh data
+    log('🌐 Fetching fresh data for: $cacheKey');
+    final data = await fetcher();
+    _cache[cacheKey] = data;
+    _cacheTimestamps[cacheKey] = now;
+    return data;
+  }
+
+  // Helper method to invalidate cache
+  void _invalidateCache(String pattern) {
+    _cache.removeWhere((key, value) => key.contains(pattern));
+    _cacheTimestamps.removeWhere((key, value) => key.contains(pattern));
+    log('🗑️ Cache invalidated for pattern: $pattern');
+  }
 
   @override
   Future<AuthResponseEntity> login({
@@ -67,47 +91,41 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
   }) async {
     try {
-      final response = await _dio.post(
-        '/auth/login',
-        data: {
+      log('🔍 Auth Login API Request: /api/auth/login');
+
+      final uri = Uri.parse('$_baseUrl/api/auth/login');
+      final response = await _client.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
           'email': email,
           'password': password,
-        },
+        }),
       );
 
       if (response.statusCode == 200) {
-        final data = response.data;
+        final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AuthResponseModel.fromJson(data['data']).toEntity();
+          final authResponse = AuthResponseModel.fromApiJson(data['data']);
+          
+          // Invalidate user cache on login
+          _invalidateCache('current_user');
+          
+          return authResponse.toEntity();
         } else {
           throw ServerException(data['error'] ?? data['message'] ?? 'Login failed');
         }
-      } else if (response.statusCode == 401) {
-        throw AuthenticationException('Invalid credentials');
-      } else if (response.statusCode == 422) {
-        final data = response.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
       } else {
         throw ServerException('Login failed with status ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw AuthenticationException('Invalid credentials');
-      } else if (e.response?.statusCode == 422) {
-        final data = e.response?.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
-      }
     } catch (e) {
-      if (e is ServerException || e is AuthenticationException || e is ValidationException) {
+      if (e is ServerException || e is NetworkException) {
         rethrow;
       }
-      throw ServerException('Unexpected error: $e');
+      throw ServerException('Unexpected error during login: $e');
     }
   }
 
@@ -120,93 +138,109 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? lastName,
   }) async {
     try {
-      final response = await _dio.post(
-        '/auth/register',
-        data: {
+      log('🔍 Auth Register API Request: /api/auth/register');
+
+      final uri = Uri.parse('$_baseUrl/api/auth/register');
+      final response = await _client.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
           'email': email,
           'username': username,
           'password': password,
           if (firstName != null) 'firstName': firstName,
           if (lastName != null) 'lastName': lastName,
-        },
+        }),
       );
 
-      if (response.statusCode == 201) {
-        final data = response.data;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AuthResponseModel.fromJson(data['data']).toEntity();
+          final authResponse = AuthResponseModel.fromApiJson(data['data']);
+          
+          // Invalidate user cache on register
+          _invalidateCache('current_user');
+          
+          return authResponse.toEntity();
         } else {
           throw ServerException(data['error'] ?? data['message'] ?? 'Registration failed');
         }
-      } else if (response.statusCode == 422) {
-        final data = response.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
       } else {
         throw ServerException('Registration failed with status ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 422) {
-        final data = e.response?.data;
-        throw ValidationException(data['error'] ?? data['message'] ?? 'Validation failed');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
-      }
     } catch (e) {
-      if (e is ServerException || e is ValidationException) {
+      if (e is ServerException || e is NetworkException) {
         rethrow;
       }
-      throw ServerException('Unexpected error: $e');
+      throw ServerException('Unexpected error during registration: $e');
     }
   }
 
   @override
   Future<UserEntity> getCurrentUser() async {
-    try {
-      log('🔍 Auth API Request: /auth/me');
-      final response = await _dio.get('/auth/me');
+    const cacheKey = 'current_user';
+    
+    return _getCachedOrFetch(cacheKey, () async {
+      try {
+        log('🔍 Auth Get Current User API Request: /api/auth/me');
 
-      log('📡 Auth API Response Status: ${response.statusCode}');
+        final uri = Uri.parse('$_baseUrl/api/auth/me');
+        final response = await _client.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        );
 
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data['success'] == true) {
-          return UserModel.fromJson(data['data']).toEntity();
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final user = UserModel.fromApiJson(data['data']);
+            return user.toEntity();
+          } else {
+            throw ServerException(data['error'] ?? data['message'] ?? 'Failed to get current user');
+          }
         } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Failed to get user data');
+          throw ServerException('Failed to get current user with status ${response.statusCode}');
         }
-      } else if (response.statusCode == 401) {
-        throw AuthenticationException('User not authenticated');
-      } else {
-        throw ServerException('Failed to get user data with status ${response.statusCode}');
+      } catch (e) {
+        if (e is ServerException || e is NetworkException) {
+          rethrow;
+        }
+        throw ServerException('Unexpected error getting current user: $e');
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw AuthenticationException('User not authenticated');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
-      }
-    } catch (e) {
-      if (e is ServerException || e is NetworkException || e is AuthenticationException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
+    });
   }
 
   @override
   Future<void> logout() async {
-    // No remote logout call needed - just clear local data
-    // The logout endpoint doesn't exist in the backend
-    // This method is kept for interface compatibility but does nothing
-    return;
+    try {
+      log('🔍 Auth Logout API Request: /api/auth/logout');
+
+      final uri = Uri.parse('$_baseUrl/api/auth/logout');
+      final response = await _client.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Invalidate all auth-related cache on logout
+        _invalidateCache('current_user');
+        log('✅ Logout successful');
+      } else {
+        log('⚠️ Logout failed with status ${response.statusCode}');
+      }
+    } catch (e) {
+      log('❌ Logout error: $e');
+      // Don't throw on logout errors - just log them
+    }
   }
 
   @override
@@ -214,100 +248,40 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String refreshToken,
   }) async {
     try {
-      final response = await _dio.post(
-        '/auth/refresh',
-        data: {'refreshToken': refreshToken},
+      log('🔍 Auth Refresh Token API Request: /api/auth/refresh');
+
+      final uri = Uri.parse('$_baseUrl/api/auth/refresh');
+      final response = await _client.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'refreshToken': refreshToken,
+        }),
       );
 
       if (response.statusCode == 200) {
-        final data = response.data;
+        final data = json.decode(response.body);
         if (data['success'] == true) {
-          return AuthResponseModel.fromJson(data['data']).toEntity();
+          final authResponse = AuthResponseModel.fromApiJson(data['data']);
+          
+          // Invalidate user cache on token refresh
+          _invalidateCache('current_user');
+          
+          return authResponse.toEntity();
         } else {
           throw ServerException(data['error'] ?? data['message'] ?? 'Token refresh failed');
         }
-      } else if (response.statusCode == 401) {
-        throw AuthenticationException('Invalid refresh token');
       } else {
         throw ServerException('Token refresh failed with status ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else if (e.response?.statusCode == 401) {
-        throw AuthenticationException('Invalid refresh token');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
-      }
-    } catch (e) {
-      if (e is ServerException || e is AuthenticationException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
-    }
-  }
-
-  @override
-  Future<void> forgotPassword({
-    required String email,
-  }) async {
-    try {
-      final response = await _dio.post(
-        '/auth/forgot-password',
-        data: {'email': email},
-      );
-
-      if (response.statusCode != 200) {
-        throw ServerException('Failed to send reset email with status ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
-      }
     } catch (e) {
       if (e is ServerException || e is NetworkException) {
         rethrow;
       }
-      throw ServerException('Unexpected error: $e');
-    }
-  }
-
-  @override
-  Future<void> resetPassword({
-    required String token,
-    required String password,
-  }) async {
-    try {
-      final response = await _dio.post(
-        '/auth/reset-password',
-        data: {
-          'token': token,
-          'password': password,
-        },
-      );
-
-      if (response.statusCode != 200) {
-        throw ServerException('Failed to reset password with status ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
-      }
-    } catch (e) {
-      if (e is ServerException || e is NetworkException) {
-        rethrow;
-      }
-      throw ServerException('Unexpected error: $e');
+      throw ServerException('Unexpected error during token refresh: $e');
     }
   }
 
@@ -317,30 +291,35 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String newPassword,
   }) async {
     try {
-      final response = await _dio.post(
-        '/auth/change-password',
-        data: {
-          'currentPassword': currentPassword,
-          'newPassword': newPassword,
+      log('🔍 Change Password API Request: /api/auth/change-password');
+
+      final uri = Uri.parse('$_baseUrl/api/auth/change-password');
+      final response = await _client.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
+        body: jsonEncode({
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        }),
       );
 
-      if (response.statusCode != 200) {
-        throw ServerException('Failed to change password with status ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
+      log('📡 Change Password Response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        log('✅ Password changed successfully');
+        return;
       } else {
-        throw NetworkException('Network error: ${e.message}');
+        final errorBody = jsonDecode(response.body);
+        throw ServerException(errorBody['message'] ?? 'Failed to change password');
       }
     } catch (e) {
       if (e is ServerException || e is NetworkException) {
         rethrow;
       }
-      throw ServerException('Unexpected error: $e');
+      throw ServerException('Unexpected error during password change: $e');
     }
   }
 
@@ -348,41 +327,43 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserEntity> updateProfile({
     String? firstName,
     String? lastName,
-    String? avatar,
+    String? email,
+    String? username,
   }) async {
     try {
-      final response = await _dio.put(
-        '/auth/profile',
-        data: {
-          if (firstName != null) 'firstName': firstName,
-          if (lastName != null) 'lastName': lastName,
-          if (avatar != null) 'avatar': avatar,
+      log('🔍 Update Profile API Request: /api/auth/profile');
+
+      final uri = Uri.parse('$_baseUrl/api/auth/profile');
+      final response = await _client.put(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
+        body: jsonEncode({
+          if (firstName != null) 'first_name': firstName,
+          if (lastName != null) 'last_name': lastName,
+          if (email != null) 'email': email,
+          if (username != null) 'username': username,
+        }),
       );
 
+      log('📡 Update Profile Response: ${response.statusCode}');
+
       if (response.statusCode == 200) {
-        final data = response.data;
-        if (data['success'] == true) {
-          return UserModel.fromJson(data['data']).toEntity();
-        } else {
-          throw ServerException(data['error'] ?? data['message'] ?? 'Profile update failed');
-        }
+        final userData = jsonDecode(response.body)['data'];
+        final user = UserModel.fromJson(userData);
+        log('✅ Profile updated successfully: ${user.username}');
+        return user;
       } else {
-        throw ServerException('Profile update failed with status ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw NetworkException('Network timeout occurred');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
+        final errorBody = jsonDecode(response.body);
+        throw ServerException(errorBody['message'] ?? 'Failed to update profile');
       }
     } catch (e) {
       if (e is ServerException || e is NetworkException) {
         rethrow;
       }
-      throw ServerException('Unexpected error: $e');
+      throw ServerException('Unexpected error during profile update: $e');
     }
   }
 }
