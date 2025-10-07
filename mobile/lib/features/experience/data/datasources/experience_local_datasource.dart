@@ -21,32 +21,32 @@ class ExperienceLocalDataSourceImpl implements ExperienceLocalDataSource {
   Future<List<ExperienceEntity>> getCachedExperienceList() async {
     final db = await _dbHelper.database;
     final result = await db.query(
-      'experience',
-      orderBy: 'order ASC, company ASC',
+      'experiences',
+      orderBy: '`order` ASC, company ASC',
     );
-    return result.map((experienceMap) => ExperienceModel.fromJson(experienceMap)).toList();
+    return result.map((experienceMap) => ExperienceModel.fromLocalJson(experienceMap).toEntity()).toList();
   }
 
   @override
   Future<ExperienceEntity?> getCachedExperience(String id) async {
     final db = await _dbHelper.database;
     final result = await db.query(
-      'experience',
+      'experiences',
       where: 'id = ?',
       whereArgs: [id],
     );
-    return result.isEmpty ? null : ExperienceModel.fromJson(result.first);
+    return result.isEmpty ? null : ExperienceModel.fromLocalJson(result.first).toEntity();
   }
 
   @override
   Future<void> cacheExperience(ExperienceEntity experience) async {
     final db = await _dbHelper.database;
-    final experienceMap = ExperienceModel.fromEntity(experience).toJson();
+    final experienceMap = ExperienceModel.fromEntity(experience).toLocalJson();
     experienceMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
     experienceMap['is_dirty'] = 0;
 
     await db.insert(
-      'experience',
+      'experiences',
       experienceMap,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -58,12 +58,12 @@ class ExperienceLocalDataSourceImpl implements ExperienceLocalDataSource {
     final batch = db.batch();
 
     for (final experience in experienceList) {
-      final experienceMap = ExperienceModel.fromEntity(experience).toJson();
+      final experienceMap = ExperienceModel.fromEntity(experience).toLocalJson();
       experienceMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
       experienceMap['is_dirty'] = 0;
 
       batch.insert(
-        'experience',
+        'experiences',
         experienceMap,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
@@ -75,19 +75,19 @@ class ExperienceLocalDataSourceImpl implements ExperienceLocalDataSource {
   @override
   Future<void> updateCachedExperience(ExperienceEntity experience) async {
     final db = await _dbHelper.database;
-    final experienceMap = ExperienceModel.fromEntity(experience).toJson();
+    final experienceMap = ExperienceModel.fromEntity(experience).toLocalJson();
     experienceMap['updated_at'] = DateTime.now().millisecondsSinceEpoch;
     experienceMap['is_dirty'] = 1;
 
     await db.update(
-      'experience',
+      'experiences',
       experienceMap,
       where: 'id = ?',
       whereArgs: [experience.id],
     );
 
     await _syncManager.addToSyncQueue(
-      tableName: 'experience',
+      tableName: 'experiences',
       recordId: experience.id,
       operation: SyncOperation.update,
       data: experienceMap,
@@ -99,13 +99,13 @@ class ExperienceLocalDataSourceImpl implements ExperienceLocalDataSource {
     final db = await _dbHelper.database;
     
     await _syncManager.addToSyncQueue(
-      tableName: 'experience',
+      tableName: 'experiences',
       recordId: id,
       operation: SyncOperation.delete,
     );
 
     await db.delete(
-      'experience',
+      'experiences',
       where: 'id = ?',
       whereArgs: [id],
     );
