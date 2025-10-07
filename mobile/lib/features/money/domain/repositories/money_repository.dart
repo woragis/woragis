@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../entities/idea_entity.dart';
 import '../entities/ai_chat_entity.dart';
+import '../entities/idea_node_entity.dart';
 import '../../../../core/error/failures.dart';
 
 abstract class MoneyRepository {
@@ -94,9 +95,65 @@ abstract class MoneyRepository {
 
   Future<Either<Failure, List<ChatMessageEntity>>> getChatMessages(String chatId);
 
+  // Idea Node methods
+  Future<Either<Failure, List<IdeaNodeEntity>>> getIdeaNodes({
+    required String ideaId,
+    String? type,
+    bool? visible,
+    int? limit,
+    int? offset,
+  });
+
+  Future<Either<Failure, IdeaNodeEntity>> getIdeaNodeById(String id);
+
+  Future<Either<Failure, IdeaNodeEntity>> createIdeaNode({
+    required String ideaId,
+    required String title,
+    String? content,
+    required String type,
+    required double positionX,
+    required double positionY,
+    double? width,
+    double? height,
+    String? color,
+    required List<String> connections,
+    required bool visible,
+  });
+
+  Future<Either<Failure, IdeaNodeEntity>> updateIdeaNode({
+    required String id,
+    String? title,
+    String? content,
+    String? type,
+    double? positionX,
+    double? positionY,
+    double? width,
+    double? height,
+    String? color,
+    List<String>? connections,
+    bool? visible,
+  });
+
+  Future<Either<Failure, void>> deleteIdeaNode(String id);
+
+  Future<Either<Failure, IdeaNodeEntity>> updateNodePosition({
+    required String id,
+    required double positionX,
+    required double positionY,
+  });
+
+  Future<Either<Failure, void>> updateNodePositions(List<Map<String, dynamic>> positions);
+
+  Future<Either<Failure, IdeaNodeEntity>> updateNodeConnections({
+    required String id,
+    required List<String> connections,
+  });
+
   // Offline/Cache methods
   Future<Either<Failure, List<IdeaEntity>>> getCachedIdeas();
   Future<Either<Failure, void>> cacheIdeas(List<IdeaEntity> ideas);
   Future<Either<Failure, List<AiChatEntity>>> getCachedAiChats();
   Future<Either<Failure, void>> cacheAiChats(List<AiChatEntity> aiChats);
+  Future<Either<Failure, List<IdeaNodeEntity>>> getCachedIdeaNodes(String ideaId);
+  Future<Either<Failure, void>> cacheIdeaNodes(List<IdeaNodeEntity> ideaNodes);
 }
