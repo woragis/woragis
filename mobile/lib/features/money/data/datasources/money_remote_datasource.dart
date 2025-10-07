@@ -228,7 +228,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
           return IdeaModel.fromApiJson(data['data']).toEntity();
@@ -433,7 +433,7 @@ class MoneyRemoteDataSourceImpl implements MoneyRemoteDataSource {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
           return AiChatModel.fromApiJson(data['data']).toEntity();
