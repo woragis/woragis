@@ -63,6 +63,8 @@ class TestimonialsRepositoryImpl implements TestimonialsRepository {
   Future<Either<Failure, TestimonialEntity>> getTestimonialById(String id) async {
     try {
       final testimonial = await remoteDataSource.getTestimonialById(id);
+      // Cache the testimonial locally
+      await localDataSource.cacheTestimonial(testimonial);
       return Right(testimonial);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
