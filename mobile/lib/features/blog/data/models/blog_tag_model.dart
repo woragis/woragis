@@ -21,7 +21,39 @@ class BlogTagModel extends BlogTagEntity {
   factory BlogTagModel.fromJson(Map<String, dynamic> json) =>
       _$BlogTagModelFromJson(json);
 
+  /// Creates a BlogTagModel from database JSON with snake_case field names
+  factory BlogTagModel.fromDatabaseJson(Map<String, dynamic> json) {
+    return BlogTagModel(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      name: json['name'] as String,
+      slug: json['slug'] as String,
+      description: json['description'] as String?,
+      color: json['color'] as String?,
+      visible: (json['visible'] as int) == 1,
+      order: json['order'] as int,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updated_at'] as int),
+    );
+  }
+
   Map<String, dynamic> toJson() => _$BlogTagModelToJson(this);
+
+  /// Converts to database format with snake_case field names
+  Map<String, dynamic> toDatabaseJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'name': name,
+      'slug': slug,
+      'description': description,
+      'color': color,
+      'visible': visible ? 1 : 0,
+      'order': order,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
+    };
+  }
 
   factory BlogTagModel.fromEntity(BlogTagEntity entity) {
     return BlogTagModel(

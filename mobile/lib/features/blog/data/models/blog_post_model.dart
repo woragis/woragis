@@ -34,7 +34,58 @@ class BlogPostModel extends BlogPostEntity {
   factory BlogPostModel.fromJson(Map<String, dynamic> json) =>
       _$BlogPostModelFromJson(json);
 
+  /// Creates a BlogPostModel from database JSON with snake_case field names
+  factory BlogPostModel.fromDatabaseJson(Map<String, dynamic> json) {
+    return BlogPostModel(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      title: json['title'] as String,
+      slug: json['slug'] as String,
+      excerpt: json['excerpt'] as String,
+      content: json['content'] as String,
+      featuredImage: json['featured_image'] as String?,
+      readingTime: json['reading_time'] as int?,
+      featured: (json['featured'] as int) == 1,
+      published: (json['published'] as int) == 1,
+      publishedAt: json['published_at'] != null 
+          ? DateTime.fromMillisecondsSinceEpoch(json['published_at'] as int)
+          : null,
+      order: json['order'] as int,
+      visible: (json['visible'] as int) == 1,
+      public: (json['public'] as int) == 1,
+      viewCount: json['view_count'] as int?,
+      likeCount: json['like_count'] as int?,
+      tags: null, // Tags are stored in separate blog_post_tags table
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updated_at'] as int),
+    );
+  }
+
   Map<String, dynamic> toJson() => _$BlogPostModelToJson(this);
+
+  /// Converts to database format with snake_case field names
+  Map<String, dynamic> toDatabaseJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'title': title,
+      'slug': slug,
+      'excerpt': excerpt,
+      'content': content,
+      'featured_image': featuredImage,
+      'reading_time': readingTime,
+      'featured': featured ? 1 : 0,
+      'published': published ? 1 : 0,
+      'published_at': publishedAt?.millisecondsSinceEpoch,
+      'order': order,
+      'visible': visible ? 1 : 0,
+      'public': public ? 1 : 0,
+      'view_count': viewCount,
+      'like_count': likeCount,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
+    };
+  }
 
   factory BlogPostModel.fromEntity(BlogPostEntity entity) {
     return BlogPostModel(
