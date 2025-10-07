@@ -103,7 +103,7 @@ class _TestimonialsListPageState extends State<TestimonialsListPage> {
                     ),
                   if (_selectedRating != null)
                     Chip(
-                      label: Text('${_selectedRating}★+'),
+                      label: Text('$_selectedRating★+'),
                       onDeleted: () => _removeFilter('rating'),
                       deleteIcon: const Icon(Icons.close, size: 18),
                     ),
