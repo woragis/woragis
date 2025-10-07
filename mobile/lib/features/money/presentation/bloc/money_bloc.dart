@@ -253,6 +253,51 @@ class MoneyError extends MoneyState {
   List<Object> get props => [message];
 }
 
+// Composite state that holds multiple pieces of data
+class MoneyDataState extends MoneyState {
+  final List<IdeaEntity>? ideas;
+  final IdeaEntity? currentIdea;
+  final List<AiChatEntity>? aiChats;
+  final AiChatEntity? currentAiChat;
+  final bool isLoading;
+  final String? error;
+
+  const MoneyDataState({
+    this.ideas,
+    this.currentIdea,
+    this.aiChats,
+    this.currentAiChat,
+    this.isLoading = false,
+    this.error,
+  });
+
+  MoneyDataState copyWith({
+    List<IdeaEntity>? ideas,
+    IdeaEntity? currentIdea,
+    List<AiChatEntity>? aiChats,
+    AiChatEntity? currentAiChat,
+    bool? isLoading,
+    String? error,
+    bool clearIdeas = false,
+    bool clearCurrentIdea = false,
+    bool clearAiChats = false,
+    bool clearCurrentAiChat = false,
+  }) {
+    return MoneyDataState(
+      ideas: clearIdeas ? null : (ideas ?? this.ideas),
+      currentIdea: clearCurrentIdea ? null : (currentIdea ?? this.currentIdea),
+      aiChats: clearAiChats ? null : (aiChats ?? this.aiChats),
+      currentAiChat: clearCurrentAiChat ? null : (currentAiChat ?? this.currentAiChat),
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
+
+  @override
+  List<Object?> get props => [ideas, currentIdea, aiChats, currentAiChat, isLoading, error];
+}
+
+// Legacy states for backward compatibility
 class IdeasLoaded extends MoneyState {
   final List<IdeaEntity> ideas;
 
@@ -368,7 +413,7 @@ class MoneyBloc extends Bloc<MoneyEvent, MoneyState> {
     required this.deleteAiChatUseCase,
     required this.sendMessageUseCase,
     required this.getChatMessagesUseCase,
-  }) : super(MoneyInitial()) {
+  }) : super(const MoneyDataState()) {
     on<GetIdeasRequested>(_onGetIdeasRequested);
     on<GetIdeaByIdRequested>(_onGetIdeaByIdRequested);
     on<CreateIdeaRequested>(_onCreateIdeaRequested);
@@ -384,7 +429,13 @@ class MoneyBloc extends Bloc<MoneyEvent, MoneyState> {
     GetIdeasRequested event,
     Emitter<MoneyState> emit,
   ) async {
-    emit(MoneyLoading());
+    // Preserve existing data while loading
+    if (state is MoneyDataState) {
+      final currentState = state as MoneyDataState;
+      emit(currentState.copyWith(isLoading: true, error: null));
+    } else {
+      emit(const MoneyDataState(isLoading: true));
+    }
 
     final result = await getIdeasUseCase(GetIdeasParams(
       page: event.page,
@@ -398,8 +449,22 @@ class MoneyBloc extends Bloc<MoneyEvent, MoneyState> {
     ));
 
     result.fold(
-      (failure) => emit(MoneyError(failure.message)),
-      (ideas) => emit(IdeasLoaded(ideas)),
+      (failure) {
+        if (state is MoneyDataState) {
+          final currentState = state as MoneyDataState;
+          emit(currentState.copyWith(isLoading: false, error: failure.message));
+        } else {
+          emit(MoneyError(failure.message));
+        }
+      },
+      (ideas) {
+        if (state is MoneyDataState) {
+          final currentState = state as MoneyDataState;
+          emit(currentState.copyWith(ideas: ideas, isLoading: false, error: null));
+        } else {
+          emit(IdeasLoaded(ideas));
+        }
+      },
     );
   }
 
@@ -407,13 +472,33 @@ class MoneyBloc extends Bloc<MoneyEvent, MoneyState> {
     GetIdeaByIdRequested event,
     Emitter<MoneyState> emit,
   ) async {
-    emit(MoneyLoading());
+    // Preserve existing data while loading
+    if (state is MoneyDataState) {
+      final currentState = state as MoneyDataState;
+      emit(currentState.copyWith(isLoading: true, error: null));
+    } else {
+      emit(const MoneyDataState(isLoading: true));
+    }
 
     final result = await getIdeaByIdUseCase(event.id);
 
     result.fold(
-      (failure) => emit(MoneyError(failure.message)),
-      (idea) => emit(IdeaLoaded(idea)),
+      (failure) {
+        if (state is MoneyDataState) {
+          final currentState = state as MoneyDataState;
+          emit(currentState.copyWith(isLoading: false, error: failure.message));
+        } else {
+          emit(MoneyError(failure.message));
+        }
+      },
+      (idea) {
+        if (state is MoneyDataState) {
+          final currentState = state as MoneyDataState;
+          emit(currentState.copyWith(currentIdea: idea, isLoading: false, error: null));
+        } else {
+          emit(IdeaLoaded(idea));
+        }
+      },
     );
   }
 
