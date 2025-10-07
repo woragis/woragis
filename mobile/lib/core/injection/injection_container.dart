@@ -10,6 +10,7 @@ import '../database/database_helper.dart';
 import '../database/sync_manager.dart';
 import '../network/network_info.dart';
 import '../query/query_client.dart';
+import '../query/flutter_query_client.dart';
 
 // Core BLoCs
 import '../presentation/bloc/theme/theme_bloc.dart';
@@ -116,8 +117,11 @@ Future<void> init() async {
   // Core - Network Info
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   
-  // Core - Query Client Manager
+  // Core - Query Client Manager (Dio wrapper)
   sl.registerLazySingleton<QueryClientManager>(() => QueryClientManager());
+  
+  // Core - Flutter Query Client Manager
+  sl.registerLazySingleton<FlutterQueryClientManager>(() => FlutterQueryClientManager());
   
   // Core - Auth Store
   sl.registerLazySingleton<AuthStoreBloc>(() => AuthStoreBloc());
@@ -127,6 +131,9 @@ Future<void> init() async {
   
   // Set auth store in query client manager
   sl<QueryClientManager>().setAuthStore(sl<AuthStoreBloc>());
+  
+  // Set Dio in Flutter Query client manager
+  sl<FlutterQueryClientManager>().setDio(sl<QueryClientManager>().dio);
 
   // Core BLoCs (for local UI state only)
   _initCoreBLoCs();
