@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/money/presentation/bloc/money_bloc.dart';
+import '../../features/money/presentation/bloc/money_simple_bloc.dart';
 import '../../features/projects/presentation/bloc/projects_bloc.dart';
 import '../../features/frameworks/presentation/bloc/frameworks_bloc.dart';
 import '../../features/education/presentation/bloc/education_bloc.dart';
 import '../../features/about/presentation/bloc/about_bloc.dart';
 import '../../features/settings/presentation/bloc/settings_bloc.dart';
 import '../../features/experience/presentation/bloc/experience_bloc.dart';
+import '../../features/experience/presentation/bloc/experience_simple_bloc.dart';
 import '../../features/blog/presentation/bloc/blog_bloc.dart';
 import '../../features/blog/presentation/bloc/blog_filter/blog_filter_bloc.dart';
 import '../../features/blog/presentation/bloc/create_blog_post/create_blog_post_bloc.dart';
@@ -37,11 +39,17 @@ class AppConfig {
     BlocProvider<ExperienceBloc>(
       create: (context) => di.sl<ExperienceBloc>(),
     ),
+    BlocProvider<ExperienceSimpleBloc>(
+      create: (context) => di.sl<ExperienceSimpleBloc>(),
+    ),
     BlocProvider<FrameworksBloc>(
       create: (context) => di.sl<FrameworksBloc>(),
     ),
     BlocProvider<MoneyBloc>(
       create: (context) => di.sl<MoneyBloc>(),
+    ),
+    BlocProvider<MoneySimpleBloc>(
+      create: (context) => di.sl<MoneySimpleBloc>(),
     ),
     BlocProvider<ProjectsBloc>(
       create: (context) => di.sl<ProjectsBloc>(),
