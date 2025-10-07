@@ -104,12 +104,12 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
       'blog_posts',
       where: whereClause,
       whereArgs: whereArgs,
-      orderBy: 'order ASC, created_at DESC',
+      orderBy: '`order` ASC, created_at DESC',
       limit: limit,
       offset: offset,
     );
 
-    return result.map((postMap) => BlogPostModel.fromJson(postMap).toEntity()).toList();
+    return result.map((postMap) => BlogPostModel.fromDatabaseJson(postMap).toEntity()).toList();
   }
 
   @override
@@ -122,7 +122,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
     );
 
     if (result.isEmpty) return null;
-    return BlogPostModel.fromJson(result.first).toEntity();
+    return BlogPostModel.fromDatabaseJson(result.first).toEntity();
   }
 
   @override
@@ -135,14 +135,14 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
     );
 
     if (result.isEmpty) return null;
-    return BlogPostModel.fromJson(result.first).toEntity();
+    return BlogPostModel.fromDatabaseJson(result.first).toEntity();
   }
 
   @override
   Future<void> cacheBlogPost(BlogPostEntity post) async {
     final db = await _dbHelper.database;
     final postModel = BlogPostModel.fromEntity(post);
-    final postMap = postModel.toJson();
+    final postMap = postModel.toDatabaseJson();
     
     // Add metadata for sync
     postMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
@@ -162,7 +162,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
 
     for (final post in posts) {
       final postModel = BlogPostModel.fromEntity(post);
-      final postMap = postModel.toJson();
+      final postMap = postModel.toDatabaseJson();
       
       postMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
       postMap['is_dirty'] = 0;
@@ -181,7 +181,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
   Future<void> updateCachedBlogPost(BlogPostEntity post) async {
     final db = await _dbHelper.database;
     final postModel = BlogPostModel.fromEntity(post);
-    final postMap = postModel.toJson();
+    final postMap = postModel.toDatabaseJson();
     
     postMap['updated_at'] = DateTime.now().millisecondsSinceEpoch;
     postMap['is_dirty'] = 1;
@@ -222,7 +222,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
     // Also remove related blog post tags
     await db.delete(
       'blog_post_tags',
-      where: 'post_id = ?',
+      where: 'blog_post_id = ?',
       whereArgs: [id],
     );
   }
@@ -260,7 +260,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
       offset: offset,
     );
 
-    return result.map((tagMap) => BlogTagModel.fromJson(tagMap).toEntity()).toList();
+    return result.map((tagMap) => BlogTagModel.fromDatabaseJson(tagMap).toEntity()).toList();
   }
 
   @override
@@ -273,7 +273,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
     );
 
     if (result.isEmpty) return null;
-    return BlogTagModel.fromJson(result.first).toEntity();
+    return BlogTagModel.fromDatabaseJson(result.first).toEntity();
   }
 
   @override
@@ -286,14 +286,14 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
     );
 
     if (result.isEmpty) return null;
-    return BlogTagModel.fromJson(result.first).toEntity();
+    return BlogTagModel.fromDatabaseJson(result.first).toEntity();
   }
 
   @override
   Future<void> cacheBlogTag(BlogTagEntity tag) async {
     final db = await _dbHelper.database;
     final tagModel = BlogTagModel.fromEntity(tag);
-    final tagMap = tagModel.toJson();
+    final tagMap = tagModel.toDatabaseJson();
     
     tagMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
     tagMap['is_dirty'] = 0;
@@ -312,7 +312,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
 
     for (final tag in tags) {
       final tagModel = BlogTagModel.fromEntity(tag);
-      final tagMap = tagModel.toJson();
+      final tagMap = tagModel.toDatabaseJson();
       
       tagMap['synced_at'] = DateTime.now().millisecondsSinceEpoch;
       tagMap['is_dirty'] = 0;
@@ -331,7 +331,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
   Future<void> updateCachedBlogTag(BlogTagEntity tag) async {
     final db = await _dbHelper.database;
     final tagModel = BlogTagModel.fromEntity(tag);
-    final tagMap = tagModel.toJson();
+    final tagMap = tagModel.toDatabaseJson();
     
     tagMap['updated_at'] = DateTime.now().millisecondsSinceEpoch;
     tagMap['is_dirty'] = 1;
@@ -383,8 +383,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
     await db.insert(
       'blog_post_tags',
       {
-        'id': '${postId}_${tagId}_${DateTime.now().millisecondsSinceEpoch}',
-        'post_id': postId,
+        'blog_post_id': postId,
         'tag_id': tagId,
         'created_at': DateTime.now().millisecondsSinceEpoch,
       },
@@ -398,7 +397,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
     
     await db.delete(
       'blog_post_tags',
-      where: 'post_id = ? AND tag_id = ?',
+      where: 'blog_post_id = ? AND tag_id = ?',
       whereArgs: [postId, tagId],
     );
   }
@@ -410,11 +409,11 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
     final result = await db.rawQuery('''
       SELECT bt.* FROM blog_tags bt
       INNER JOIN blog_post_tags bpt ON bt.id = bpt.tag_id
-      WHERE bpt.post_id = ?
+      WHERE bpt.blog_post_id = ?
       ORDER BY bt.name ASC
     ''', [postId]);
 
-    return result.map((tagMap) => BlogTagModel.fromJson(tagMap).toEntity()).toList();
+    return result.map((tagMap) => BlogTagModel.fromDatabaseJson(tagMap).toEntity()).toList();
   }
 
   // Offline Operations
@@ -427,7 +426,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
       whereArgs: [1],
     );
 
-    return result.map((postMap) => BlogPostModel.fromJson(postMap).toEntity()).toList();
+    return result.map((postMap) => BlogPostModel.fromDatabaseJson(postMap).toEntity()).toList();
   }
 
   @override
@@ -439,7 +438,7 @@ class BlogLocalDataSourceImpl implements BlogLocalDataSource {
       whereArgs: [1],
     );
 
-    return result.map((tagMap) => BlogTagModel.fromJson(tagMap).toEntity()).toList();
+    return result.map((tagMap) => BlogTagModel.fromDatabaseJson(tagMap).toEntity()).toList();
   }
 
   @override
