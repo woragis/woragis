@@ -173,6 +173,16 @@ class HomePage extends StatelessWidget {
               ),
               _buildQuickActionCard(
                 context,
+                icon: Icons.auto_awesome,
+                title: 'Flutter Query Demo',
+                subtitle: 'Automatic caching & sync',
+                color: Colors.orange,
+                onTap: () {
+                  context.push('/money/query');
+                },
+              ),
+              _buildQuickActionCard(
+                context,
                 icon: Icons.work,
                 title: 'Projects',
                 subtitle: 'Showcase your work',

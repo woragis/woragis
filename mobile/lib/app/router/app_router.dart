@@ -104,6 +104,29 @@ class AppRouter {
           child: IdeasListPage(),
         ),
       ),
+      
+      // Flutter Query Money routes
+      GoRoute(
+        path: '/money/query',
+        builder: (context, state) => const AuthGuard(
+          child: MoneyHomePageQuery(),
+        ),
+      ),
+      GoRoute(
+        path: '/money/ideas/query',
+        builder: (context, state) => const AuthGuard(
+          child: IdeasListPageQuery(),
+        ),
+      ),
+      GoRoute(
+        path: '/money/ideas/query/:id',
+        builder: (context, state) {
+          final ideaId = state.pathParameters['id']!;
+          return AuthGuard(
+            child: IdeaDetailPageQuery(ideaId: ideaId),
+          );
+        },
+      ),
       GoRoute(
         path: '/money/ideas/create',
         builder: (context, state) => const AuthGuard(
