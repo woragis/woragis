@@ -71,7 +71,7 @@ class WoragisStyles {
   // ===== SHADOWS =====
   static List<BoxShadow> get shadowSm => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.05),
+      color: Colors.black.withValues(alpha: 0.05),
       blurRadius: 4,
       offset: const Offset(0, 1),
     ),
@@ -79,7 +79,7 @@ class WoragisStyles {
 
   static List<BoxShadow> get shadowMd => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withValues(alpha: 0.1),
       blurRadius: 10,
       offset: const Offset(0, 4),
     ),
@@ -87,7 +87,7 @@ class WoragisStyles {
 
   static List<BoxShadow> get shadowLg => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withValues(alpha: 0.1),
       blurRadius: 20,
       offset: const Offset(0, 8),
     ),
@@ -95,7 +95,7 @@ class WoragisStyles {
 
   static List<BoxShadow> get shadowXl => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.15),
+      color: Colors.black.withValues(alpha: 0.15),
       blurRadius: 40,
       offset: const Offset(0, 16),
     ),
@@ -103,7 +103,7 @@ class WoragisStyles {
 
   static List<BoxShadow> shadowPurple({double opacity = 0.3}) => [
     BoxShadow(
-      color: primaryPurple.withOpacity(opacity),
+      color: primaryPurple.withValues(alpha: opacity),
       blurRadius: 20,
       offset: const Offset(0, 8),
     ),
@@ -111,7 +111,7 @@ class WoragisStyles {
 
   static List<BoxShadow> shadowPink({double opacity = 0.3}) => [
     BoxShadow(
-      color: accentPink.withOpacity(opacity),
+      color: accentPink.withValues(alpha: opacity),
       blurRadius: 20,
       offset: const Offset(0, 8),
     ),
@@ -296,7 +296,7 @@ class WoragisButtonStyles {
       backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimary,
       elevation: 0,
-      shadowColor: colorScheme.primary.withOpacity(0.3),
+      shadowColor: colorScheme.primary.withValues(alpha: 0.3),
       padding: const EdgeInsets.symmetric(
         horizontal: WoragisStyles.spacingLg,
         vertical: WoragisStyles.spacingSm,
@@ -314,7 +314,7 @@ class WoragisButtonStyles {
       backgroundColor: colorScheme.secondary,
       foregroundColor: colorScheme.onSecondary,
       elevation: 0,
-      shadowColor: colorScheme.secondary.withOpacity(0.3),
+      shadowColor: colorScheme.secondary.withValues(alpha: 0.3),
       padding: const EdgeInsets.symmetric(
         horizontal: WoragisStyles.spacingLg,
         vertical: WoragisStyles.spacingSm,
@@ -379,10 +379,10 @@ class WoragisCardStyles {
 
   static BoxDecoration glass(BuildContext context) {
     return BoxDecoration(
-      color: Colors.white.withOpacity(0.1),
+      color: Colors.white.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(WoragisStyles.radiusMd),
       border: Border.all(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         width: 1,
       ),
       boxShadow: WoragisStyles.shadowLg,
@@ -394,15 +394,15 @@ class WoragisCardStyles {
     return BoxDecoration(
       gradient: LinearGradient(
         colors: [
-          colorScheme.primary.withOpacity(0.1),
-          colorScheme.secondary.withOpacity(0.1),
+          colorScheme.primary.withValues(alpha: 0.1),
+          colorScheme.secondary.withValues(alpha: 0.1),
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
       borderRadius: BorderRadius.circular(WoragisStyles.radiusMd),
       border: Border.all(
-        color: colorScheme.outline.withOpacity(0.3),
+        color: colorScheme.outline.withValues(alpha: 0.3),
         width: 1,
       ),
       boxShadow: WoragisStyles.shadowPurple(opacity: 0.1),
@@ -421,7 +421,7 @@ class WoragisCardStyles {
       boxShadow: [
         ...WoragisStyles.shadowLg,
         BoxShadow(
-          color: colorScheme.primary.withOpacity(0.05),
+          color: colorScheme.primary.withValues(alpha: 0.05),
           blurRadius: 40,
           offset: const Offset(0, 16),
         ),
@@ -443,13 +443,13 @@ class WoragisInputStyles {
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(WoragisStyles.radiusMd),
         borderSide: BorderSide(
-          color: colorScheme.outline.withOpacity(0.3),
+          color: colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(WoragisStyles.radiusMd),
         borderSide: BorderSide(
-          color: colorScheme.outline.withOpacity(0.3),
+          color: colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       focusedBorder: OutlineInputBorder(
@@ -470,7 +470,7 @@ class WoragisInputStyles {
         vertical: WoragisStyles.spacingSm,
       ),
       hintStyle: WoragisTextStyles.bodyMedium(
-        colorScheme.onSurface.withOpacity(0.6),
+        colorScheme.onSurface.withValues(alpha: 0.6),
       ),
       labelStyle: WoragisTextStyles.labelMedium(colorScheme.onSurface),
     );
