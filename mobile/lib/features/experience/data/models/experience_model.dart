@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:json_annotation/json_annotation.dart';
 import '../../domain/entities/experience_entity.dart';
 
@@ -26,6 +27,87 @@ class ExperienceModel extends ExperienceEntity {
       _$ExperienceModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$ExperienceModelToJson(this);
+
+  // Custom methods for API (camelCase) and Local Storage (snake_case) conversion
+  factory ExperienceModel.fromApiJson(Map<String, dynamic> json) {
+    return ExperienceModel(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      title: json['title'] as String,
+      company: json['company'] as String,
+      period: json['period'] as String,
+      location: json['location'] as String,
+      description: json['description'] as String,
+      achievements: List<String>.from(json['achievements'] as List),
+      technologies: List<String>.from(json['technologies'] as List),
+      icon: json['icon'] as String,
+      order: (json['order'] as num).toInt(),
+      visible: json['visible'] as bool,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toApiJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'title': title,
+      'company': company,
+      'period': period,
+      'location': location,
+      'description': description,
+      'achievements': achievements,
+      'technologies': technologies,
+      'icon': icon,
+      'order': order,
+      'visible': visible,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
+  factory ExperienceModel.fromLocalJson(Map<String, dynamic> json) {
+    return ExperienceModel(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      title: json['title'] as String,
+      company: json['company'] as String,
+      period: json['period'] as String,
+      location: json['location'] as String,
+      description: json['description'] as String,
+      achievements: List<String>.from(json['achievements'] != null 
+          ? jsonDecode(json['achievements'] as String) 
+          : []),
+      technologies: List<String>.from(json['technologies'] != null 
+          ? jsonDecode(json['technologies'] as String) 
+          : []),
+      icon: json['icon'] as String,
+      order: json['order'] as int,
+      visible: (json['visible'] as int) == 1,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updated_at'] as int),
+    );
+  }
+
+  Map<String, dynamic> toLocalJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'title': title,
+      'company': company,
+      'period': period,
+      'location': location,
+      'description': description,
+      'achievements': jsonEncode(achievements),
+      'technologies': jsonEncode(technologies),
+      'icon': icon,
+      'order': order,
+      'visible': visible ? 1 : 0,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
+    };
+  }
 
   factory ExperienceModel.fromEntity(ExperienceEntity entity) {
     return ExperienceModel(
