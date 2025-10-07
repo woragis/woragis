@@ -169,8 +169,8 @@ class AiChatModel extends AiChatEntity {
       ),
       model: json['model'] as String?,
       systemPrompt: json['systemPrompt'] as String?,
-      temperature: (json['temperature'] as num).toDouble(),
-      maxTokens: json['maxTokens'] as int?,
+      temperature: double.parse(json['temperature'] as String),
+      maxTokens: json['maxTokens'] != null ? int.parse(json['maxTokens'] as String) : null,
       messages: (json['messages'] as List<dynamic>?)
           ?.map((msg) => ChatMessageModel.fromApiJson(msg as Map<String, dynamic>))
           .toList() ?? [],
@@ -190,8 +190,8 @@ class AiChatModel extends AiChatEntity {
       'agent': agent,
       'model': model,
       'systemPrompt': systemPrompt,
-      'temperature': temperature,
-      'maxTokens': maxTokens,
+      'temperature': temperature.toString(),
+      'maxTokens': maxTokens?.toString(),
       'messages': messages.map((msg) => msg.toApiJson()).toList(),
       'visible': visible,
       'archived': archived,
@@ -212,8 +212,8 @@ class AiChatModel extends AiChatEntity {
       ),
       model: json['model'] as String?,
       systemPrompt: json['system_prompt'] as String?,
-      temperature: (json['temperature'] as num).toDouble(),
-      maxTokens: json['max_tokens'] as int?,
+      temperature: double.parse(json['temperature'] as String),
+      maxTokens: json['max_tokens'] != null ? int.parse(json['max_tokens'] as String) : null,
       messages: (json['messages'] as String?)
           ?.let((messagesJson) => (jsonDecode(messagesJson) as List<dynamic>)
               .map((msg) => ChatMessageModel.fromLocalJson(msg as Map<String, dynamic>))
@@ -234,8 +234,8 @@ class AiChatModel extends AiChatEntity {
       'agent': agent,
       'model': model,
       'system_prompt': systemPrompt,
-      'temperature': temperature,
-      'max_tokens': maxTokens,
+      'temperature': temperature.toString(),
+      'max_tokens': maxTokens?.toString(),
       'messages': jsonEncode(messages.map((msg) => msg.toLocalJson()).toList()),
       'visible': visible ? 1 : 0,
       'archived': archived ? 1 : 0,
