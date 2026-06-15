@@ -1,3 +1,9 @@
 [submodule "landing"]
 	path = landing
 	url = git@github.com:woragis/landing.git
+[submodule "management/backend"]
+	path = management/backend
+	url = git@github.com:woragis/woragis-management-backend.git
+[submodule "management/frontend"]
+	path = management/frontend
+	url = git@github.com:woragis/woragis-management-frontend.git
